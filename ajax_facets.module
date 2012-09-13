@@ -1,0 +1,149 @@
+<?php
+/**
+ * @file
+ *  Ajax facets implementation.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function ajax_facets_menu() {
+  $items = array();
+
+  $items['ajax/ajax_facets/refresh/%/%'] = array(
+    'title' => 'Callback to update facets content',
+    'page callback' => 'ajax_facets_refresh_facets_content',
+    'page arguments' => array(3, 4),
+    'access arguments' => array('access content'),
+    'delivery callback' => 'ajax_facets_ajax_deliver',
+    'type' => MENU_CALLBACK,
+    'file' => 'ajax_facets.pages.inc',
+  );
+
+  return $items;
+}
+
+function ajax_facets_init() {
+  error_reporting(E_ALL);
+  ini_set('display_errors', 1);
+}
+
+/**
+ * Implements hook_facetapi_widgets().
+ */
+function ajax_facets_facetapi_widgets() {
+  return array(
+    // Custom widget to handle ajax-refreshed facets.
+    'facetapi_ajax_checkboxes' => array(
+      'handler' => array(
+        'label' => 'Ajax multiple checkboxes',
+        'class' => 'FacetapiAjaxWidgetCheckboxes',
+        'query types' => array('term'),
+      ),
+    ),
+  );
+}
+
+/**
+ * Add required JS and handle single inclusion.
+ */
+function ajax_facets_add_ajax_checkboxes_js($facet) {
+  static $included = FALSE;
+  if (!$included) {
+    $included = TRUE;
+    drupal_add_library('system', 'ui.draggable');
+    $module_path = drupal_get_path('module', 'ajax_facets');
+    drupal_add_js($module_path . '/js/ajax_facets.js');
+    drupal_add_js($module_path . '/js/jquery.mousewheel.min.js');
+    drupal_add_js($module_path . '/js/jquery.mCustomScrollbar.js');
+    drupal_add_css($module_path . '/css/jquery.mCustomScrollbar.css');
+    $search_path = $facet->getAdapter()->getSearchPath();
+    $filter_key = $facet->getAdapter()->getUrlProcessor()->getFilterKey();
+    // Note that we add in query only filter params and exclude pages and etc...
+    $query = (isset($_GET[$filter_key])) ? array($filter_key => $_GET[$filter_key]) : array();
+    $views = search_api_current_search();
+    $view_name = '';
+    $display_name = '';
+    if (!empty($views)) {
+      $keys = array_keys($views);
+      foreach ($keys as $key) {
+        if (substr_count($key, 'search_api_views')) {
+          list(, $view_name, $display_name) = explode(':', $key);
+        }
+      }
+    }
+    $facet = $facet->getFacet();
+    $setting['facetapi'] = array(
+      'defaultQuery' => isset($_GET[$filter_key]) ? $_GET[$filter_key] : '',
+      'searchPath' => $search_path,
+      'index_id' => $facet['map options']['index id'],
+      'view_name' => $view_name,
+      'display_name' => $display_name,
+      'facet_field' => $facet['map options']['field']['key'],
+      'searchKeys' => isset($_GET['search_api_views_fulltext']) ? $_GET['search_api_views_fulltext'] : '',
+      'applyPath' => url($search_path, array('query' => $query)),
+    );
+    drupal_add_js($setting, 'setting');
+  }
+}
+
+/**
+ * Return Drupal formed url for reset current facet filter.
+ */
+function ajax_facets_facet_build_reset_path($facet, $adapter) {
+  $params = $adapter->getUrlProcessor()->fetchParams();
+  $filter_key = $adapter->getUrlProcessor()->getFilterKey();
+  $clean_params = array();
+  // Build query params except current facet filters.
+  foreach ($params[$filter_key] as $param) {
+    if (strpos($param, $facet['name']) !== 0) {
+      $clean_params[] = $param;
+    }
+  }
+  $url_params = array();
+  if (!empty($clean_params)) {
+    $url_params = array('query' => array($filter_key => $clean_params));
+  }
+
+  $unset_keys = array('searchPath', 'q', 'page', $filter_key);
+  // Remove default params from redirect.
+  foreach ($params as $key => $value) {
+    if (!in_array($key, $unset_keys)) {
+      $url_params['query'][$key] = $value;
+    }
+  }
+  return url((!empty($_GET['searchPath']) ? $_GET['searchPath'] : $adapter->getSearchPath()), $url_params);
+}
+
+/**
+ * Return Drupal formed url for apply current facets state.
+ */
+function ajax_facets_facet_build_apply_path($adapter) {
+  $params = $adapter->getUrlProcessor()->fetchParams();
+  $unset_keys = array('searchPath', 'q', 'page');
+  // Remove default params from redirect.
+  foreach ($unset_keys as $key) {
+    if (isset($params[$key])) {
+      unset($params[$key]);
+    }
+  }
+  // Remove empty filter key.
+  $filter_key = $adapter->getUrlProcessor()->getFilterKey();
+  if (isset($params[$filter_key]) && empty($params[$filter_key])) {
+    unset($params[$filter_key]);
+  }
+  $url_params = !empty($params) ? array('query' => $params) : array();
+  return url((!empty($_GET['searchPath']) ? $_GET['searchPath'] : $adapter->getSearchPath()), $url_params);
+}
+
+/**
+ * Delivery callback for Ajax results of facet filtering.
+ */
+function ajax_facets_ajax_deliver($page_callback_result) {
+
+  // Just print results in Json.
+  print drupal_json_output($page_callback_result);
+
+  // Perform end-of-request tasks.
+  ajax_footer();
+}
