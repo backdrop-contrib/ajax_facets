@@ -177,8 +177,6 @@
       var queryNew = new Array();
       if ($this.is(':checked')) {
         var addCurrentParam = true;
-        console.log(Drupal.settings.facetapi.facets);
-        console.log(Drupal.ajax_facets.queryState['f']);
         Drupal.settings.facetapi.facets;
         for (var index in Drupal.ajax_facets.queryState['f']) {
           if (Drupal.ajax_facets.queryState['f'][index] == facetCheckboxName) {
@@ -199,7 +197,6 @@
         Drupal.ajax_facets.queryState['f'] = queryNew;
       }
     }
-//    console.log(Drupal.ajax_facets.queryState);
     // Deny any filtering during refresh.
     Drupal.ajax_facets.applyFlag = false;
     $.ajax({
