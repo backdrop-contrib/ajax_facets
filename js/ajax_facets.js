@@ -9,6 +9,17 @@
   // State of each facet.
   Drupal.ajax_facets.facetQueryState = null;
 
+  // You can use it for freeze facet form elements while ajax is processing.
+  Drupal.ajax_facets.beforeAjaxCallbacks = {};
+
+  Drupal.ajax_facets.beforeAjax = function(context, settings, element) {
+    $.each(Drupal.ajax_facets.beforeAjaxCallbacks, function () {
+      if ($.isFunction(this)) {
+        this(context, settings, element);
+      }
+    });
+  };
+
   Drupal.behaviors.ajax_facets = {
     attach: function(context, settings) {
 
@@ -69,9 +80,18 @@
           }
           if (null != settings.facetapi.facets[index].limit) {
             // Applies soft limit to the list.
-            Drupal.facetapi.applyLimit(settings.facetapi.facets[index]);
+            if (typeof(Drupal.facetapi) != 'undefined') {
+              Drupal.facetapi.applyLimit(settings.facetapi.facets[index]);
+            }
           }
         }
+
+        $('.facet-wrapper-selectbox').each(function() {
+          var target_select = $(this).find('select');
+          if ($(target_select).length != null) {
+            $(target_select).change([settings.facetapi.facets[index]], Drupal.ajax_facets.processSelectbox).addClass('processed');
+          }
+        });
       }
     }
   };
@@ -163,8 +183,39 @@
 
   /**
    * Process click on each checkbox.
-   * 1. Send Ajax to refresh facets.
-   * 2. Control Apply link state.
+   */
+  Drupal.ajax_facets.processSelectbox = function(event) {
+
+    var $this = $(this);
+    var facetOptions = event.data[0];
+    var name = $this.attr('name') + ':';
+    // Show loader on request start.
+    $('div.block-facetapi div.loader').show();
+
+    if (Drupal.ajax_facets.queryState['f'] != undefined) {
+      var queryNew = new Array();
+      for (var index in Drupal.ajax_facets.queryState['f']) {
+         if (Drupal.ajax_facets.queryState['f'][index].substring(0, name.length) != name) {
+           queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+         }
+      }
+      Drupal.ajax_facets.queryState['f'] = queryNew;
+
+      /* Default value. */
+      if ($this.find(":selected").text() == Drupal.settings.facetapi.ajax_select_box.default_value) {
+        delete Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length];
+      }
+      else {
+        Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name + $this.find(":selected").val();
+      }
+    }
+
+    var url_part = name + $this.find(":selected").text() + '/1';
+    Drupal.ajax_facets.sendAjaxQuery(url_part, $this, facetOptions);
+  };
+
+  /**
+   * Process click on each checkbox.
    */
   Drupal.ajax_facets.processCheckboxes = function(event) {
     var $this = $(this);
@@ -197,18 +248,23 @@
         Drupal.ajax_facets.queryState['f'] = queryNew;
       }
     }
+
+    var url_part = $this.attr('name') + '/' + ($this.is(':checked') ? '1' : '0');
+    Drupal.ajax_facets.sendAjaxQuery(url_part, $this, facetOptions);
+  };
+
+  /* Send ajax. */
+  Drupal.ajax_facets.sendAjaxQuery = function(url_part, $this, facetOptions) {
     // Deny any filtering during refresh.
     Drupal.ajax_facets.applyFlag = false;
+    Drupal.ajax_facets.beforeAjax();
     $.ajax({
       type: 'GET',
-      url: Drupal.settings.basePath + 'ajax/ajax_facets/refresh/' + $this.attr('name') + '/' + ($this.is(':checked') ? '1' : '0'),
+      url: Drupal.settings.basePath + 'ajax/ajax_facets/refresh/' + url_part,
       dataType: 'json',
       // We copy all params to force search query with proper arguments.
       data: Drupal.ajax_facets.queryState,
       success: function (response) {
-//        if (response.facets != undefined) {
-//          Drupal.ajax_facets.queryState['f'] = response.facets;
-//        }
         if (response.activeItems != undefined) {
           Drupal.ajax_facets.facetQueryState = response.activeItems;
         }
@@ -240,7 +296,7 @@
               $block.show();
             }
           }
-          Drupal.attachBehaviors(response.newContent);
+          Drupal.attachBehaviors($('#block-system-main'));
         }
         $('.view-id-' + response.views_name + '.view-display-id-' + response.display_id).replaceWith(response.views_content);
         // As some blocks could be empty in results of filtering - hide them.
@@ -263,5 +319,5 @@
         Drupal.ajax_facets.updateBlockScroll();
       }
     });
-  };
+  }
 })(jQuery);

@@ -59,23 +59,25 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
     $items = array();
     $items_count = count($build);
     $active_items = array();
+
     foreach ($build as $value => $item) {
       $row = array('class' => array());
       $attributes = array(
         'class' => array('facet-multiselect-checkbox'),
+        'data-facet' => urlencode($this->settings->facet),
       );
       // Respect current selection.
       if ($item['#active']) {
         $attributes['checked'] = 'checked';
         $have_active = TRUE;
-        $active_items[] = $this->key . ':' . $value;
+        $active_items[] = $this->key . ':' . $item['#markup'];
       }
+
       $checkbox = array(
-        '#id' => 'facet-checkboxes-' . str_replace('_', '-', $this->key) . '-' . $value,
-        '#name' => $this->key . ':' . $value,
+        '#id' => 'facet-checkboxes-' . str_replace(array('_', ' '), '-', $this->key) . '-' . $value,
+        '#name' => urlencode($this->key) . ':' . $value,
         '#type' => 'checkbox',
         '#title' => $item['#markup'] . '(' . $item['#count'] . ')',
-//        '#theme_wrappers' => array('form_element_no_wrapper'),
         '#attributes' => $attributes,
       );
       $row['data'] = drupal_render($checkbox);

@@ -41,6 +41,13 @@ function ajax_facets_facetapi_widgets() {
         'query types' => array('term'),
       ),
     ),
+    'facetapi_ajax_select' => array(
+      'handler' => array(
+        'label' => 'Ajax selectbox',
+        'class' => 'FacetapiAjaxWidgetSelect',
+        'query types' => array('term'),
+      ),
+    ),
   );
 }
 
@@ -64,14 +71,25 @@ function ajax_facets_add_ajax_checkboxes_js($facet) {
     $views = search_api_current_search();
     $view_name = '';
     $display_name = '';
+
     if (!empty($views)) {
-      $keys = array_keys($views);
-      foreach ($keys as $key) {
-        if (substr_count($key, 'search_api_views')) {
-          list(, $view_name, $display_name) = explode(':', $key);
+      // Get display from settings.
+      $facet_settings = $facet->getSettings();
+      if (!empty($facet_settings->settings['facet_search_ids'])) {
+        $first_display_from_settings = reset($facet_settings->settings['facet_search_ids']);
+        list(, $view_name, $display_name) = explode(':', $first_display_from_settings);
+      }
+      // Default search.
+      if (empty($view_name) || empty($display_name)) {
+        $keys = array_keys($views);
+        foreach ($keys as $key) {
+          if (substr_count($key, 'search_api_views')) {
+            list(, $view_name, $display_name) = explode(':', $key);
+          }
         }
       }
     }
+
     $facet = $facet->getFacet();
     $setting['facetapi'] = array(
       'defaultQuery' => isset($_GET[$filter_key]) ? $_GET[$filter_key] : '',

@@ -20,6 +20,7 @@ function ajax_facets_refresh_facets_content($field_name, $state) {
   if (!empty($_GET['f'])) {
     foreach ($_GET['f'] as $key => $facet) {
       list($type, $value) = explode(':', $facet);
+      $type = urldecode($type);
       if (!empty($views['search_api_facets'][$type])) {
         $delete_facet = TRUE;
         foreach ($views['search_api_facets'][$type] as $search_facet) {
@@ -40,7 +41,6 @@ function ajax_facets_refresh_facets_content($field_name, $state) {
   $facets_to_proceed = array();
   $enabled_facets = facetapi_get_enabled_facets($searcher, $realm_name);
   foreach ($enabled_facets as $facet) {
-    $widget = facetapi_adapter_load($searcher)->getFacetSettings($facet, facetapi_realm_load($realm_name))->settings['widget'];
     $facets_to_proceed[] = $facet['name'];
   }
   $facet_blocks = array();
@@ -53,7 +53,6 @@ function ajax_facets_refresh_facets_content($field_name, $state) {
   $adapter = facetapi_adapter_load($searcher);
   $builds[$group] = ($adapter) ? $adapter->buildRealm($realm_name) : array();
   foreach ($facets_to_proceed as $facet_name) {
-
     $facet = $adapter->getFacet(array('name' => $facet_name));
     $reset_urls[$facet_name] = ajax_facets_facet_build_reset_path($facet, $adapter);
     if (!empty($builds[$group][$facet_name])) {
@@ -72,10 +71,12 @@ function ajax_facets_refresh_facets_content($field_name, $state) {
       $facet_blocks[$builds[$group][$facet_name]['#attributes']['id']] = drupal_render($builds[$group][$facet_name]);
     }
     else {
+      $facet_name = urlencode($facet_name);
       $delta = array_search("$searcher:$realm_name:$facet_name", $map);
       $hide_blocks[] = 'block-facetapi-' . strtolower($delta);
     }
   }
+
   $result = array(
     'applyUrl' => ajax_facets_facet_build_apply_path($adapter),
     'resetUrls' => $reset_urls,
@@ -87,5 +88,6 @@ function ajax_facets_refresh_facets_content($field_name, $state) {
     'views_name' => $name,
     'facets' => !empty($_GET['f']) ? $_GET['f'] : '',
   );
+
   return $result;
 }
