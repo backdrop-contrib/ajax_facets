@@ -1,8 +1,10 @@
 name = Ajax facet filters.
 description = Ajax facet filters.
 dependencies[] = facetapi
+dependencies[] = search_api_solr
 package = Search Toolkit
 core = 7.x
 
 files[] = plugins/facetapi/ajax_widget_checkboxes.inc
 files[] = plugins/facetapi/ajax_widget_select.inc
+
