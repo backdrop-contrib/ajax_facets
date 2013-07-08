@@ -7,4 +7,3 @@ core = 7.x
 
 files[] = plugins/facetapi/ajax_widget_checkboxes.inc
 files[] = plugins/facetapi/ajax_widget_select.inc
-

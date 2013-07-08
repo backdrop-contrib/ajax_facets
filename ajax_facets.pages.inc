@@ -8,7 +8,7 @@
 /**
  * Callback to update facets content by AJAX.
  */
-function ajax_facets_refresh_facets_content($field_name, $state) {
+function ajax_facets_refresh_facets_content() {
 
   $name = $_GET['view_name'];
   $display_id = $_GET['display_name'];
@@ -16,25 +16,7 @@ function ajax_facets_refresh_facets_content($field_name, $state) {
   $view = views_get_view($name);
   $view->execute_display($display_id, array());
   $page = $view->preview($display_id);
-  $views = array_pop(search_api_current_search("search_api_views:$name:$display_id"));
-  if (!empty($_GET['f'])) {
-    foreach ($_GET['f'] as $key => $facet) {
-      list($type, $value) = explode(':', $facet);
-      $type = urldecode($type);
-      if (!empty($views['search_api_facets'][$type])) {
-        $delete_facet = TRUE;
-        foreach ($views['search_api_facets'][$type] as $search_facet) {
-          if ($value == str_replace('"', '', $search_facet['filter'])) {
-            $delete_facet = FALSE;
-            break;
-          }
-        }
-        if ($delete_facet) {
-//          unset($_GET['f'][$key]);
-        }
-      }
-    }
-  }
+
   $map = facetapi_get_delta_map();
   $realm_name = 'block';
   $searcher = 'search_api@' . $_GET['index_id'];
@@ -88,6 +70,30 @@ function ajax_facets_refresh_facets_content($field_name, $state) {
     'views_name' => $name,
     'facets' => !empty($_GET['f']) ? $_GET['f'] : '',
   );
+
+  // @see template_preprocess_views_view();
+  // Update settings when view will be reloaded. Specifically $view->dom_id.
+  if ($view->use_ajax) {
+    $result['settings'] = array(
+      'views' => array(
+        'ajax_path' => url('views/ajax'),
+        'ajaxViews' => array(
+          'views_dom_id:' . $view->dom_id => array(
+            'view_name' => $view->name,
+            'view_display_id' => $view->current_display,
+            'view_args' => check_plain(implode('/', $view->args)),
+            'view_path' => check_plain($_GET['q']),
+            // Pass through URL to ensure we get e.g. language prefixes.
+            'view_base_path' => $view->get_path(),
+            'view_dom_id' => $view->dom_id,
+            // To fit multiple views on a page, the programmer may have
+            // overridden the display's pager_element.
+            'pager_element' => isset($view->query->pager) ? $view->query->pager->get_pager_id() : 0,
+          ),
+        ),
+      ),
+    );
+  }
 
   return $result;
 }

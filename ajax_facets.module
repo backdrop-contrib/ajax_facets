@@ -10,10 +10,9 @@
 function ajax_facets_menu() {
   $items = array();
 
-  $items['ajax/ajax_facets/refresh/%/%'] = array(
+  $items['ajax/ajax_facets/refresh'] = array(
     'title' => 'Callback to update facets content',
     'page callback' => 'ajax_facets_refresh_facets_content',
-    'page arguments' => array(3, 4),
     'access arguments' => array('access content'),
     'delivery callback' => 'ajax_facets_ajax_deliver',
     'type' => MENU_CALLBACK,

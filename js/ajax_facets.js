@@ -210,8 +210,7 @@
       }
     }
 
-    var url_part = name + $this.find(":selected").text() + '/1';
-    Drupal.ajax_facets.sendAjaxQuery(url_part, $this, facetOptions);
+    Drupal.ajax_facets.sendAjaxQuery($this, facetOptions);
   };
 
   /**
@@ -249,18 +248,17 @@
       }
     }
 
-    var url_part = $this.attr('name') + '/' + ($this.is(':checked') ? '1' : '0');
-    Drupal.ajax_facets.sendAjaxQuery(url_part, $this, facetOptions);
+    Drupal.ajax_facets.sendAjaxQuery($this, facetOptions);
   };
 
   /* Send ajax. */
-  Drupal.ajax_facets.sendAjaxQuery = function(url_part, $this, facetOptions) {
+  Drupal.ajax_facets.sendAjaxQuery = function($this, facetOptions) {
     // Deny any filtering during refresh.
     Drupal.ajax_facets.applyFlag = false;
     Drupal.ajax_facets.beforeAjax();
     $.ajax({
       type: 'GET',
-      url: Drupal.settings.basePath + 'ajax/ajax_facets/refresh/' + url_part,
+      url: encodeURI(Drupal.settings.basePath + 'ajax/ajax_facets/refresh/'),
       dataType: 'json',
       // We copy all params to force search query with proper arguments.
       data: Drupal.ajax_facets.queryState,
@@ -296,7 +294,6 @@
               $block.show();
             }
           }
-          Drupal.attachBehaviors($('#block-system-main'));
         }
         $('.view-id-' + response.views_name + '.view-display-id-' + response.display_id).replaceWith(response.views_content);
         // As some blocks could be empty in results of filtering - hide them.
@@ -308,6 +305,12 @@
             }
           }
         }
+
+        if (response.settings.views != undefined) {
+          Drupal.settings.views = response.settings.views;
+          Drupal.attachBehaviors($('#block-system-main'));
+        }
+
         // Hide loader on request success.
         $('div.block-facetapi div.loader').hide();
         Drupal.ajax_facets.updateBlockScroll();
