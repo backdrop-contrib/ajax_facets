@@ -289,7 +289,7 @@
             if ($blockToReplace.size()) {
               $blockToReplace.replaceWith(response.newContent[id]);
             }
-            var $block = $('#' + id).parents('div.block-facetapi-facetapi-ajax-multi:not(:visible)');
+            var $block = $('#' + id).parents('div.block-facetapi:not(:visible)');
             if ($block.size()) {
               $block.show();
             }

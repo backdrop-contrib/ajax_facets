@@ -57,7 +57,6 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
    */
   function buildListItems($build) {
 
-    $have_active = FALSE;
     // Builds rows.
     $items = array();
 
@@ -71,40 +70,15 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
 
     $items['values'][0] = t('Select');
 
-    $active_items = array();
     foreach ($build as $value => $item) {
       // Respect current selection.
       if ($item['#active']) {
-        $attributes['checked'] = 'checked';
-        $have_active = TRUE;
         $items['active_value'] = $value;
-        $active_items[] = $this->key . ':' . $value;
       }
 
-      if ($term = taxonomy_term_load($item['#indexed_value'])) {
-        $items['values'][$item['#indexed_value']] = $term->name;
-
-        // Get name for facet.
-        if (empty($items['name'])) {
-          if ($name_tid = field_get_items('taxonomy_term', $term, 'field_property')) {
-            if ($name_term = taxonomy_term_load($name_tid[0]['tid'])) {
-              $items['name'] = $name_term->name;
-            }
-          }
-        }
-      }
-      else if ($item['#indexed_value'] != '!') {
-        $items['values'][$item['#indexed_value']] = $item['#indexed_value'];
-      }
+      $items['values'][$item['#indexed_value']] = $item['#indexed_value'];
     }
 
-    $this->jsSettings['haveActiveSelection'] = $this->settings->settings['have_active_selection'] = $have_active;
-    sort($active_items);
-    $this->jsSettings['activeItems'] = $active_items;
-    // Generate reset path on server side to make possible to use aliases.
-    if ($have_active) {
-      $this->jsSettings['resetPath'] = ajax_facets_facet_build_reset_path($this->facet->getFacet(), $this->facet->getAdapter());
-    }
     return $items;
   }
 
@@ -147,7 +121,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
     $id = 'block-facetapi-' . strtolower($delta);
 
     $element = array(
-      '#markup' => '<div id="' . $id . '" class="facet-wrapper-selectbox">'
+      '#markup' => '<div class="facet-wrapper-selectbox">'
         . '<div id="' . $this->build['#attributes']['id'] . '">' . render($select) . '</div>'
         . '</div>'
     );

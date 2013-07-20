@@ -38,6 +38,29 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
         ),
       ),
     );
+
+    if ($this->facet['hierarchy callback']) {
+      $form['widget']['widget_settings']['links'][$this->id]['show_expanded'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Expand hierarchy'),
+        '#default_value' => !empty($this->settings->settings['show_expanded']),
+        '#description' => t('Show the entire tree regardless of whether the parent items are active.'),
+        '#states' => array(
+          'visible' => array(
+            'select[name="widget"]' => array('value' => $this->id),
+          ),
+        ),
+      );
+    }
+  }
+
+  /**
+   * Overrides FacetapiWidget::getDefaultSettings().
+   */
+  function getDefaultSettings() {
+    return array(
+      'show_expanded' => 0,
+    );
   }
 
   /**
@@ -83,6 +106,15 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
       $row['data'] = drupal_render($checkbox);
       if ($items_count == 1) {
         $row['class'][] = 'single-leaf';
+      }
+
+      if(!empty($item['#item_children'])) {
+        if ($item['#active'] || !empty($this->settings->settings['show_expanded'])) {
+          $row['class'][] = 'expanded';
+          $row['children'] = $this->buildListItems($item['#item_children']);
+        } else {
+          $row['class'][] = 'collapsed';
+        }
       }
       $items[] = $row;
     }
