@@ -20,7 +20,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
     parent::init();
     drupal_add_js(
       array(
-        'facetapi' => array('ajax_select_box' => array('default_value' => t('Выберите')))
+        'facetapi' => array('ajax_select_box' => array('default_value' => t('Select')))
       ),
       'setting'
     );
@@ -59,14 +59,6 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
 
     // Builds rows.
     $items = array();
-
-    // Put default value as JS setting.
-    drupal_add_js(
-      array(
-        'facetapi' => array('ajax_select_box' => array('default_value' => t('Select')))
-      ),
-      'setting'
-    );
 
     $items['values'][0] = t('Select');
 
@@ -116,13 +108,9 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
       $select['#value'] = $items['active_value'];
     }
 
-    $facet = $this->facet->getSettings();
-    $delta = facetapi_hash_delta(facetapi_build_delta($facet->searcher, 'block', $facet->facet));
-    $id = 'block-facetapi-' . strtolower($delta);
-
     $element = array(
       '#markup' => '<div class="facet-wrapper-selectbox">'
-        . '<div id="' . $this->build['#attributes']['id'] . '">' . render($select) . '</div>'
+        . '<div class="' . $this->build['#attributes']['id'] . '">' . render($select) . '</div>'
         . '</div>'
     );
   }

@@ -72,11 +72,6 @@
             }
 
             $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change([settings.facetapi.facets[index]], Drupal.ajax_facets.processCheckboxes).addClass('processed');
-            // Process colors facet links.
-            $('#' + settings.facetapi.facets[index].id + ' a.facet-colors-ajax-link:not(.processed)').click(function () {
-              $(this).parent().toggleClass('selected').find('input[type="checkbox"]').click().trigger('change');
-              return false;
-            }).addClass('processed');
           }
           if (null != settings.facetapi.facets[index].limit) {
             // Applies soft limit to the list.
@@ -284,12 +279,12 @@
         Drupal.ajax_facets.addApplyLink($this, facetOptions);
 
         if (response.newContent != undefined && response.newContent) {
-          for (var id in response.newContent) {
-            var $blockToReplace = $('#' + id).parent();
+          for (var class_name in response.newContent) {
+            var $blockToReplace = $('.' + class_name).parent();
             if ($blockToReplace.size()) {
-              $blockToReplace.replaceWith(response.newContent[id]);
+              $blockToReplace.replaceWith(response.newContent[class_name]);
             }
-            var $block = $('#' + id).parents('div.block-facetapi:not(:visible)');
+            var $block = $('.' + class_name).parents('div.block-facetapi:not(:visible)');
             if ($block.size()) {
               $block.show();
             }
