@@ -303,8 +303,8 @@
 
         if (response.settings.views != undefined) {
           Drupal.settings.views = response.settings.views;
-          Drupal.attachBehaviors($('#block-system-main'));
         }
+        Drupal.attachBehaviors($('#block-system-main'));
 
         // Hide loader on request success.
         $('div.block-facetapi div.loader').hide();

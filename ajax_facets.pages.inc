@@ -69,6 +69,7 @@ function ajax_facets_refresh_facets_content() {
     'display_id' => $display_id,
     'views_name' => $name,
     'facets' => !empty($_GET['f']) ? $_GET['f'] : '',
+    'settings' => array(),
   );
 
   // @see template_preprocess_views_view();
