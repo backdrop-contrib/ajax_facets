@@ -34,6 +34,8 @@ function ajax_facets_refresh_facets_content() {
   // Process values once per searcher-realm group.
   $adapter = facetapi_adapter_load($searcher);
   $builds[$group] = ($adapter) ? $adapter->buildRealm($realm_name) : array();
+  $realm = facetapi_realm_load($realm_name);
+  $update_results = array();
   foreach ($facets_to_proceed as $facet_name) {
     $facet = $adapter->getFacet(array('name' => $facet_name));
     $reset_urls[$facet_name] = ajax_facets_facet_build_reset_path($facet, $adapter);
@@ -57,6 +59,10 @@ function ajax_facets_refresh_facets_content() {
       $delta = array_search("$searcher:$realm_name:$facet_name", $map);
       $hide_blocks[] = 'block-facetapi-' . strtolower($delta);
     }
+
+    // Settings for update view.
+    $facet_settings = $facet->getSettings($realm);
+    $update_results[$facet_name] = isset($facet_settings->settings['update_results']) ? $facet_settings->settings['update_results'] : 0;
   }
 
   $result = array(
@@ -69,6 +75,8 @@ function ajax_facets_refresh_facets_content() {
     'display_id' => $display_id,
     'views_name' => $name,
     'facets' => !empty($_GET['f']) ? $_GET['f'] : '',
+    'update_results' => $update_results,
+    'total_results' => $view->total_rows,
     'settings' => array(),
   );
 

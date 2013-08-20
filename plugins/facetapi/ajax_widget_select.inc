@@ -24,6 +24,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
       ),
       'setting'
     );
+    ajax_facets_add_ajax_js($this->facet);
   }
 
   /**
@@ -35,6 +36,19 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
       '#title' => t('Index id'),
       '#default_value' => $form['#facetapi']['facet']['map options']['index id'],
       '#description' => t('Limits the number of displayed facets via JavaScript.'),
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+        ),
+      ),
+    );
+
+    $form['widget']['widget_settings']['links'][$this->id]['update_results'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Update results by ajax'),
+      '#default_value' => $this->settings->settings['update_results'],
+      '#description' => t('If active, then search results will be updated by AJAX when facet was changed.
+       If not active, then after than facet will be updated, user will see special popup with link for filter results.'),
       '#states' => array(
         'visible' => array(
           'select[name="widget"]' => array('value' => $this->id),
@@ -62,15 +76,26 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
 
     $items['values'][0] = t('Select');
 
+    $active_items = array();
+    $have_active = FALSE;
     foreach ($build as $value => $item) {
       // Respect current selection.
       if ($item['#active']) {
         $items['active_value'] = $value;
+        $have_active = TRUE;
+        $active_items[] = $this->key . ':' . $item['#markup'];
       }
 
       $items['values'][$item['#indexed_value']] = $item['#indexed_value'];
     }
 
+    $this->jsSettings['haveActiveSelection'] = $this->settings->settings['have_active_selection'] = $have_active;
+    sort($active_items);
+    $this->jsSettings['activeItems'] = $active_items;
+    // Generate reset path on server side to make possible to use aliases.
+    if ($have_active) {
+      $this->jsSettings['resetPath'] = ajax_facets_facet_build_reset_path($this->facet->getFacet(), $this->facet->getAdapter());
+    }
     return $items;
   }
 
@@ -98,6 +123,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
       '#type' => 'select',
       '#title' => $this->build['#title'],
       '#options' => $items['values'],
+      '#id' => 'ajax-facets-selectbox-' . str_replace('_', '-', $this->settings->facet),
       '#name' => urlencode($this->settings->facet),
       '#attributes' => array(
         'data-facet' => urlencode($this->settings->facet),
@@ -110,7 +136,8 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
 
     $element = array(
       '#markup' => '<div class="facet-wrapper-selectbox">'
-        . '<div class="' . $this->build['#attributes']['id'] . '">' . render($select) . '</div>'
+        . '<a class="reset-link" href="#">' . t('Reset filter') . '</a>'
+        . '<div id="' . $this->build['#attributes']['id'] .'" class="' . $this->build['#attributes']['id'] . '">' . render($select) . '</div>'
         . '</div>'
     );
   }

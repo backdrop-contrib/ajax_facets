@@ -53,16 +53,14 @@ function ajax_facets_facetapi_widgets() {
 /**
  * Add required JS and handle single inclusion.
  */
-function ajax_facets_add_ajax_checkboxes_js($facet) {
+function ajax_facets_add_ajax_js($facet) {
   static $included = FALSE;
   if (!$included) {
     $included = TRUE;
     drupal_add_library('system', 'ui.draggable');
     $module_path = drupal_get_path('module', 'ajax_facets');
     drupal_add_js($module_path . '/js/ajax_facets.js');
-    drupal_add_js($module_path . '/js/jquery.mousewheel.min.js');
-    drupal_add_js($module_path . '/js/jquery.mCustomScrollbar.js');
-    drupal_add_css($module_path . '/css/jquery.mCustomScrollbar.css');
+    drupal_add_css($module_path . '/css/ajax_facets.css');
     $search_path = $facet->getAdapter()->getSearchPath();
     $filter_key = $facet->getAdapter()->getUrlProcessor()->getFilterKey();
     // Note that we add in query only filter params and exclude pages and etc...

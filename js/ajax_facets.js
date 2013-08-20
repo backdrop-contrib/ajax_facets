@@ -22,7 +22,6 @@
 
   Drupal.behaviors.ajax_facets = {
     attach: function(context, settings) {
-
       $('div.block-facetapi-content-wrapper').once(function () {
         $(this).each(function() {
           if ($(this).height() > 200) {
@@ -57,8 +56,6 @@
         if (settings.facetapi.searchKeys != undefined) {
           Drupal.ajax_facets.queryState['search_api_views_fulltext'] = settings.facetapi.searchKeys;
         }
-
-        Drupal.ajax_facets.applyPath = '';
       }
       // Iterates over facet settings, applies functionality like the "Show more"
       // links for block realm facets.
@@ -66,13 +63,8 @@
       // based on the realm.
       if (settings.facetapi) {
         for (var index in settings.facetapi.facets) {
-          if (null != settings.facetapi.facets[index].makeMultiCheckboxes) {
-            if (settings.facetapi.facets[index].haveActiveSelection) {
-              Drupal.ajax_facets.bindResetLink(settings.facetapi.facets[index].id, index, settings);
-            }
-
-            $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change([settings.facetapi.facets[index]], Drupal.ajax_facets.processCheckboxes).addClass('processed');
-          }
+          Drupal.ajax_facets.bindResetLink(settings.facetapi.facets[index].id, index, settings);
+          $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change([settings.facetapi.facets[index]], Drupal.ajax_facets.processCheckboxes).addClass('processed');
           if (null != settings.facetapi.facets[index].limit) {
             // Applies soft limit to the list.
             if (typeof(Drupal.facetapi) != 'undefined') {
@@ -88,20 +80,25 @@
           }
         });
       }
+
+      $('body').once(function() {$(this).append('<div id="ajax-facets-tooltip"><span></span></div>');});
     }
   };
 
   Drupal.ajax_facets.bindResetLink = function(parentId, index, settings) {
+    var facet_values = Drupal.ajax_facets.getFacetValues();
+    if (facet_values[settings.facetapi.facets[index]['facetName']] != undefined) {
+      $('#' + parentId).parents('.block-facetapi').find('a.reset-link').show();
+    }
+    else {
+      $('#' + parentId).parents('.block-facetapi').find('a.reset-link').hide();
+    }
+
     $('#' + parentId).parents('.block-facetapi').find('a.reset-link:not(".processed")').addClass('processed').click(function() {
-      if (Drupal.ajax_facets.applyFlag) {
-        window.location = settings.facetapi.facets[index].resetPath;
-      }
+      window.location = settings.facetapi.facets[index].resetPath;
       return false;
     });
   };
-
-  // Detect could we click apply or not.
-  Drupal.ajax_facets.applyFlag = true;
 
   /**
    * Just compare two arrays.
@@ -128,54 +125,6 @@
     }
   }
 
-  Drupal.ajax_facets.addApplyLink = function($this, facetOptions) {
-    var $parent = $this.parents('div.block-facetapi').find('div.block-facet-title');
-    // Each time we check if enw apply path is equals to default page (created on page load), we will not show link.
-    if ($parent.size()) {
-      var $link = $('a.apply-link', $parent);
-      var $resetLink = $('a.reset-link', $parent);
-      if (Drupal.settings.facetapi.applyPath != undefined && Drupal.settings.facetapi.applyPath != Drupal.ajax_facets.applyPath) {
-        if (Drupal.ajax_facets.facetQueryState[facetOptions.facetName] != undefined && !Drupal.ajax_facets.compareArrays(Drupal.ajax_facets.facetQueryState[facetOptions.facetName], facetOptions.activeItems)) {
-          if ($resetLink.size()) {
-            $resetLink.hide();
-          }
-          if ($link.size()) {
-            $link.show();
-          }
-          else {
-            $parent.append('<a href="#" class="block-title-link apply-link">' + Drupal.t('Apply') + '</a>');
-            $('a.apply-link', $parent).click(function () {
-              if (Drupal.ajax_facets.applyFlag) {
-                window.location = Drupal.ajax_facets.applyPath;
-              }
-              return false;
-            });
-          }
-        }
-        else {
-          Drupal.ajax_facets.hideApplyLink($link, $resetLink);
-        }
-      }
-      // If pathes are equal we hide apply link.
-      else {
-        Drupal.ajax_facets.hideApplyLink($link, $resetLink);
-      }
-    }
-  };
-
-  Drupal.ajax_facets.updateBlockScroll = function() {
-    $('div.block-facetapi-content-wrapper').each(function() {
-      $this = $(this);
-      if ($('div.mCSB_container', $this).size()) {
-        $this.mCustomScrollbar("update", {set_height: 200});
-      }
-      // Because some blocks could have no scroll on page load, we should init them from scratch.
-      else if ($this.height() > 200) {
-        $this.mCustomScrollbar({set_height: 200, scrollEasing:'swing', scrollInertia:0});
-      }
-    });
-  };
-
   /**
    * Process click on each checkbox.
    */
@@ -184,9 +133,6 @@
     var $this = $(this);
     var facetOptions = event.data[0];
     var name = $this.attr('name') + ':';
-    // Show loader on request start.
-    $('div.block-facetapi div.loader').show();
-
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       for (var index in Drupal.ajax_facets.queryState['f']) {
@@ -215,9 +161,6 @@
     var $this = $(this);
     var facetOptions = event.data[0];
     var facetCheckboxName = $this.attr('name');
-    // Show loader on request start.
-    $('div.block-facetapi div.loader').show();
-
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       if ($this.is(':checked')) {
@@ -248,8 +191,7 @@
 
   /* Send ajax. */
   Drupal.ajax_facets.sendAjaxQuery = function($this, facetOptions) {
-    // Deny any filtering during refresh.
-    Drupal.ajax_facets.applyFlag = false;
+    var current_id = $this.attr('id');
     Drupal.ajax_facets.beforeAjax();
     $.ajax({
       type: 'GET',
@@ -271,13 +213,6 @@
           }
         }
 
-        // Handle apply link url.
-        if (response.applyUrl != undefined) {
-          Drupal.ajax_facets.applyPath = response.applyUrl;
-        }
-        Drupal.ajax_facets.applyFlag = true;
-        Drupal.ajax_facets.addApplyLink($this, facetOptions);
-
         if (response.newContent != undefined && response.newContent) {
           for (var class_name in response.newContent) {
             var $blockToReplace = $('.' + class_name).parent();
@@ -290,7 +225,19 @@
             }
           }
         }
-        $('.view-id-' + response.views_name + '.view-display-id-' + response.display_id).replaceWith(response.views_content);
+
+        /* Update results. */
+        var results_updated = false;
+        $.each(response.update_results, function(facet_name, mode) {
+          if ($this.data('facet') == facet_name && mode == 1) {
+            $('.view-id-' + response.views_name + '.view-display-id-' + response.display_id).replaceWith(response.views_content);
+            results_updated = true;
+          }
+        });
+        if (!results_updated) {
+          Drupal.ajax_facets.showTooltip($, response, current_id);
+        }
+
         // As some blocks could be empty in results of filtering - hide them.
         if (response.hideBlocks != undefined && response.hideBlocks) {
           for (var id in response.hideBlocks) {
@@ -304,18 +251,30 @@
         if (response.settings.views != undefined) {
           Drupal.settings.views = response.settings.views;
         }
-        Drupal.attachBehaviors($('#block-system-main'));
-
-        // Hide loader on request success.
-        $('div.block-facetapi div.loader').hide();
-        Drupal.ajax_facets.updateBlockScroll();
-      },
-      error: function (xmlhttp) {
-        Drupal.ajax_facets.applyFlag = true;
-        // Hide loader on request success.
-        $('div.block-facetapi div.loader').hide();
-        Drupal.ajax_facets.updateBlockScroll();
+        Drupal.attachBehaviors();
       }
     });
+  },
+
+  Drupal.ajax_facets.getFacetValues = function() {
+    var f = Drupal.ajax_facets.queryState.f;
+    var facets_values = {};
+    var symbol = ':';
+    jQuery.each(f, function(k,v) {
+      var parts = v.split(symbol);
+      var value = parts[parts.length - 1];
+      var appendix = symbol + value;
+      var key = v.substr(0, v.length - appendix.length);
+      facets_values[key] = value;
+    });
+    return facets_values;
+  },
+
+  Drupal.ajax_facets.showTooltip = function($, response, current_id) {
+    var pos = $('#' + current_id).offset();
+    jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
+    jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
+    jQuery('#ajax-facets-tooltip').css('display', 'block');
+    jQuery('#ajax-facets-tooltip span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
   }
 })(jQuery);

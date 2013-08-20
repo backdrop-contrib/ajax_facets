@@ -13,14 +13,14 @@
  */
 class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
 
+
+  public $update_result;
   /**
    * Overrides FacetapiWidgetCheckboxLinks::init().
    */
   public function init() {
     parent::init();
-    $this->jsSettings['makeCheckboxes'] = null;
-    $this->jsSettings['makeMultiCheckboxes'] = 1;
-    ajax_facets_add_ajax_checkboxes_js($this->facet);
+    ajax_facets_add_ajax_js($this->facet);
   }
 
   /**
@@ -32,6 +32,19 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
       '#title' => t('Index id'),
       '#default_value' => $form['#facetapi']['facet']['map options']['index id'],
       '#description' => t('Limits the number of displayed facets via JavaScript.'),
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+        ),
+      ),
+    );
+
+    $form['widget']['widget_settings']['links'][$this->id]['update_results'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Update results by ajax'),
+      '#default_value' => $this->settings->settings['update_results'],
+      '#description' => t('If active, then search results will be updated by AJAX when facet was changed.
+       If not active, then after than facet will be updated, user will see special popup with link for filter results.'),
       '#states' => array(
         'visible' => array(
           'select[name="widget"]' => array('value' => $this->id),
@@ -60,6 +73,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
   function getDefaultSettings() {
     return array(
       'show_expanded' => 0,
+      'update_results' => 1,
     );
   }
 
@@ -97,7 +111,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
       }
 
       $checkbox = array(
-        '#id' => 'facet-checkboxes-' . str_replace(array('_', ' '), '-', $this->key) . '-' . $value,
+        '#id' => 'ajax-facets-checkboxes-' . str_replace(array('_', ' '), '-', $this->key) . '-' . drupal_strtolower($value),
         '#name' => urlencode($this->key) . ':' . $value,
         '#type' => 'checkbox',
         '#title' => $item['#markup'] . '(' . $item['#count'] . ')',
@@ -151,6 +165,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
 
     $element = array(
       '#markup' => '<div class="facet-wrapper-selectbox">'
+        . '<a class="reset-link" href="#">' . t('Reset filter') . '</a>'
         . '<div class="' . $this->build['#attributes']['id'] . '">' . render($item_list) . '</div>'
         . '</div>'
     );
