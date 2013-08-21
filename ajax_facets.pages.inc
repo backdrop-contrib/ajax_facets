@@ -62,7 +62,13 @@ function ajax_facets_refresh_facets_content() {
 
     // Settings for update view.
     $facet_settings = $facet->getSettings($realm);
-    $update_results[$facet_name] = isset($facet_settings->settings['update_results']) ? $facet_settings->settings['update_results'] : 0;
+    $update_results[$facet_name] = 0;
+    if ($facet_settings->settings['widget'] == 'facetapi_ajax_checkboxes' && isset($facet_settings->settings['checkboxes_update_results'])) {
+      $update_results[$facet_name] = $facet_settings->settings['checkboxes_update_results'];
+    }
+    elseif ($facet_settings->settings['widget'] == 'facetapi_ajax_select' && isset($facet_settings->settings['selectbox_update_results'])) {
+      $update_results[$facet_name] = $facet_settings->settings['selectbox_update_results'];
+    }
   }
 
   $result = array(

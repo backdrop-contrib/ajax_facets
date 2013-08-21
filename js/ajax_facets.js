@@ -192,6 +192,7 @@
   /* Send ajax. */
   Drupal.ajax_facets.sendAjaxQuery = function($this, facetOptions) {
     var current_id = $this.attr('id');
+    var current_facet_name = $this.data('facet');
     Drupal.ajax_facets.beforeAjax();
     $.ajax({
       type: 'GET',
@@ -229,14 +230,17 @@
         /* Update results. */
         var results_updated = false;
         $.each(response.update_results, function(facet_name, mode) {
-          if ($this.data('facet') == facet_name && mode == 1) {
-            $('.view-id-' + response.views_name + '.view-display-id-' + response.display_id).replaceWith(response.views_content);
-            results_updated = true;
+          if (current_facet_name == facet_name) {
+            /* Update by ajax. */
+            if (mode) {
+              $('.view-id-' + response.views_name + '.view-display-id-' + response.display_id).replaceWith(response.views_content);
+            }
+            /* Update by link. */
+            else {
+              Drupal.ajax_facets.showTooltip($, response, current_id);
+            }
           }
         });
-        if (!results_updated) {
-          Drupal.ajax_facets.showTooltip($, response, current_id);
-        }
 
         // As some blocks could be empty in results of filtering - hide them.
         if (response.hideBlocks != undefined && response.hideBlocks) {

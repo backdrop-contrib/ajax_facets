@@ -39,12 +39,24 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
       ),
     );
 
-    $form['widget']['widget_settings']['links'][$this->id]['update_results'] = array(
+    $form['widget']['widget_settings']['links'][$this->id]['checkboxes_update_results'] = array(
       '#type' => 'checkbox',
       '#title' => t('Update results by ajax'),
-      '#default_value' => $this->settings->settings['update_results'],
+      '#default_value' => !empty($this->settings->settings['checkboxes_update_results']),
       '#description' => t('If active, then search results will be updated by AJAX when facet was changed.
        If not active, then after than facet will be updated, user will see special popup with link for filter results.'),
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+        ),
+      ),
+    );
+
+    $form['widget']['widget_settings']['links'][$this->id]['checkboxes_show_reset_link'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Display reset link'),
+      '#default_value' => !empty($this->settings->settings['checkboxes_show_reset_link']),
+      '#description' => t('Display link for reset facet.'),
       '#states' => array(
         'visible' => array(
           'select[name="widget"]' => array('value' => $this->id),
@@ -73,7 +85,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
   function getDefaultSettings() {
     return array(
       'show_expanded' => 0,
-      'update_results' => 1,
+      'checkboxes_update_results' => 1,
     );
   }
 
@@ -163,9 +175,14 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
       '#attributes' => $this->build['#attributes'],
     );
 
+    $reset_link = '';
+    if (!empty($this->settings->settings['checkboxes_show_reset_link']) && $this->settings->settings['checkboxes_show_reset_link']) {
+      $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
+    }
+
     $element = array(
       '#markup' => '<div class="facet-wrapper-selectbox">'
-        . '<a class="reset-link" href="#">' . t('Reset filter') . '</a>'
+        . $reset_link
         . '<div class="' . $this->build['#attributes']['id'] . '">' . render($item_list) . '</div>'
         . '</div>'
     );
