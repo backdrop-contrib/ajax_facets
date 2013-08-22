@@ -55,7 +55,6 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
       ),
     );
 
-
     $form['widget']['widget_settings']['links'][$this->id]['selectbox_update_results'] = array(
       '#type' => 'checkbox',
       '#title' => t('Update results by ajax'),
@@ -76,6 +75,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
   function getDefaultSettings() {
     return array(
       'selectbox_update_results' => 1,
+      'selectbox_show_reset_link' => 0,
     );
   }
 
@@ -162,9 +162,9 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
     }
 
     $element = array(
-      '#markup' => '<div class="facet-wrapper-selectbox">'
+      '#markup' => '<div class="facet-wrapper-selectbox ' . $this->build['#attributes']['id'] . '">'
         . $reset_link
-        . '<div id="' . $this->build['#attributes']['id'] .'" class="' . $this->build['#attributes']['id'] . '">' . render($select) . '</div>'
+        . render($select)
         . '</div>'
     );
   }

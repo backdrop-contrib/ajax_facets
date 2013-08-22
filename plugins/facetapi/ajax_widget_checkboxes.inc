@@ -86,7 +86,8 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
     return array(
       'show_expanded' => 0,
       'checkboxes_update_results' => 1,
-    );
+      'checkboxes_show_reset_link' => 0,
+   );
   }
 
   /**
@@ -181,9 +182,9 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiWidgetCheckboxLinks {
     }
 
     $element = array(
-      '#markup' => '<div class="facet-wrapper-selectbox">'
+      '#markup' => '<div class="facet-wrapper-checkboxes ' . $this->build['#attributes']['id'] . '">'
         . $reset_link
-        . '<div class="' . $this->build['#attributes']['id'] . '">' . render($item_list) . '</div>'
+        . render($item_list)
         . '</div>'
     );
   }

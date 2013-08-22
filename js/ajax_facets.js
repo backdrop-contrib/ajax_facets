@@ -194,12 +194,19 @@
     var current_id = $this.attr('id');
     var current_facet_name = $this.data('facet');
     Drupal.ajax_facets.beforeAjax();
+    var data = Drupal.ajax_facets.queryState;
+    // Render the exposed filter data to send along with the ajax request
+    var exposedFormId = '#views-exposed-form-' + Drupal.ajax_facets.queryState['view_name'] + '-' + Drupal.ajax_facets.queryState['display_name'];
+    exposedFormId = exposedFormId.replace(/\_/g, '-');
+    $.each($(exposedFormId).serializeArray(), function(index, value) {
+      data[value.name] = value.value;
+    });
     $.ajax({
       type: 'GET',
       url: encodeURI(Drupal.settings.basePath + 'ajax/ajax_facets/refresh/'),
       dataType: 'json',
       // We copy all params to force search query with proper arguments.
-      data: Drupal.ajax_facets.queryState,
+      data: data,
       success: function (response) {
         if (response.activeItems != undefined) {
           Drupal.ajax_facets.facetQueryState = response.activeItems;
@@ -216,7 +223,7 @@
 
         if (response.newContent != undefined && response.newContent) {
           for (var class_name in response.newContent) {
-            var $blockToReplace = $('.' + class_name).parent();
+            var $blockToReplace = $('.' + class_name);
             if ($blockToReplace.size()) {
               $blockToReplace.replaceWith(response.newContent[class_name]);
             }
@@ -229,6 +236,7 @@
 
         /* Update results. */
         var results_updated = false;
+        console.log(response);
         $.each(response.update_results, function(facet_name, mode) {
           if (current_facet_name == facet_name) {
             /* Update by ajax. */
