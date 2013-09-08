@@ -11,7 +11,7 @@
  * Links make it easy for users to narrow down their search results by clicking
  * on them. The render arrays use theme_item_list() to generate the HTML markup.
  */
-class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
+class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
 
   /**
    * Overrides FacetapiWidgetCheckboxLinks::init().
@@ -31,36 +31,12 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
    * Overrides FacetapiWidget::settingsForm().
    */
   function settingsForm(&$form, &$form_state) {
+    parent::settingsForm($form, $form_state);
     $form['widget']['widget_settings']['links'][$this->id]['index_id'] = array(
       '#type' => 'value',
       '#title' => t('Index id'),
       '#default_value' => $form['#facetapi']['facet']['map options']['index id'],
       '#description' => t('Limits the number of displayed facets via JavaScript.'),
-      '#states' => array(
-        'visible' => array(
-          'select[name="widget"]' => array('value' => $this->id),
-        ),
-      ),
-    );
-
-    $form['widget']['widget_settings']['links'][$this->id]['selectbox_show_reset_link'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Display reset link'),
-      '#default_value' => !empty($this->settings->settings['selectbox_show_reset_link']),
-      '#description' => t('Display link for reset facet.'),
-      '#states' => array(
-        'visible' => array(
-          'select[name="widget"]' => array('value' => $this->id),
-        ),
-      ),
-    );
-
-    $form['widget']['widget_settings']['links'][$this->id]['selectbox_update_results'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Update results by ajax'),
-      '#default_value' => $this->settings->settings['selectbox_update_results'],
-      '#description' => t('If active, then search results will be updated by AJAX when facet was changed.
-       If not active, then after than facet will be updated, user will see special popup with link for filter results.'),
       '#states' => array(
         'visible' => array(
           'select[name="widget"]' => array('value' => $this->id),
@@ -157,7 +133,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiWidgetCheckboxLinks {
     }
 
     $reset_link = '';
-    if (!empty($this->settings->settings['selectbox_show_reset_link']) && $this->settings->settings['selectbox_show_reset_link']) {
+    if (!empty($this->settings->settings['show_reset_link']) && $this->settings->settings['show_reset_link']) {
       $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
     }
 

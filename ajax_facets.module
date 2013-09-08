@@ -265,13 +265,15 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
     // Settings for update view.
     $facet_settings = $facet->getSettings($realm);
     $update_results[$facet_name] = 0;
-    if ($facet_settings->settings['widget'] == 'facetapi_ajax_checkboxes' && isset($facet_settings->settings['checkboxes_update_results'])) {
-      $blocks['update_results'][$facet_name] = $facet_settings->settings['checkboxes_update_results'];
-    }
-    elseif ($facet_settings->settings['widget'] == 'facetapi_ajax_select' && isset($facet_settings->settings['selectbox_update_results'])) {
-      $blocks['update_results'][$facet_name] = $facet_settings->settings['selectbox_update_results'];
-    }
+    $blocks['update_results'][$facet_name] = $facet_settings->settings['update_results'];
   }
 
   return $blocks;
+}
+
+/**
+ * Implements hook_form_form_id_alter().
+ */
+function ajax_facets_form_facetapi_facet_display_form_alter(&$form, $form_state) {
+  drupal_add_js(drupal_get_path('module', 'ajax_facets') . '/js/ajax_facets.admin.js');
 }

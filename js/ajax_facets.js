@@ -88,13 +88,13 @@
   Drupal.ajax_facets.bindResetLink = function(parentId, index, settings) {
     var facet_values = Drupal.ajax_facets.getFacetValues();
     if (facet_values[settings.facetapi.facets[index]['facetName']] != undefined) {
-      $('#' + parentId).parents('.block-facetapi').find('a.reset-link').show();
+      $('.' + parentId).parents('.block-facetapi').find('a.reset-link').show();
     }
     else {
-      $('#' + parentId).parents('.block-facetapi').find('a.reset-link').hide();
+      $('.' + parentId).parents('.block-facetapi').find('a.reset-link').hide();
     }
 
-    $('#' + parentId).parents('.block-facetapi').find('a.reset-link:not(".processed")').addClass('processed').click(function() {
+    $('.' + parentId).parents('.block-facetapi').find('a.reset-link:not(".processed")').addClass('processed').click(function() {
       window.location = settings.facetapi.facets[index].resetPath;
       return false;
     });
