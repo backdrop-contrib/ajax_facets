@@ -236,7 +236,6 @@
 
         /* Update results. */
         var results_updated = false;
-        console.log(response);
         $.each(response.update_results, function(facet_name, mode) {
           if (current_facet_name == facet_name) {
             /* Update by ajax. */
@@ -286,7 +285,10 @@
     var pos = $('#' + current_id).offset();
     jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
     jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
-    jQuery('#ajax-facets-tooltip').css('display', 'block');
+    jQuery('#ajax-facets-tooltip').show();
     jQuery('#ajax-facets-tooltip span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
+    setTimeout(function() {
+      jQuery('#ajax-facets-tooltip').hide(250);
+    }, 1000);
   }
 })(jQuery);
