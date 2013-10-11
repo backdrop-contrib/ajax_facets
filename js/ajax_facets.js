@@ -203,7 +203,7 @@
     });
     $.ajax({
       type: 'GET',
-      url: encodeURI(Drupal.settings.basePath + 'ajax/ajax_facets/refresh/'),
+      url: encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh/'),
       dataType: 'json',
       // We copy all params to force search query with proper arguments.
       data: data,
