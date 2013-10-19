@@ -12,7 +12,7 @@
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
 
-  Drupal.ajax_facets.beforeAjax = function(context, settings, element) {
+  Drupal.ajax_facets.beforeAjax = function (context, settings, element) {
     $.each(Drupal.ajax_facets.beforeAjaxCallbacks, function () {
       if ($.isFunction(this)) {
         this(context, settings, element);
@@ -21,20 +21,13 @@
   };
 
   Drupal.behaviors.ajax_facets = {
-    attach: function(context, settings) {
-      $('div.block-facetapi-content-wrapper').once(function () {
-        $(this).each(function() {
-          if ($(this).height() > 200) {
-            $(this).mCustomScrollbar({set_height: 200, scrollEasing:'swing', scrollInertia:0});
-          }
-        })
-      });
+    attach: function (context, settings) {
       if (!Drupal.ajax_facets.queryState) {
         if (settings.facetapi.defaultQuery != undefined && settings.facetapi.defaultQuery) {
-          Drupal.ajax_facets.queryState = {'f' : settings.facetapi.defaultQuery};
+          Drupal.ajax_facets.queryState = {'f': settings.facetapi.defaultQuery};
         }
         else {
-          Drupal.ajax_facets.queryState = {'f':[]};
+          Drupal.ajax_facets.queryState = {'f': []};
         }
         // We will send original search path to server to get back proper reset links.
         if (settings.facetapi.searchPath != undefined) {
@@ -64,7 +57,9 @@
       if (settings.facetapi) {
         for (var index in settings.facetapi.facets) {
           Drupal.ajax_facets.bindResetLink(settings.facetapi.facets[index].id, index, settings);
-          $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change([settings.facetapi.facets[index]], Drupal.ajax_facets.processCheckboxes).addClass('processed');
+          $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change([
+            settings.facetapi.facets[index]
+          ], Drupal.ajax_facets.processCheckboxes).addClass('processed');
           if (null != settings.facetapi.facets[index].limit) {
             // Applies soft limit to the list.
             if (typeof(Drupal.facetapi) != 'undefined') {
@@ -73,19 +68,23 @@
           }
         }
 
-        $('.facet-wrapper-selectbox').each(function() {
+        $('.facet-wrapper-selectbox').each(function () {
           var target_select = $(this).find('select');
           if ($(target_select).length != null) {
-            $(target_select).change([settings.facetapi.facets[index]], Drupal.ajax_facets.processSelectbox).addClass('processed');
+            $(target_select).change([
+              settings.facetapi.facets[index]
+            ], Drupal.ajax_facets.processSelectbox).addClass('processed');
           }
         });
       }
 
-      $('body').once(function() {$(this).append('<div id="ajax-facets-tooltip"><span></span></div>');});
+      $('body').once(function () {
+        $(this).append('<div id="ajax-facets-tooltip"><span></span></div>');
+      });
     }
   };
 
-  Drupal.ajax_facets.bindResetLink = function(parentId, index, settings) {
+  Drupal.ajax_facets.bindResetLink = function (parentId, index, settings) {
     var facet_values = Drupal.ajax_facets.getFacetValues();
     if (facet_values[settings.facetapi.facets[index]['facetName']] != undefined) {
       $('.' + parentId).parents('.block-facetapi').find('a.reset-link').show();
@@ -94,7 +93,7 @@
       $('.' + parentId).parents('.block-facetapi').find('a.reset-link').hide();
     }
 
-    $('.' + parentId).parents('.block-facetapi').find('a.reset-link:not(".processed")').addClass('processed').click(function() {
+    $('.' + parentId).parents('.block-facetapi').find('a.reset-link:not(".processed")').addClass('processed').click(function () {
       window.location = settings.facetapi.facets[index].resetPath;
       return false;
     });
@@ -103,7 +102,7 @@
   /**
    * Just compare two arrays.
    */
-  Drupal.ajax_facets.compareArrays = function(a, b) {
+  Drupal.ajax_facets.compareArrays = function (a, b) {
     if (a.length != b.length) {
       return false;
     }
@@ -128,7 +127,7 @@
   /**
    * Process click on each checkbox.
    */
-  Drupal.ajax_facets.processSelectbox = function(event) {
+  Drupal.ajax_facets.processSelectbox = function (event) {
 
     var $this = $(this);
     var facetOptions = event.data[0];
@@ -136,9 +135,9 @@
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       for (var index in Drupal.ajax_facets.queryState['f']) {
-         if (Drupal.ajax_facets.queryState['f'][index].substring(0, name.length) != name) {
-           queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
-         }
+        if (Drupal.ajax_facets.queryState['f'][index].substring(0, name.length) != name) {
+          queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+        }
       }
       Drupal.ajax_facets.queryState['f'] = queryNew;
 
@@ -157,7 +156,7 @@
   /**
    * Process click on each checkbox.
    */
-  Drupal.ajax_facets.processCheckboxes = function(event) {
+  Drupal.ajax_facets.processCheckboxes = function (event) {
     var $this = $(this);
     var facetOptions = event.data[0];
     var facetCheckboxName = $this.attr('name');
@@ -190,7 +189,7 @@
   };
 
   /* Send ajax. */
-  Drupal.ajax_facets.sendAjaxQuery = function($this, facetOptions) {
+  Drupal.ajax_facets.sendAjaxQuery = function ($this, facetOptions) {
     var current_id = $this.attr('id');
     var current_facet_name = $this.data('facet');
     Drupal.ajax_facets.beforeAjax();
@@ -198,7 +197,7 @@
     // Render the exposed filter data to send along with the ajax request
     var exposedFormId = '#views-exposed-form-' + Drupal.ajax_facets.queryState['view_name'] + '-' + Drupal.ajax_facets.queryState['display_name'];
     exposedFormId = exposedFormId.replace(/\_/g, '-');
-    $.each($(exposedFormId).serializeArray(), function(index, value) {
+    $.each($(exposedFormId).serializeArray(), function (index, value) {
       data[value.name] = value.value;
     });
     $.ajax({
@@ -236,7 +235,7 @@
 
         /* Update results. */
         var results_updated = false;
-        $.each(response.update_results, function(facet_name, mode) {
+        $.each(response.update_results, function (facet_name, mode) {
           if (current_facet_name == facet_name) {
             /* Update by ajax. */
             if (mode) {
@@ -267,28 +266,29 @@
     });
   },
 
-  Drupal.ajax_facets.getFacetValues = function() {
-    var f = Drupal.ajax_facets.queryState.f;
-    var facets_values = {};
-    var symbol = ':';
-    jQuery.each(f, function(k,v) {
-      var parts = v.split(symbol);
-      var value = parts[parts.length - 1];
-      var appendix = symbol + value;
-      var key = v.substr(0, v.length - appendix.length);
-      facets_values[key] = value;
-    });
-    return facets_values;
-  },
+    Drupal.ajax_facets.getFacetValues = function () {
+      var f = Drupal.ajax_facets.queryState.f;
+      var facets_values = {};
+      var symbol = ':';
+      jQuery.each(f, function (k, v) {
+        var parts = v.split(symbol);
+        var value = parts[parts.length - 1];
+        var appendix = symbol + value;
+        var key = v.substr(0, v.length - appendix.length);
+        facets_values[key] = value;
+      });
+      return facets_values;
+    },
 
-  Drupal.ajax_facets.showTooltip = function($, response, current_id) {
-    var pos = $('#' + current_id).offset();
-    jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
-    jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
-    jQuery('#ajax-facets-tooltip').show();
-    jQuery('#ajax-facets-tooltip span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
-    setTimeout(function() {
-      jQuery('#ajax-facets-tooltip').hide(250);
-    }, 1000);
-  }
+    Drupal.ajax_facets.showTooltip = function ($, response, current_id) {
+      var pos = $('#' + current_id).offset();
+      jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
+      jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
+      jQuery('#ajax-facets-tooltip').show();
+      jQuery('#ajax-facets-tooltip span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
+
+      setTimeout(function () {
+        jQuery('#ajax-facets-tooltip').hide(250);
+      }, 2000);
+    }
 })(jQuery);

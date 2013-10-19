@@ -1,4 +1,4 @@
-name = Ajax facet filters.
+name = Ajax facet filters
 description = Ajax facet filters.
 dependencies[] = facetapi
 dependencies[] = search_api_solr
@@ -9,10 +9,3 @@ core = 7.x
 files[] = plugins/facetapi/ajax_widget.inc
 files[] = plugins/facetapi/ajax_widget_checkboxes.inc
 files[] = plugins/facetapi/ajax_widget_select.inc
-
-; Information added by drupal.org packaging script on 2013-07-08
-version = "7.x-1.3"
-core = "7.x"
-project = "ajax_facets"
-datestamp = "1373306151"
-
