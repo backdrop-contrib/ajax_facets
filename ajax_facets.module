@@ -57,10 +57,9 @@ function ajax_facets_add_ajax_js($facet) {
   static $included = FALSE;
   if (!$included) {
     $included = TRUE;
-    drupal_add_library('system', 'ui.draggable');
     $module_path = drupal_get_path('module', 'ajax_facets');
-    drupal_add_js($module_path . '/js/ajax_facets.js');
-    drupal_add_css($module_path . '/css/ajax_facets.css');
+    drupal_add_js($module_path . '/misc/ajax_facets.js');
+    drupal_add_css($module_path . '/misc/ajax_facets.css');
     $search_path = $facet->getAdapter()->getSearchPath();
     $filter_key = $facet->getAdapter()->getUrlProcessor()->getFilterKey();
     // Note that we add in query only filter params and exclude pages and etc...
@@ -275,5 +274,5 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
  * Implements hook_form_form_id_alter().
  */
 function ajax_facets_form_facetapi_facet_display_form_alter(&$form, $form_state) {
-  drupal_add_js(drupal_get_path('module', 'ajax_facets') . '/js/ajax_facets.admin.js');
+  drupal_add_js(drupal_get_path('module', 'ajax_facets') . '/misc/ajax_facets.admin.js');
 }
