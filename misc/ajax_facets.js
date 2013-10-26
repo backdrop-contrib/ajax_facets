@@ -100,31 +100,6 @@
   };
 
   /**
-   * Just compare two arrays.
-   */
-  Drupal.ajax_facets.compareArrays = function (a, b) {
-    if (a.length != b.length) {
-      return false;
-    }
-    for (i in a) {
-      if (a[i] != b[i]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  Drupal.ajax_facets.hideApplyLink = function ($link, $resetLink) {
-    if ($link.size()) {
-      $link.hide();
-      if ($resetLink.size()) {
-        $resetLink.show();
-      }
-    }
-  }
-
-  /**
    * Process click on each checkbox.
    */
   Drupal.ajax_facets.processSelectbox = function (event) {
@@ -235,6 +210,7 @@
 
         /* Update results. */
         var results_updated = false;
+        var show_tip = false;
         $.each(response.update_results, function (facet_name, mode) {
           if (current_facet_name == facet_name) {
             /* Update by ajax. */
@@ -243,7 +219,7 @@
             }
             /* Update by link. */
             else {
-              Drupal.ajax_facets.showTooltip($, response, current_id);
+              show_tip = true;
             }
           }
         });
@@ -262,6 +238,9 @@
           Drupal.settings.views = response.settings.views;
         }
         Drupal.attachBehaviors();
+        if (show_tip) {
+          Drupal.ajax_facets.showTooltip($, response, current_id);
+        }
       }
     });
   },
@@ -289,6 +268,6 @@
 
       setTimeout(function () {
         jQuery('#ajax-facets-tooltip').hide(250);
-      }, 2000);
+      }, 3000);
     }
 })(jQuery);
