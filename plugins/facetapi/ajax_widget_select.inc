@@ -84,7 +84,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
         $active_items[] = $this->key . ':' . $item['#markup'];
       }
 
-      $items['values'][$item['#indexed_value']] = $item['#indexed_value'] . theme('facetapi_count',(array('count' => $item['#count'])));
+      $items['values'][$item['#markup']] = $item['#markup'] . theme('facetapi_count',(array('count' => $item['#count'])));
     }
 
     $this->jsSettings['haveActiveSelection'] = $this->settings->settings['have_active_selection'] = $have_active;
