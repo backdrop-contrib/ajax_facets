@@ -35,14 +35,14 @@ function ajax_facets_facetapi_widgets() {
     // Custom widget to handle ajax-refreshed facets.
     'facetapi_ajax_checkboxes' => array(
       'handler' => array(
-        'label' => 'Ajax multiple checkboxes',
+        'label' => t('Ajax multiple checkboxes'),
         'class' => 'FacetapiAjaxWidgetCheckboxes',
         'query types' => array('term'),
       ),
     ),
     'facetapi_ajax_select' => array(
       'handler' => array(
-        'label' => 'Ajax selectbox',
+        'label' => t('Ajax selectbox'),
         'class' => 'FacetapiAjaxWidgetSelect',
         'query types' => array('term'),
       ),
