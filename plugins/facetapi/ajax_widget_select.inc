@@ -121,10 +121,10 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       '#type' => 'select',
       '#title' => $this->build['#title'],
       '#options' => $items['values'],
-      '#id' => 'ajax-facets-selectbox-' . str_replace('_', '-', $this->settings->facet),
+      '#id' => 'ajax-facets-selectbox-' . str_replace(array('_', ' ', ':'), '-', $this->settings->facet),
       '#name' => urlencode($this->settings->facet),
       '#attributes' => array(
-        'data-facet' => urlencode($this->settings->facet),
+        'data-facet' => $this->settings->facet,
       ),
     );
 

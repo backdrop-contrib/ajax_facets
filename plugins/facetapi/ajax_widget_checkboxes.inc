@@ -96,7 +96,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
       $row = array('class' => array());
       $attributes = array(
         'class' => array('facet-multiselect-checkbox'),
-        'data-facet' => urlencode($this->settings->facet),
+        'data-facet' => $this->settings->facet,
       );
       // Respect current selection.
       if ($item['#active']) {
@@ -106,7 +106,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
       }
 
       $checkbox = array(
-        '#id' => 'ajax-facets-checkboxes-' . str_replace(array('_', ' '), '-', $this->key) . '-' . drupal_strtolower($value),
+        '#id' => 'ajax-facets-checkboxes-' . str_replace(array('_', ' ', ':'), '-', $this->key) . '-' . drupal_strtolower($value),
         '#name' => urlencode($this->key) . ':' . $value,
         '#type' => 'checkbox',
         '#title' => $item['#markup'] . theme('facetapi_count',(array('count' => $item['#count']))),
