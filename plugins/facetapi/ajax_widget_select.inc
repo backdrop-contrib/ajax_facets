@@ -67,12 +67,18 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    * @return array
    *   The "items" parameter for theme_item_list().
    */
-  function buildListItems($build) {
+  function buildListItems($build, $level = 0) {
 
     // Builds rows.
     $items = array();
 
-    $items['values'][0] = t('Select');
+    // Add default item only once.
+    if ($level == 0) {
+      $items['values'][0] = t('Select');
+    }
+
+    $prefix = str_repeat('-', $level);
+    $level++;
 
     $active_items = array();
     $have_active = FALSE;
@@ -84,7 +90,15 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
         $active_items[] = $this->key . ':' . $item['#markup'];
       }
 
-      $items['values'][$item['#markup']] = $item['#markup'] . theme('facetapi_count',(array('count' => $item['#count'])));
+      $items['values'][$item['#indexed_value']] = $prefix . $item['#markup'] . theme('facetapi_count',(array('count' => $item['#count'])));
+
+      if (!empty($item['#item_children'])) {
+        $childrens = $this->buildListItems($item['#item_children'], $level);
+        if (!empty($childrens['active_value'])) {
+          $items['active_value'] = $childrens['active_value'];
+        }
+        $items['values'] = $items['values'] + $childrens['values'];
+      }
     }
 
     $this->jsSettings['haveActiveSelection'] = $this->settings->settings['have_active_selection'] = $have_active;
