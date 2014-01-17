@@ -53,6 +53,20 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         ),
       );
     }
+
+    $form['widget']['widget_settings']['links'][$this->id]['soft_limit'] = array(
+      '#type' => 'select',
+      '#title' => t('Soft limit'),
+      '#default_value' => $this->settings->settings['soft_limit'],
+      '#options' => array(0 => t('No limit')) + drupal_map_assoc(array(50, 40, 30, 20, 15, 10, 5, 3)),
+      '#description' => t('Limits the number of displayed facets via JavaScript.'),
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+        ),
+      ),
+    );
+
     $last = end($form['widget']['widget_settings']['links']);
     foreach ($form['widget']['widget_settings']['links'] as $id => $element) {
       if ($last != $element) {
@@ -66,6 +80,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
    */
   function getDefaultSettings() {
     return array(
+      'soft_limit' => 20,
       'show_expanded' => 0,
       'checkboxes_update_results' => 1,
       'checkboxes_show_reset_link' => 0,
