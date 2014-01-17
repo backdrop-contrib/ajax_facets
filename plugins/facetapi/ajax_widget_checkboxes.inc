@@ -28,17 +28,6 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
    */
   function settingsForm(&$form, &$form_state) {
     parent::settingsForm($form, $form_state);
-    $form['widget']['widget_settings']['links'][$this->id]['index_id'] = array(
-      '#type' => 'value',
-      '#title' => t('Index id'),
-      '#default_value' => $form['#facetapi']['facet']['map options']['index id'],
-      '#description' => t('Limits the number of displayed facets via JavaScript.'),
-      '#states' => array(
-        'visible' => array(
-          'select[name="widget"]' => array('value' => $this->id),
-        ),
-      ),
-    );
 
     if ($this->facet['hierarchy callback']) {
       $form['widget']['widget_settings']['links'][$this->id]['show_expanded'] = array(
