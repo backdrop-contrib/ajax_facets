@@ -10,6 +10,7 @@
  */
 function ajax_facets_refresh_facets_content() {
 
+  //$_GET['f'] = $_GET['f'];
   $name = $_GET['view_name'];
   $display_id = $_GET['display_name'];
   // Execute view query to fill facets.
@@ -61,5 +62,11 @@ function ajax_facets_refresh_facets_content() {
     );
   }
 
-  return $result;
+  $commands = array();
+  $commands[] = array(
+    'command' => 'ajax_facets_update_content',
+    'data' => $result,
+  );
+  print ajax_render($commands);
+  drupal_exit();
 }

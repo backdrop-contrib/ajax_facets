@@ -8,6 +8,10 @@
   Drupal.ajax_facets.queryState = null;
   // State of each facet.
   Drupal.ajax_facets.facetQueryState = null;
+  // HTML ID of element of current facet.
+  Drupal.ajax_facets.current_id = null;
+  // Current changed facet.
+  Drupal.ajax_facets.current_facet_name = null;
 
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
@@ -165,8 +169,8 @@
 
   /* Send ajax. */
   Drupal.ajax_facets.sendAjaxQuery = function ($this, facetOptions) {
-    var current_id = $this.attr('id');
-    var current_facet_name = $this.data('facet');
+    Drupal.ajax_facets.current_id = $this.attr('id');
+    Drupal.ajax_facets.current_facet_name = $this.data('facet');
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
     // Render the exposed filter data to send along with the ajax request
@@ -175,74 +179,13 @@
     $.each($(exposedFormId).serializeArray(), function (index, value) {
       data[value.name] = value.value;
     });
-    $.ajax({
-      type: 'GET',
-      url: encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh/'),
-      dataType: 'json',
-      // We copy all params to force search query with proper arguments.
-      data: data,
-      success: function (response) {
-        if (response.activeItems != undefined) {
-          Drupal.ajax_facets.facetQueryState = response.activeItems;
-        }
-        // After Ajax success we should update reset, apply link to handle proper redirects.
-        if (response.resetUrls != undefined && Drupal.settings.facetapi.facets != undefined) {
-          for (index in Drupal.settings.facetapi.facets) {
-            if (response.resetUrls[Drupal.settings.facetapi.facets[index].facetName] != undefined) {
-              // Update path from responce.
-              Drupal.settings.facetapi.facets[index].resetPath = response.resetUrls[Drupal.settings.facetapi.facets[index].facetName];
-            }
-          }
-        }
-
-        if (response.newContent != undefined && response.newContent) {
-          for (var class_name in response.newContent) {
-            var $blockToReplace = $('.' + class_name);
-            if ($blockToReplace.size()) {
-              $blockToReplace.replaceWith(response.newContent[class_name]);
-            }
-            var $block = $('.' + class_name).parents('div.block-facetapi:not(:visible)');
-            if ($block.size()) {
-              $block.show();
-            }
-          }
-        }
-
-        /* Update results. */
-        var results_updated = false;
-        var show_tip = false;
-        $.each(response.update_results, function (facet_name, mode) {
-          if (current_facet_name == facet_name) {
-            /* Update by ajax. */
-            if (mode) {
-              $('.view-id-' + response.views_name + '.view-display-id-' + response.display_id).replaceWith(response.views_content);
-            }
-            /* Update by link. */
-            else {
-              show_tip = true;
-            }
-          }
-        });
-
-        // As some blocks could be empty in results of filtering - hide them.
-        if (response.hideBlocks != undefined && response.hideBlocks) {
-          for (var id in response.hideBlocks) {
-            var $block = $('#' + response.hideBlocks[id]);
-            if ($block.size()) {
-              $block.hide();
-            }
-          }
-        }
-
-        if (response.settings.views != undefined) {
-          Drupal.settings.views = response.settings.views;
-        }
-        Drupal.attachBehaviors();
-        if (show_tip) {
-          Drupal.ajax_facets.showTooltip($, response, current_id);
-        }
-      }
-    });
+    var settings = {
+      url : encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh/'),
+      submit : data
+    };
+    var ajax = new Drupal.ajax(false, false, settings);
+    ajax.options.type = 'GET';
+    ajax.eventResponse(ajax, {});
   },
 
     Drupal.ajax_facets.getFacetValues = function () {
@@ -259,8 +202,9 @@
       return facets_values;
     },
 
-    Drupal.ajax_facets.showTooltip = function ($, response, current_id) {
-      var pos = $('#' + current_id).offset();
+    /* Show tooltip if facet results are not updated by ajax (in settings). */
+    Drupal.ajax_facets.showTooltip = function ($, response) {
+      var pos = $('#' + Drupal.ajax_facets.current_id).offset();
       jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
       jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
       jQuery('#ajax-facets-tooltip').show();
@@ -270,4 +214,69 @@
         jQuery('#ajax-facets-tooltip').hide(250);
       }, 3000);
     }
+
+  if (Drupal.ajax) {
+    // Command for process search results and facets by ajax.
+    Drupal.ajax.prototype.commands.ajax_facets_update_content = function(ajax, response) {
+      if (response.data.activeItems != undefined) {
+        Drupal.ajax_facets.facetQueryState = response.data.activeItems;
+      }
+      // After Ajax success we should update reset, apply link to handle proper redirects.
+      if (response.data.resetUrls != undefined && Drupal.settings.facetapi.facets != undefined) {
+        for (index in Drupal.settings.facetapi.facets) {
+          if (response.data.resetUrls[Drupal.settings.facetapi.facets[index].facetName] != undefined) {
+            // Update path from responce.
+            Drupal.settings.facetapi.facets[index].resetPath = response.data.resetUrls[Drupal.settings.facetapi.facets[index].facetName];
+          }
+        }
+      }
+
+      if (response.data.newContent != undefined && response.data.newContent) {
+        for (var class_name in response.data.newContent) {
+          var $blockToReplace = $('.' + class_name);
+          if ($blockToReplace.size()) {
+            $blockToReplace.replaceWith(response.data.newContent[class_name]);
+          }
+          var $block = $('.' + class_name).parents('div.block-facetapi:not(:visible)');
+          if ($block.size()) {
+            $block.show();
+          }
+        }
+      }
+
+      /* Update results. */
+      var results_updated = false;
+      var show_tip = false;
+      $.each(response.data.update_results, function (facet_name, mode) {
+        if (Drupal.ajax_facets.current_facet_name == facet_name) {
+          /* Update by ajax. */
+          if (mode) {
+            $('.view-id-' + response.data.views_name + '.view-display-id-' + response.data.display_id).replaceWith(response.data.views_content);
+          }
+          /* Update by link. */
+          else {
+            show_tip = true;
+          }
+        }
+      });
+
+      // As some blocks could be empty in results of filtering - hide them.
+      if (response.data.hideBlocks != undefined && response.data.hideBlocks) {
+        for (var id in response.data.hideBlocks) {
+          var $block = $('#' + response.data.hideBlocks[id]);
+          if ($block.size()) {
+            $block.hide();
+          }
+        }
+      }
+
+      if (response.data.settings.views != undefined) {
+        Drupal.settings.views = response.data.settings.views;
+      }
+      Drupal.attachBehaviors();
+      if (show_tip) {
+        Drupal.ajax_facets.showTooltip($, response.data);
+      }
+    }
+  }
 })(jQuery);

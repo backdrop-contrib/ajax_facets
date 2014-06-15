@@ -14,13 +14,13 @@ function ajax_facets_menu() {
     'title' => 'Callback to update facets content',
     'page callback' => 'ajax_facets_refresh_facets_content',
     'access arguments' => array('access content'),
-    'delivery callback' => 'ajax_facets_ajax_deliver',
+    'delivery callback' => 'ajax_deliver',
     'type' => MENU_CALLBACK,
     'file' => 'ajax_facets.pages.inc',
   );
 
   return $items;
-} 
+}
 
 /**
  * Implements hook_facetapi_widgets().
@@ -94,6 +94,7 @@ function ajax_facets_add_ajax_js($facet) {
     );
     drupal_add_js($setting, 'setting');
   }
+  drupal_add_library('system', 'drupal.ajax');
 }
 
 /**
@@ -144,17 +145,6 @@ function ajax_facets_facet_build_apply_path($adapter) {
   $url_params = !empty($params) ? array('query' => $params) : array();
   return url((!empty($_GET['searchPath']) ? $_GET['searchPath'] : $adapter->getSearchPath()), $url_params);
 }
-
-/**
- * Delivery callback for Ajax results of facet filtering.
- */
-function ajax_facets_ajax_deliver($page_callback_result) {
-  // Just print results in Json.
-  print drupal_json_output($page_callback_result);
-  // Perform end-of-request tasks.
-  ajax_footer();
-}
-
 
 /**
  * Implementation of hook_views_ajax_data_alter()
