@@ -181,10 +181,9 @@
     });
     var settings = {
       url : encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh/'),
-      submit : data
+      submit : {'ajax_facets' : data}
     };
     var ajax = new Drupal.ajax(false, false, settings);
-    ajax.options.type = 'GET';
     ajax.eventResponse(ajax, {});
   },
 
