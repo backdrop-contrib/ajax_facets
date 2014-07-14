@@ -73,6 +73,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
       'show_expanded' => 0,
       'checkboxes_update_results' => 1,
       'checkboxes_show_reset_link' => 0,
+      'empty_behavior' => 'ajax_facets',
     );
   }
 
@@ -107,6 +108,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         $attributes['checked'] = 'checked';
         $have_active = TRUE;
         $active_items[] = $this->key . ':' . $item['#markup'];
+        $row['class'][] = 'facetapi-active';
       }
 
       $checkbox = array(

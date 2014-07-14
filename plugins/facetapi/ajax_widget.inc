@@ -17,8 +17,6 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
    * Overrides FacetapiWidget::settingsForm().
    */
   function settingsForm(&$form, &$form_state) {
-
-
     $form['widget']['widget_settings']['links'][$this->id]['wrapper_container'] = array(
       '#type' => 'container',
       '#states' => array(
@@ -54,25 +52,20 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
     );
 
     $searcher = $this->facet->getAdapter()->getSearcher();
-    $class = drupal_html_class("facetapi-facet-$searcher-{$this->realm['name']}-{$this->facet['name']}");
     $form['widget']['widget_settings']['links'][$this->id]['wrapper_container']['wrapper_code'] = array(
       '#type' => 'markup',
       '#markup' => '<div class="form-item messages warning">'
         . t(
-          'Please select "@empty" as @d_text. Use "Full html" as format and add this wrapper as empty text.
-          It\'s need for avoid problem, when some facets was empty on page and cannot be loaded again after
+          'Please select "@empty" as "@d_text". It\'s need for avoid problem, when some facets was empty on page and cannot be loaded again after
           than values of other facets will be changed.
           ',
           array(
             '@empty' => t('Empty facet behavior'),
-            '@d_text' => t('Display text')
+            '@d_text' => t('Display ajax_facets wrapper')
           )
         )
         . '<br />'
         . t('More info here !link', array('!link' => l('https://drupal.org/node/2081831', 'https://drupal.org/node/2081831')))
-        . '<br /><br />'
-        . check_plain('<div class="facet-wrapper-selectbox ' . $class . '"></div>')
-
         . '</div>',
     );
   }

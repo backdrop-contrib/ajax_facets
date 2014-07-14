@@ -188,32 +188,32 @@
     ajax.eventResponse(ajax, {});
   },
 
-    Drupal.ajax_facets.getFacetValues = function () {
-      var f = Drupal.ajax_facets.queryState.f;
-      var facets_values = {};
-      var symbol = ':';
-      jQuery.each(f, function (k, v) {
-        var parts = v.split(symbol);
-        var value = parts[parts.length - 1];
-        var appendix = symbol + value;
-        var key = v.substr(0, v.length - appendix.length);
-        facets_values[key] = value;
-      });
-      return facets_values;
-    },
+  Drupal.ajax_facets.getFacetValues = function () {
+    var f = Drupal.ajax_facets.queryState.f;
+    var facets_values = {};
+    var symbol = ':';
+    jQuery.each(f, function (k, v) {
+      var parts = v.split(symbol);
+      var value = parts[parts.length - 1];
+      var appendix = symbol + value;
+      var key = v.substr(0, v.length - appendix.length);
+      facets_values[key] = value;
+    });
+    return facets_values;
+  },
 
-    /* Show tooltip if facet results are not updated by ajax (in settings). */
-    Drupal.ajax_facets.showTooltip = function ($, response) {
-      var pos = $('#' + Drupal.ajax_facets.current_id).offset();
-      jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
-      jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
-      jQuery('#ajax-facets-tooltip').show();
-      jQuery('#ajax-facets-tooltip span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
+  /* Show tooltip if facet results are not updated by ajax (in settings). */
+  Drupal.ajax_facets.showTooltip = function ($, response) {
+    var pos = $('#' + Drupal.ajax_facets.current_id).offset();
+    jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
+    jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
+    jQuery('#ajax-facets-tooltip').show();
+    jQuery('#ajax-facets-tooltip span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
 
-      setTimeout(function () {
-        jQuery('#ajax-facets-tooltip').hide(250);
-      }, 3000);
-    }
+    setTimeout(function () {
+      jQuery('#ajax-facets-tooltip').hide(250);
+    }, 3000);
+  }
 
   if (Drupal.ajax) {
     // Command for process search results and facets by ajax.

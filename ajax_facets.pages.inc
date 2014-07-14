@@ -10,7 +10,6 @@
  */
 function ajax_facets_refresh_facets_content() {
 
-  //$_GET['f'] = $_GET['f'];
   $name = $_GET['view_name'];
   $display_id = $_GET['display_name'];
   // Execute view query to fill facets.

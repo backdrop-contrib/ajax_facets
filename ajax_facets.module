@@ -45,6 +45,21 @@ function ajax_facets_facetapi_widgets() {
   );
 }
 
+
+/**
+ * Implements hook_facetapi_empty_behaviors().
+ */
+function ajax_facets_facetapi_empty_behaviors() {
+  return array(
+    'ajax_facets' => array(
+      'handler' => array(
+        'label' => t('Display ajax_facets wrapper'),
+        'class' => 'FacetapiEmptyBehaviorAjaxFacets',
+      ),
+    ),
+  );
+}
+
 /**
  * Add required JS and handle single inclusion.
  */
