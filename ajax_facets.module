@@ -263,8 +263,8 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
 
     // Settings for update view.
     $facet_settings = $facet->getSettings($realm);
-    $update_results[$facet_name] = 0;
-    $blocks['update_results'][$facet_name] = $facet_settings->settings['update_results'];
+    $update_results = !empty($facet_settings->settings['update_results']) ? $facet_settings->settings['update_results'] : 0;
+    $blocks['update_results'][$facet_name] = $update_results;
   }
 
   return $blocks;

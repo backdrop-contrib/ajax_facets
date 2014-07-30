@@ -9,6 +9,7 @@
  * Callback to update facets content by AJAX.
  */
 function ajax_facets_refresh_facets_content() {
+  //var_dump($_POST);
   if (!empty($_POST['ajax_facets'])) {
     // Dirty hack to avoid error 414 in $_GET query.
     // @see class FacetapiUrlProcessorStandard->fetchParams();
@@ -16,9 +17,19 @@ function ajax_facets_refresh_facets_content() {
 
     $name = $_GET['view_name'];
     $display_id = $_GET['display_name'];
+
+    // Prepare args for view.
+    $view_args = array();
+    $denied_args = array('q', 'f', 'searchPath', 'index_id', 'view_name', 'facet_field', 'display_name');
+    foreach ($_POST['ajax_facets'] as $key => $value) {
+      if (!in_array($key, $denied_args)) {
+        $view_args[$key] = $value;
+      }
+    }
+
     // Execute view query to fill facets.
     $view = views_get_view($name);
-    $view->execute_display($display_id, $_GET);
+    $view->execute_display($display_id, $view_args);
     $page = $view->preview($display_id);
 
     $searcher = 'search_api@' . $_GET['index_id'];
