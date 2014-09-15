@@ -9,11 +9,14 @@
  * Callback to update facets content by AJAX.
  */
 function ajax_facets_refresh_facets_content() {
-  //var_dump($_POST);
   if (!empty($_POST['ajax_facets'])) {
     // Dirty hack to avoid error 414 in $_GET query.
     // @see class FacetapiUrlProcessorStandard->fetchParams();
     $_GET = array_merge($_GET, $_POST['ajax_facets']);
+
+    // Reset $_POST, because html ids, can break ids of facets for update.
+    unset($_POST['ajax_facets']);
+    unset($_POST['ajax_html_ids']);
 
     $name = $_GET['view_name'];
     $display_id = $_GET['display_name'];
