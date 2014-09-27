@@ -84,6 +84,9 @@ function ajax_facets_refresh_facets_content() {
       'command' => 'ajax_facets_update_content',
       'data' => $result,
     );
+
+    // Allow other modules to add, change or delete commands.
+    drupal_alter('ajax_facets_data', $commands, $view);
     print ajax_render($commands);
     drupal_exit();
   }
