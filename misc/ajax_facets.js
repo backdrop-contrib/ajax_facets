@@ -61,9 +61,32 @@
       if (settings.facetapi) {
         for (var index in settings.facetapi.facets) {
           Drupal.ajax_facets.bindResetLink(settings.facetapi.facets[index].id, index, settings);
-          $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change([
-            settings.facetapi.facets[index]
-          ], Drupal.ajax_facets.processCheckboxes).addClass('processed');
+
+          // Checkboxes.
+          $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change(
+            [settings.facetapi.facets[index]],
+            Drupal.ajax_facets.processCheckboxes
+          ).addClass('processed');
+
+          // Selectboxes.
+          $('.facet-wrapper-selectbox:not(.processed)').each(function () {
+            var target_select = $(this).find('select');
+            if ($(target_select).length != null) {
+              $(target_select).change(
+                [settings.facetapi.facets[index]],
+                Drupal.ajax_facets.processSelectbox)
+              .addClass('processed');
+            }
+          });
+
+          // Links.
+          $('#' + settings.facetapi.facets[index].id + ' a:not(.processed)').each(function () {
+            $(this).click(
+              [settings.facetapi.facets[index]],
+              Drupal.ajax_facets.processLink
+            ).addClass('processed');
+          });
+
           if (null != settings.facetapi.facets[index].limit) {
             // Applies soft limit to the list.
             if (typeof(Drupal.facetapi) != 'undefined') {
@@ -71,15 +94,6 @@
             }
           }
         }
-
-        $('.facet-wrapper-selectbox').each(function () {
-          var target_select = $(this).find('select');
-          if ($(target_select).length != null) {
-            $(target_select).change([
-              settings.facetapi.facets[index]
-            ], Drupal.ajax_facets.processSelectbox).addClass('processed');
-          }
-        });
       }
 
       $('body').once(function () {
@@ -165,6 +179,41 @@
     }
 
     Drupal.ajax_facets.sendAjaxQuery($this, facetOptions);
+  };
+
+  Drupal.ajax_facets.processLink = function (event) {
+
+    var $this = $(this);
+    var facetOptions = event.data[0];
+    var name_value = $this.data('name') + ':' + $this.data('value');
+    if (Drupal.ajax_facets.queryState['f'] != undefined) {
+      var queryNew = new Array();
+      /* Handle value - deactivate. */
+      if ($this.hasClass('facetapi-active')) {
+        for (var index in Drupal.ajax_facets.queryState['f']) {
+          if (Drupal.ajax_facets.queryState['f'][index] != name_value) {
+            queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+          }
+        }
+        Drupal.ajax_facets.queryState['f'] = queryNew;
+      }
+      /* Handle value - activate. */
+      else if ($this.hasClass('facetapi-inactive')) {
+        Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name_value;
+        var addCurrentParam = true;
+        for (var index in Drupal.ajax_facets.queryState['f']) {
+          if (Drupal.ajax_facets.queryState['f'][index] == name_value) {
+            addCurrentParam = false;
+          }
+        }
+        if (addCurrentParam) {
+          Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name_value;
+        }
+      }
+    }
+
+    Drupal.ajax_facets.sendAjaxQuery($this, facetOptions);
+    event.preventDefault();
   };
 
   /* Send ajax. */

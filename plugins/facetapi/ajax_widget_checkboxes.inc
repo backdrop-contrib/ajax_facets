@@ -115,7 +115,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         '#id' => 'ajax-facets-checkboxes-' . str_replace(array('_', ' ', ':'), '-', $this->key) . '-' . drupal_strtolower($value),
         '#name' => urlencode($this->key) . ':' . $value,
         '#type' => 'checkbox',
-        '#title' => $item['#markup'] . theme('facetapi_count',(array('count' => $item['#count']))),
+        '#title' => $item['#markup'] . ' ' . theme('facetapi_count',(array('count' => $item['#count']))),
         '#attributes' => $attributes,
       );
       $row['data'] = drupal_render($checkbox);

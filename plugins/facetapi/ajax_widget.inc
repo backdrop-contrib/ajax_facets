@@ -51,7 +51,6 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
       ),
     );
 
-    $searcher = $this->facet->getAdapter()->getSearcher();
     $form['widget']['widget_settings']['links'][$this->id]['wrapper_container']['wrapper_code'] = array(
       '#type' => 'markup',
       '#markup' => '<div class="form-item messages warning">'
@@ -68,5 +67,9 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
         . t('More info here !link', array('!link' => l('https://drupal.org/node/2081831', 'https://drupal.org/node/2081831')))
         . '</div>',
     );
+  }
+
+  function getFacetAjaxWidgetWrapper() {
+    return drupal_html_class("$this->id-wrapper");
   }
 }
