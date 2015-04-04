@@ -63,29 +63,35 @@
           Drupal.ajax_facets.bindResetLink(settings.facetapi.facets[index].id, index, settings);
 
           // Checkboxes.
-          $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change(
-            [settings.facetapi.facets[index]],
-            Drupal.ajax_facets.processCheckboxes
-          ).addClass('processed');
+          if(settings.facetapi.facets[index].widget == 'facetapi_ajax_checkboxes') {
+            $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change(
+              [settings.facetapi.facets[index]],
+              Drupal.ajax_facets.processCheckboxes
+            ).addClass('processed');
+          }
 
           // Selectboxes.
-          $('.facet-wrapper-selectbox:not(.processed)').each(function () {
-            var target_select = $(this).find('select');
-            if ($(target_select).length != null) {
-              $(target_select).change(
-                [settings.facetapi.facets[index]],
-                Drupal.ajax_facets.processSelectbox)
-              .addClass('processed');
-            }
-          });
+          if(settings.facetapi.facets[index].widget == 'facetapi_ajax_select') {
+            $('.facet-wrapper-selectbox:not(.processed)').each(function () {
+              var target_select = $(this).find('select');
+              if ($(target_select).length != null) {
+                $(target_select).change(
+                  [settings.facetapi.facets[index]],
+                  Drupal.ajax_facets.processSelectbox)
+                  .addClass('processed');
+              }
+            });
+          }
 
           // Links.
-          $('#' + settings.facetapi.facets[index].id + ' a:not(.processed)').each(function () {
-            $(this).click(
-              [settings.facetapi.facets[index]],
-              Drupal.ajax_facets.processLink
-            ).addClass('processed');
-          });
+          if(settings.facetapi.facets[index].widget == 'facetapi_ajax_links') {
+            $('#' + settings.facetapi.facets[index].id + ' a:not(.processed)').each(function () {
+              $(this).click(
+                [settings.facetapi.facets[index]],
+                Drupal.ajax_facets.processLink
+              ).addClass('processed');
+            });
+          }
 
           if (null != settings.facetapi.facets[index].limit) {
             // Applies soft limit to the list.
