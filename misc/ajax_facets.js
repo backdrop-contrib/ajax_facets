@@ -235,7 +235,7 @@
       data[value.name] = value.value;
     });
     var settings = {
-      url : encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh/'),
+      url : encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh'),
       submit : {'ajax_facets' : data}
     };
     var ajax = new Drupal.ajax(false, false, settings);
