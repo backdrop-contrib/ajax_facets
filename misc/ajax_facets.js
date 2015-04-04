@@ -286,12 +286,12 @@
       }
 
       if (response.data.newContent != undefined && response.data.newContent) {
-        for (var class_name in response.data.newContent) {
-          var $blockToReplace = $('.' + class_name);
+        for (var id in response.data.newContent) {
+          var $blockToReplace = $('#' + id);
           if ($blockToReplace.size()) {
-            $blockToReplace.replaceWith(response.data.newContent[class_name]);
+            $blockToReplace.replaceWith(response.data.newContent[id]);
           }
-          var $block = $('.' + class_name).parents('div.block-facetapi:not(:visible)');
+          var $block = $('#' + id).parents('div.block-facetapi:not(:visible)');
           if ($block.size()) {
             $block.show();
           }
