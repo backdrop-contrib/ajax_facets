@@ -263,7 +263,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
       $blocks['facet_blocks'][$builds[$group][$facet_name]['#attributes']['id']] = drupal_render($builds[$group][$facet_name]);
     }
     else {
-      $facet_name = urlencode($facet_name);
+      $facet_name = rawurlencode($facet_name);
       $delta = array_search("$searcher:$realm_name:$facet_name", $map);
       $blocks['hide_blocks'][] = 'block-facetapi-' . strtolower($delta);
     }
