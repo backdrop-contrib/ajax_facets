@@ -123,7 +123,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         $row['class'][] = 'single-leaf';
       }
 
-      if(!empty($item['#item_children'])) {
+      if (!empty($item['#item_children'])) {
         if ($item['#active'] || !empty($this->settings->settings['show_expanded'])) {
           $row['class'][] = 'expanded';
           $row['children'] = $this->buildListItems($item['#item_children']);
@@ -170,7 +170,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     }
 
     $element = array(
-      '#markup' => '<div class="facet-wrapper-checkboxes ' . $this->build['#attributes']['id'] . '">'
+      '#markup' => '<div class="ajax-facets-wrapper facet-wrapper-ajax-checkboxes ' . $this->build['#attributes']['id'] . '">'
         . $reset_link
         . render($item_list)
         . '</div>'

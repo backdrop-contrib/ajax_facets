@@ -279,7 +279,7 @@
       if (response.data.resetUrls != undefined && Drupal.settings.facetapi.facets != undefined) {
         for (index in Drupal.settings.facetapi.facets) {
           if (response.data.resetUrls[Drupal.settings.facetapi.facets[index].facetName] != undefined) {
-            // Update path from responce.
+            // Update path from response.
             Drupal.settings.facetapi.facets[index].resetPath = response.data.resetUrls[Drupal.settings.facetapi.facets[index].facetName];
           }
         }
@@ -287,7 +287,7 @@
 
       if (response.data.newContent != undefined && response.data.newContent) {
         for (var id in response.data.newContent) {
-          var $blockToReplace = $('#' + id);
+          var $blockToReplace = $('#' + id).parents('.ajax-facets-wrapper');
           if ($blockToReplace.size()) {
             $blockToReplace.replaceWith(response.data.newContent[id]);
           }

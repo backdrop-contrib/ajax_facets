@@ -39,10 +39,13 @@ class FacetapiEmptyBehaviorAjaxFacets extends FacetapiEmptyBehavior {
   public function execute() {
     switch ($this->settings['widget']) {
       case 'facetapi_ajax_checkboxes':
-        $class1 = 'facet-wrapper-checkboxes';
+        $class1 = 'facet-wrapper-ajax-checkboxes';
         break;
       case 'facetapi_ajax_select':
-        $class1 = 'facet-wrapper-selectbox';
+        $class1 = 'facet-wrapper-ajax-selectbox';
+        break;
+      case 'facetapi_ajax_links':
+        $class1 = 'facet-wrapper-ajax-links';
         break;
       default:
         $class1 = '';

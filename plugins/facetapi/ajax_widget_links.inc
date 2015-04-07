@@ -135,7 +135,7 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
     }
 
     $element = array(
-      '#markup' => '<div class="facet-wrapper-links ' . $this->build['#attributes']['id'] . '">'
+      '#markup' => '<div class="ajax-facets-wrapper facet-wrapper-ajax-links ' . $this->build['#attributes']['id'] . '">'
         . $reset_link
         . render($item_list)
         . '</div>'
