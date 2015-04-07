@@ -126,22 +126,26 @@ function ajax_facets_facet_build_reset_path($facet, $adapter) {
   $params = $adapter->getUrlProcessor()->fetchParams();
   $filter_key = $adapter->getUrlProcessor()->getFilterKey();
   $clean_params = array();
-  // Build query params except current facet filters.
-  foreach ($params[$filter_key] as $param) {
-    if (strpos($param, $facet['name']) !== 0) {
-      $clean_params[] = $param;
-    }
-  }
   $url_params = array();
-  if (!empty($clean_params)) {
-    $url_params = array('query' => array($filter_key => $clean_params));
-  }
 
-  $unset_keys = array('searchPath', 'q', 'page', $filter_key);
-  // Remove default params from redirect.
-  foreach ($params as $key => $value) {
-    if (!in_array($key, $unset_keys)) {
-      $url_params['query'][$key] = $value;
+  // Build query params except current facet filters.
+  if (!empty($params[$filter_key])) {
+    foreach ($params[$filter_key] as $param) {
+      if (strpos($param, $facet['name']) !== 0) {
+        $clean_params[] = $param;
+      }
+    }
+    $url_params = array();
+    if (!empty($clean_params)) {
+      $url_params = array('query' => array($filter_key => $clean_params));
+    }
+
+    $unset_keys = array('searchPath', 'q', 'page', $filter_key);
+    // Remove default params from redirect.
+    foreach ($params as $key => $value) {
+      if (!in_array($key, $unset_keys)) {
+        $url_params['query'][$key] = $value;
+      }
     }
   }
   return url((!empty($_GET['searchPath']) ? $_GET['searchPath'] : $adapter->getSearchPath()), $url_params);

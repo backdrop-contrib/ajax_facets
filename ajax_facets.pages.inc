@@ -15,7 +15,6 @@ function ajax_facets_refresh_facets_content() {
     $_GET = array_merge($_GET, $_POST['ajax_facets']);
 
     // Reset $_POST, because html ids, can break ids of facets for update.
-    unset($_POST['ajax_facets']);
     unset($_POST['ajax_html_ids']);
 
     $name = $_GET['view_name'];
@@ -23,7 +22,16 @@ function ajax_facets_refresh_facets_content() {
 
     // Prepare args for view.
     $view_args = array();
-    $denied_args = array('q', 'f', 'searchPath', 'index_id', 'view_name', 'facet_field', 'display_name');
+    $denied_args = array(
+      'q',
+      'f',
+      'searchPath',
+      'index_id',
+      'view_name',
+      'facet_field',
+      'display_name'
+    );
+
     foreach ($_POST['ajax_facets'] as $key => $value) {
       if (!in_array($key, $denied_args)) {
         $view_args[$key] = $value;
