@@ -72,14 +72,11 @@
 
           // Selectboxes.
           if(settings.facetapi.facets[index].widget == 'facetapi_ajax_select') {
-            $('.facet-wrapper-selectbox:not(.processed)').each(function () {
-              var target_select = $(this).find('select');
-              if ($(target_select).length != null) {
-                $(target_select).change(
-                  [settings.facetapi.facets[index]],
-                  Drupal.ajax_facets.processSelectbox)
-                  .addClass('processed');
-              }
+            $('#' + settings.facetapi.facets[index].id + ' select:not(.processed)').each(function () {
+              $(this).change(
+                [settings.facetapi.facets[index]],
+                Drupal.ajax_facets.processSelectbox
+              ).addClass('processed');
             });
           }
 
