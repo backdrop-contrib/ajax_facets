@@ -86,13 +86,7 @@ function ajax_facets_add_ajax_js($facet) {
     $display_name = '';
 
     if (!empty($views)) {
-      // Get display from settings.
-      $facet_settings = $facet->getSettings();
-      if (!empty($facet_settings->settings['facet_search_ids'])) {
-        $first_display_from_settings = reset($facet_settings->settings['facet_search_ids']);
-        list(, $view_name, $display_name) = explode(':', $first_display_from_settings);
-      }
-      // Default search.
+      // Get display from current search.
       if (empty($view_name) || empty($display_name)) {
         $keys = array_keys($views);
         foreach ($keys as $key) {
@@ -248,34 +242,47 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
   // Process values once per searcher-realm group.
   $adapter = facetapi_adapter_load($searcher);
   $builds[$group] = ($adapter) ? $adapter->buildRealm($realm_name) : array();
+  // Take search id.
+  $search_id = key(search_api_current_search());
+
+  // Process facets.
   foreach ($facets_to_proceed as $facet_name) {
     $facet = $adapter->getFacet(array('name' => $facet_name));
-    $blocks['reset_urls'][$facet_name] = ajax_facets_facet_build_reset_path($facet, $adapter);
-    if (!empty($builds[$group][$facet_name])) {
-      $build = $facet->getBuild();
-      $blocks['active_items'][$facet_name] = array();
-      foreach ($build as $key => $value) {
-        if ($value['#active']) {
-          $blocks['active_items'][$facet_name][] = "$facet_name:$key";
+    //$facet->getSettings($builds[$group])->settings['facet_search_ids']
+    //search_api_views:search_results:page
+    // First check if the facet is enabled for this search.
+    $settings = $facet->getSettings()->settings;
+
+    $default_true = isset($settings['default_true']) ? $settings['default_true'] : TRUE;
+    $facet_search_ids = isset($settings['facet_search_ids']) ? $settings['facet_search_ids'] : array();
+    // If facet is enabled for this search id.
+    if ($default_true == empty($facet_search_ids[$search_id])) {
+      $blocks['reset_urls'][$facet_name] = ajax_facets_facet_build_reset_path($facet, $adapter);
+      if (!empty($builds[$group][$facet_name])) {
+        $build = $facet->getBuild();
+        $blocks['active_items'][$facet_name] = array();
+        foreach ($build as $key => $value) {
+          if ($value['#active']) {
+            $blocks['active_items'][$facet_name][] = "$facet_name:$key";
+          }
         }
-      }
-      if (!empty($blocks['active_items'][$facet_name])) {
-        sort($blocks['active_items'][$facet_name]);
+        if (!empty($blocks['active_items'][$facet_name])) {
+          sort($blocks['active_items'][$facet_name]);
+        }
+
+        // Skip currently checked facet - we will not refresh them.
+        $blocks['facet_blocks'][$builds[$group][$facet_name]['#attributes']['id']] = drupal_render($builds[$group][$facet_name]);
+      } else {
+        $facet_name = rawurlencode($facet_name);
+        $delta = array_search("$searcher:$realm_name:$facet_name", $map);
+        $blocks['hide_blocks'][] = 'block-facetapi-' . strtolower($delta);
       }
 
-      // Skip currently checked facet - we will not refresh them.
-      $blocks['facet_blocks'][$builds[$group][$facet_name]['#attributes']['id']] = drupal_render($builds[$group][$facet_name]);
+      // Settings for update view.
+      $facet_settings = $facet->getSettings($realm);
+      $update_results = !empty($facet_settings->settings['update_results']) ? $facet_settings->settings['update_results'] : 0;
+      $blocks['update_results'][$facet_name] = $update_results;
     }
-    else {
-      $facet_name = rawurlencode($facet_name);
-      $delta = array_search("$searcher:$realm_name:$facet_name", $map);
-      $blocks['hide_blocks'][] = 'block-facetapi-' . strtolower($delta);
-    }
-
-    // Settings for update view.
-    $facet_settings = $facet->getSettings($realm);
-    $update_results = !empty($facet_settings->settings['update_results']) ? $facet_settings->settings['update_results'] : 0;
-    $blocks['update_results'][$facet_name] = $update_results;
   }
 
   return $blocks;
