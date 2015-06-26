@@ -141,6 +141,9 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     if ($have_active) {
       $this->jsSettings['resetPath'] = ajax_facets_facet_build_reset_path($this->facet->getFacet(), $this->facet->getAdapter());
     }
+
+    $facet_settings = $this->facet->getSettings();
+    $this->jsSettings['limit_active_items'] = $facet_settings->settings['limit_active_items'];
     return $items;
   }
 

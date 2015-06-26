@@ -103,6 +103,9 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       $items[] = $row;
     }
 
+    $facet_settings = $this->facet->getSettings();
+    $this->jsSettings['limit_active_items'] = $facet_settings->settings['limit_active_items'];
+
     return $items;
   }
 

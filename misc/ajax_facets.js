@@ -12,6 +12,8 @@
   Drupal.ajax_facets.current_id = null;
   // Current changed facet.
   Drupal.ajax_facets.current_facet_name = null;
+  // Settings of each ajax facet.
+  Drupal.ajax_facets.facetsSettings = {};
 
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
@@ -96,6 +98,9 @@
               Drupal.facetapi.applyLimit(settings.facetapi.facets[index]);
             }
           }
+
+          // Save settings for each facet by name.
+          Drupal.ajax_facets.facetsSettings[settings.facetapi.facets[index].facetName] = settings.facetapi.facets[index];
         }
       }
 
@@ -121,56 +126,55 @@
   };
 
   /**
-   * Process click on each checkbox.
+   * Callback for onClick event for widget selectbox.
    */
   Drupal.ajax_facets.processSelectbox = function (event) {
 
     var $this = $(this);
-    var facetOptions = event.data[0];
-    var name = $this.attr('name') + ':';
+    var facetName = $this.data('facet');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
-      var queryNew = new Array();
-      for (var index in Drupal.ajax_facets.queryState['f']) {
-        if (Drupal.ajax_facets.queryState['f'][index].substring(0, name.length) != name) {
-          queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
-        }
-      }
-      Drupal.ajax_facets.queryState['f'] = queryNew;
+      // Exclude all values for this facet from query.
+      Drupal.ajax_facets.excludeCurrentFacet(facetName);
 
       /* Default value. */
       if ($this.find(":selected").text() == Drupal.settings.facetapi.ajax_select_box.default_value) {
         delete Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length];
       }
       else {
-        Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name + $this.find(":selected").val();
+        Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':' + $this.find(":selected").val();
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this, facetOptions);
+    Drupal.ajax_facets.sendAjaxQuery($this);
   };
 
   /**
-   * Process click on each checkbox.
+   * Callback for onClick event for widget checkboxes.
    */
   Drupal.ajax_facets.processCheckboxes = function (event) {
     var $this = $(this);
-    var facetOptions = event.data[0];
+    var facetName = $this.data('facet');
     var facetCheckboxName = $this.attr('name');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       if ($this.is(':checked')) {
         var addCurrentParam = true;
-        Drupal.settings.facetapi.facets;
         for (var index in Drupal.ajax_facets.queryState['f']) {
+          // If we already have this value in queryState.
           if (Drupal.ajax_facets.queryState['f'][index] == facetCheckboxName) {
             addCurrentParam = false;
           }
         }
+        // Add new value if need.
         if (addCurrentParam) {
+          // Exclude all other values of this facet from query.
+          if (Drupal.ajax_facets.facetsSettings[facetName].limit_active_items) {
+            Drupal.ajax_facets.excludeCurrentFacet(facetName);
+          }
           Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetCheckboxName;
         }
       }
-      // If we unset filter, remove them from query.
+      // If we unset filter, remove it from query.
       else {
         for (var index in Drupal.ajax_facets.queryState['f']) {
           if (Drupal.ajax_facets.queryState['f'][index] != facetCheckboxName) {
@@ -181,13 +185,15 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this, facetOptions);
+    Drupal.ajax_facets.sendAjaxQuery($this);
   };
 
+  /**
+   * Callback for onClick event for widget links.
+   */
   Drupal.ajax_facets.processLink = function (event) {
-
     var $this = $(this);
-    var facetOptions = event.data[0];
+    var facetName = $this.data('facet');
     var name_value = $this.data('name') + ':' + $this.data('value');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
@@ -202,7 +208,6 @@
       }
       /* Handle value - activate. */
       else if ($this.hasClass('facetapi-inactive')) {
-        Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name_value;
         var addCurrentParam = true;
         for (var index in Drupal.ajax_facets.queryState['f']) {
           if (Drupal.ajax_facets.queryState['f'][index] == name_value) {
@@ -210,17 +215,37 @@
           }
         }
         if (addCurrentParam) {
+          // Exclude all other values of this facet from query.
+          if (Drupal.ajax_facets.facetsSettings[facetName].limit_active_items) {
+            Drupal.ajax_facets.excludeCurrentFacet(facetName);
+          }
           Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name_value;
         }
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this, facetOptions);
+    Drupal.ajax_facets.sendAjaxQuery($this);
     event.preventDefault();
   };
 
-  /* Send ajax. */
-  Drupal.ajax_facets.sendAjaxQuery = function ($this, facetOptions) {
+  /**
+   * Exclude all values for this facet from query.
+   */
+  Drupal.ajax_facets.excludeCurrentFacet = function (facetName) {
+    facetName = facetName + ':';
+    var queryNew = new Array();
+    for (var index in Drupal.ajax_facets.queryState['f']) {
+      if (Drupal.ajax_facets.queryState['f'][index].substring(0, facetName.length) != facetName) {
+        queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+      }
+    }
+    Drupal.ajax_facets.queryState['f'] = queryNew;
+  }
+
+  /**
+   * Send ajax.
+   */
+  Drupal.ajax_facets.sendAjaxQuery = function ($this) {
     Drupal.ajax_facets.current_id = $this.attr('id');
     Drupal.ajax_facets.current_facet_name = $this.data('facet');
     Drupal.ajax_facets.beforeAjax();
