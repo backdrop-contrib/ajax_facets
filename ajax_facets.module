@@ -241,7 +241,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
   $realm = facetapi_realm_load($realm_name);
   // Process values once per searcher-realm group.
   $adapter = facetapi_adapter_load($searcher);
-  $builds[$group] = ($adapter) ? $adapter->buildRealm($realm_name) : array();
+  $builds[$group] = facetapi_build_realm($searcher, $realm_name);
   // Take search id.
   $search_id = key(search_api_current_search());
 
@@ -256,6 +256,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
     $default_true = isset($settings['default_true']) ? $settings['default_true'] : TRUE;
     $facet_search_ids = isset($settings['facet_search_ids']) ? $settings['facet_search_ids'] : array();
     // If facet is enabled for this search id.
+    // TODO replace it on facetapi_check_block_visibility() ?
     if ($default_true == empty($facet_search_ids[$search_id])) {
       $blocks['reset_urls'][$facet_name] = ajax_facets_facet_build_reset_path($facet, $adapter);
       if (!empty($builds[$group][$facet_name])) {
