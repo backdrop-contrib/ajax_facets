@@ -16,27 +16,11 @@ function ajax_facets_refresh_facets_content() {
 
     // Reset $_POST, because html ids, can break ids of facets for update.
     unset($_POST['ajax_html_ids']);
+    unset($_POST['ajax_facets']);
 
     $name = $_GET['view_name'];
-    $display_id = $_GET['display_name'];
-
-    // Prepare args for view.
-    $view_args = array();
-    $denied_args = array(
-      'q',
-      'f',
-      'searchPath',
-      'index_id',
-      'view_name',
-      'facet_field',
-      'display_name'
-    );
-
-    foreach ($_POST['ajax_facets'] as $key => $value) {
-      if (!in_array($key, $denied_args)) {
-        $view_args[$key] = $value;
-      }
-    }
+    $display_id = $_GET['view_display_id'];
+    $view_args = !empty($_GET['view_args']) ? explode('/', $_GET['view_args']) : array();
 
     // Execute view query to fill facets.
     $view = views_get_view($name);

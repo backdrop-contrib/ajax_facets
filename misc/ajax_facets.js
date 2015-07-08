@@ -42,15 +42,25 @@
         if (settings.facetapi.index_id != undefined) {
           Drupal.ajax_facets.queryState['index_id'] = settings.facetapi.index_id;
         }
-        if (settings.facetapi.view_name != undefined) {
-          Drupal.ajax_facets.queryState['view_name'] = settings.facetapi.view_name;
+        // Check view name and display name.
+        if (settings.facetapi.view_name != undefined && settings.facetapi.display_name != undefined) {
+          if (Drupal.settings && Drupal.settings.views && Drupal.settings.views.ajaxViews) {
+            // Check each rendered view.
+            $.each(Drupal.settings.views.ajaxViews, function(i, viewSettings) {
+              // If it's our view and display.
+              if (viewSettings.view_name == settings.facetapi.view_name
+                && viewSettings.view_display_id == settings.facetapi.display_name) {
+                // Take settings from view and add them into query.
+                Drupal.ajax_facets.queryState = $.extend(Drupal.ajax_facets.queryState, viewSettings);
+              }
+            });
+          }
         }
+
         if (settings.facetapi.facet_field != undefined) {
           Drupal.ajax_facets.queryState['facet_field'] = settings.facetapi.facet_field;
         }
-        if (settings.facetapi.display_name != undefined) {
-          Drupal.ajax_facets.queryState['display_name'] = settings.facetapi.display_name;
-        }
+
         // Respect search keywords in AJAX queries.
         if (settings.facetapi.searchKeys != undefined) {
           Drupal.ajax_facets.queryState['search_api_views_fulltext'] = settings.facetapi.searchKeys;
