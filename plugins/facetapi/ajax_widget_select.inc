@@ -17,10 +17,14 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    * Overrides FacetapiWidgetCheckboxLinks::init().
    */
   public function init() {
+    $settings = $this->settings->settings;
     parent::init();
     drupal_add_js(
       array(
-        'facetapi' => array('ajax_select_box' => array('default_value' => t('Select')))
+        'facetapi' => array(
+          'ajax_select_box' => array(
+            'default_value' => t('@label', array(
+              '@label' => $settings['default_option_label'])))),
       ),
       'setting'
     );
@@ -38,6 +42,18 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
   }
 
   /**
+   * Overrides FacetapiWidget::settingsForm().
+   */
+  public function settingsForm(&$form, &$form_state) {
+    parent::settingsForm($form, $form_state);
+    $form['widget']['widget_settings']['links'][$this->id]['default_option_label'] = array(
+      '#title' => t('Default Option Label'),
+      '#type' => 'textfield',
+      '#default_value' => !empty($this->settings->settings['default_option_label']) ? $this->settings->settings['default_option_label'] : t('Select'),
+     );
+   }
+
+  /**
    * Transforms the render array for use with theme_item_list().
    *
    * The recursion allows this function to act on the various levels of a
@@ -50,13 +66,14 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    *   The "items" parameter for theme_item_list().
    */
   function buildListItems($build, $level = 0) {
+    $settings = $this->settings->settings;
 
     // Builds rows.
     $items = array();
 
     // Add default item only once.
     if ($level == 0) {
-      $items['values'][0] = t('Select');
+      $items['values'][0] = t('@label', array('@label' => $settings['default_option_label']));
     }
 
     $prefix = str_repeat('-', $level);
