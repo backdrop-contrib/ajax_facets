@@ -17,17 +17,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    * Overrides FacetapiWidgetCheckboxLinks::init().
    */
   public function init() {
-    $settings = $this->settings->settings;
     parent::init();
-    drupal_add_js(
-      array(
-        'facetapi' => array(
-          'ajax_select_box' => array(
-            'default_value' => t('@label', array(
-              '@label' => $settings['default_option_label'])))),
-      ),
-      'setting'
-    );
     ajax_facets_add_ajax_js($this->facet);
   }
 
@@ -73,7 +63,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
 
     // Add default item only once.
     if ($level == 0) {
-      $items['values'][0] = t('@label', array('@label' => $settings['default_option_label']));
+      $items['values']['_none'] = t('@label', array('@label' => $settings['default_option_label']));
     }
 
     $prefix = str_repeat('-', $level);
