@@ -147,7 +147,7 @@
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
 
       /* Default value. */
-      if ($this.find(":selected").text() == Drupal.settings.facetapi.ajax_select_box.default_value) {
+      if ($this.find(":selected").val() == '_none') {
         delete Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length];
       }
       else {
