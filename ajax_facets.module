@@ -293,5 +293,20 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
  * Implements hook_form_form_id_alter().
  */
 function ajax_facets_form_facetapi_facet_display_form_alter(&$form, $form_state) {
+  // Add JS file for settings form of each facet.
   drupal_add_js(drupal_get_path('module', 'ajax_facets') . '/misc/ajax_facets.admin.js');
+}
+
+/**
+ * Implements hook_views_pre_view().
+ */
+function ajax_facets_views_pre_render(&$view) {
+  $setting = array(
+    'facetapi' => array(
+      'view_args' => array(
+        "$view->name:$view->current_display" => $view->args,
+      )
+    )
+  );
+  drupal_add_js($setting, 'setting');
 }
