@@ -46,6 +46,7 @@
         if (settings.facetapi.view_name != undefined && settings.facetapi.display_name != undefined) {
           Drupal.ajax_facets.queryState['view_name'] = settings.facetapi.view_name;
           Drupal.ajax_facets.queryState['view_display_id'] = settings.facetapi.display_name;
+          // Respect view arguments.
           var name_display = settings.facetapi.view_name + ':' + settings.facetapi.display_name;
           if (settings.facetapi.view_args[name_display]) {
             Drupal.ajax_facets.queryState['view_args'] = settings.facetapi.view_args[name_display];
@@ -55,12 +56,16 @@
         if (settings.facetapi.facet_field != undefined) {
           Drupal.ajax_facets.queryState['facet_field'] = settings.facetapi.facet_field;
         }
+      }
 
-        // Respect search keywords in AJAX queries.
-        if (settings.facetapi.searchKeys != undefined) {
-          Drupal.ajax_facets.queryState['search_api_views_fulltext'] = settings.facetapi.searchKeys;
+      // Respect arguments in exposed form.
+      if (settings.facetapi.view_name != undefined && settings.facetapi.display_name != undefined) {
+        var name_display = settings.facetapi.view_name + ':' + settings.facetapi.display_name;
+        if (settings.facetapi.exposed_input[name_display]) {
+          $.extend(Drupal.ajax_facets.queryState, settings.facetapi.exposed_input[name_display]);
         }
       }
+
       // Iterates over facet settings, applies functionality like the "Show more"
       // links for block realm facets.
       // @todo We need some sort of JS API so we don't have to make decisions
