@@ -75,7 +75,7 @@
           Drupal.ajax_facets.bindResetLink(settings.facetapi.facets[index].id, index, settings);
 
           // Checkboxes.
-          if(settings.facetapi.facets[index].widget == 'facetapi_ajax_checkboxes') {
+          if (settings.facetapi.facets[index].widget == 'facetapi_ajax_checkboxes') {
             $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change(
               [settings.facetapi.facets[index]],
               Drupal.ajax_facets.processCheckboxes
@@ -83,7 +83,7 @@
           }
 
           // Selectboxes.
-          if(settings.facetapi.facets[index].widget == 'facetapi_ajax_select') {
+          if (settings.facetapi.facets[index].widget == 'facetapi_ajax_select') {
             $('#' + settings.facetapi.facets[index].id + ' select:not(.processed)').each(function () {
               $(this).change(
                 [settings.facetapi.facets[index]],
@@ -93,8 +93,36 @@
           }
 
           // Links.
-          if(settings.facetapi.facets[index].widget == 'facetapi_ajax_links') {
+          if (settings.facetapi.facets[index].widget == 'facetapi_ajax_links') {
             $('#' + settings.facetapi.facets[index].id + ' a:not(.processed)').each(function () {
+              $(this).click(
+                [settings.facetapi.facets[index]],
+                Drupal.ajax_facets.processLink
+              ).addClass('processed');
+            });
+          }
+
+          // Ranges.
+          if (settings.facetapi.facets[index].widget == 'facetapi_ajax_ranges') {
+            $('#' + settings.facetapi.facets[index].id + ' div.slider-wrapper:not(.processed)').each(function () {
+              var $sliderWrapper = $(this);
+              var $sliderParent = $sliderWrapper.parent();
+              $sliderWrapper.slider({
+                range: true,
+                min: $sliderParent.data('min'),
+                max: $sliderParent.data('max'),
+                values: [ $sliderParent.data('min-val'), $sliderParent.data('max-val') ],
+                slide: function( event, ui ) {
+                  //console.log(ui.values[ 0 ] + " - $" + ui.values[ 1 ]);
+                  Drupal.ajax_facets.processSlider($sliderWrapper, ui);
+                  //$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+                }
+              }).addClass('processed');
+              //$( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
+              //" - $" + $( "#slider-range" ).slider( "values", 1 ) );
+
+
+
               $(this).click(
                 [settings.facetapi.facets[index]],
                 Drupal.ajax_facets.processLink
@@ -237,6 +265,20 @@
     Drupal.ajax_facets.sendAjaxQuery($this);
     event.preventDefault();
   };
+
+  /**
+   * Callback for slide event for widget slider.
+   */
+  Drupal.ajax_facets.processSlider = function($sliderWrapper, ui) {
+    var facetName = $sliderWrapper.data('facet');
+    if (Drupal.ajax_facets.queryState['f'] != undefined) {
+      // Exclude all values for this facet from query.
+      Drupal.ajax_facets.excludeCurrentFacet(facetName);
+      Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + ui.values[0] + ' TO ' + ui.values[1] + ']';
+    }
+
+    Drupal.ajax_facets.sendAjaxQuery($sliderWrapper);
+  }
 
   /**
    * Exclude all values for this facet from query.

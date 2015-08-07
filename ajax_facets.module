@@ -49,6 +49,13 @@ function ajax_facets_facetapi_widgets() {
         'query types' => array('term'),
       ),
     ),
+    'facetapi_ajax_ranges' => array(
+      'handler' => array(
+        'label' => 'Ajax ranges',
+        'class' => 'FacetapiAjaxWidgetRanges',
+        'query types' => array('term'),
+      ),
+    ),
   );
 }
 

@@ -10,4 +10,5 @@ files[] = plugins/facetapi/ajax_widget.inc
 files[] = plugins/facetapi/ajax_widget_checkboxes.inc
 files[] = plugins/facetapi/ajax_widget_select.inc
 files[] = plugins/facetapi/ajax_widget_links.inc
+files[] = plugins/facetapi/ajax_widget_ranges.inc
 files[] = plugins/facetapi/empty_behavior_ajax_facets.inc
