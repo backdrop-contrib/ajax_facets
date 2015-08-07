@@ -106,27 +106,31 @@
           if (settings.facetapi.facets[index].widget == 'facetapi_ajax_ranges') {
             $('#' + settings.facetapi.facets[index].id + ' div.slider-wrapper:not(.processed)').each(function () {
               var $sliderWrapper = $(this);
-              var $sliderParent = $sliderWrapper.parent();
               $sliderWrapper.slider({
                 range: true,
-                min: $sliderParent.data('min'),
-                max: $sliderParent.data('max'),
-                values: [ $sliderParent.data('min-val'), $sliderParent.data('max-val') ],
+                min: $sliderWrapper.data('min'),
+                max: $sliderWrapper.data('max'),
+                values: [ $sliderWrapper.data('min-val'), $sliderWrapper.data('max-val') ],
                 slide: function( event, ui ) {
-                  //console.log(ui.values[ 0 ] + " - $" + ui.values[ 1 ]);
-                  Drupal.ajax_facets.processSlider($sliderWrapper, ui);
-                  //$( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
+                  Drupal.ajax_facets.processSlider($sliderWrapper, ui.values[0], ui.values[1]);
                 }
               }).addClass('processed');
-              //$( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
-              //" - $" + $( "#slider-range" ).slider( "values", 1 ) );
 
+              // Bind input fields.
+              var $sliderWrapperParent = $sliderWrapper.parent();
+              $sliderWrapperParent.find("input[type='text']").each(function() {
+                $(this).change(function() {
+                  var min = $sliderWrapperParent.find('.ajax-facets-slider-amount-min').val();
+                  var max = $sliderWrapperParent.find('.ajax-facets-slider-amount-max').val();
+                  // If values are numeric.
+                  if (!isNaN(parseFloat(min)) && isFinite(min) && !isNaN(parseFloat(max)) && isFinite(max)) {
+                    $sliderWrapper.slider('values', 0, min);
+                    $sliderWrapper.slider('values', 1, max);
+                    Drupal.ajax_facets.processSlider($sliderWrapper, min, max);
+                  }
+                });
+              });
 
-
-              $(this).click(
-                [settings.facetapi.facets[index]],
-                Drupal.ajax_facets.processLink
-              ).addClass('processed');
             });
           }
 
@@ -269,12 +273,12 @@
   /**
    * Callback for slide event for widget slider.
    */
-  Drupal.ajax_facets.processSlider = function($sliderWrapper, ui) {
+  Drupal.ajax_facets.processSlider = function($sliderWrapper, min, max) {
     var facetName = $sliderWrapper.data('facet');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       // Exclude all values for this facet from query.
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
-      Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + ui.values[0] + ' TO ' + ui.values[1] + ']';
+      Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
     }
 
     Drupal.ajax_facets.sendAjaxQuery($sliderWrapper);
