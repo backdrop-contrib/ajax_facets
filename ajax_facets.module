@@ -23,6 +23,18 @@ function ajax_facets_menu() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function ajax_facets_theme() {
+  return array(
+    'ajax_facets_ranges_input' => array(
+      'variables' => array('title' => NULL, 'attributes' => array(), 'value' => NULL),
+      'file' => 'ajax_facets.theme.inc',
+    ),
+  );
+}
+
+/**
  * Implements hook_facetapi_widgets().
  */
 function ajax_facets_facetapi_widgets() {
