@@ -49,7 +49,6 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
       $items['values'][$item['#indexed_value']] = $item['#indexed_value'];
     }
 
-    // @todo is active items need for slider?
     $this->jsSettings['haveActiveSelection'] = $this->settings->settings['have_active_selection'] = $have_active;
     sort($active_items);
     $this->jsSettings['activeItems'] = $active_items;

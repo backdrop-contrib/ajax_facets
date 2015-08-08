@@ -14,6 +14,8 @@
   Drupal.ajax_facets.current_facet_name = null;
   // Settings of each ajax facet.
   Drupal.ajax_facets.facetsSettings = {};
+  // Timer for ranges widget.
+  Drupal.ajax_facets.timer;
 
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
@@ -122,8 +124,8 @@
                 $(this).change(function() {
                   var min = $sliderWrapperParent.find('.ajax-facets-slider-amount-min').val();
                   var max = $sliderWrapperParent.find('.ajax-facets-slider-amount-max').val();
-                  // If values are numeric.
-                  if (!isNaN(parseFloat(min)) && isFinite(min) && !isNaN(parseFloat(max)) && isFinite(max)) {
+                  // If values are numeric and min less than max.
+                  if (!isNaN(parseFloat(min)) && isFinite(min) && !isNaN(parseFloat(max)) && isFinite(max) && min < max) {
                     $sliderWrapper.slider('values', 0, min);
                     $sliderWrapper.slider('values', 1, max);
                     Drupal.ajax_facets.processSlider($sliderWrapper, min, max);
@@ -271,17 +273,20 @@
   };
 
   /**
-   * Callback for slide event for widget slider.
+   * Callback for slide event for widget ranges.
    */
   Drupal.ajax_facets.processSlider = function($sliderWrapper, min, max) {
-    var facetName = $sliderWrapper.data('facet');
-    if (Drupal.ajax_facets.queryState['f'] != undefined) {
-      // Exclude all values for this facet from query.
-      Drupal.ajax_facets.excludeCurrentFacet(facetName);
-      Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
-    }
+    window.clearTimeout(Drupal.ajax_facets.timer);
+    Drupal.ajax_facets.timer = window.setTimeout(function() {
+      var facetName = $sliderWrapper.data('facet');
+      if (Drupal.ajax_facets.queryState['f'] != undefined) {
+        // Exclude all values for this facet from query.
+        Drupal.ajax_facets.excludeCurrentFacet(facetName);
+        Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
+      }
 
-    Drupal.ajax_facets.sendAjaxQuery($sliderWrapper);
+      Drupal.ajax_facets.sendAjaxQuery($sliderWrapper);
+    }, 600);
   }
 
   /**
