@@ -154,16 +154,16 @@
     }
   };
 
-  Drupal.ajax_facets.bindResetLink = function (parentId, index, settings) {
+  Drupal.ajax_facets.bindResetLink = function (facetWrapperId, index, settings) {
     var facet_values = Drupal.ajax_facets.getFacetValues();
     if (facet_values[settings.facetapi.facets[index]['facetName']] != undefined) {
-      $('.' + parentId).parents('.block-facetapi').find('a.reset-link').show();
+      $('#' + facetWrapperId).find('a.reset-link').show();
     }
     else {
-      $('.' + parentId).parents('.block-facetapi').find('a.reset-link').hide();
+      $('#' + facetWrapperId).find('a.reset-link').hide();
     }
 
-    $('.' + parentId).parents('.block-facetapi').find('a.reset-link:not(".processed")').addClass('processed').click(function () {
+    $('#' + facetWrapperId).find('a.reset-link:not(".processed")').addClass('processed').click(function () {
       window.location = settings.facetapi.facets[index].resetPath;
       return false;
     });
@@ -370,7 +370,7 @@
 
       if (response.data.newContent != undefined && response.data.newContent) {
         for (var id in response.data.newContent) {
-          var $blockToReplace = $('#' + id).parents('.ajax-facets-wrapper');
+          var $blockToReplace = $('#' + id);
           if ($blockToReplace.size()) {
             $blockToReplace.replaceWith(response.data.newContent[id]);
           }

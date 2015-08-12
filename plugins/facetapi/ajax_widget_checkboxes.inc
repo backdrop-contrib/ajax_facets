@@ -164,7 +164,6 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     $item_list = array(
       '#theme' => 'item_list',
       '#items' => $this->buildListItems($element),
-      '#attributes' => $this->build['#attributes'],
     );
 
     $reset_link = '';
@@ -173,7 +172,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     }
 
     $element = array(
-      '#markup' => '<div class="ajax-facets-wrapper facet-wrapper-ajax-checkboxes ' . $this->build['#attributes']['id'] . '">'
+      '#markup' => '<div' .drupal_attributes($this->build['#attributes']) .'>'
         . $reset_link
         . render($item_list)
         . '</div>'

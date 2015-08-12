@@ -141,11 +141,9 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
     }
 
     $element = array(
-      '#markup' => '<div class="ajax-facets-wrapper facet-wrapper-ajax-selectbox ' . $this->build['#attributes']['id'] . '">'
+      '#markup' => '<div' . drupal_attributes($this->build['#attributes']) . '>'
         . $reset_link
-        . '<div ' . drupal_attributes($this->build['#attributes']) . '>'
         . render($select)
-        . '</div>'
         . '</div>'
     );
   }

@@ -129,7 +129,6 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
 	  $item_list = array(
       '#theme' => 'item_list',
       '#items' => $item_list,
-      '#attributes' => $this->build['#attributes'],
     );
 
     $reset_link = '';
@@ -138,7 +137,7 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
     }
 
     $element = array(
-      '#markup' => '<div class="ajax-facets-wrapper facet-wrapper-ajax-links ' . $this->build['#attributes']['id'] . '">'
+      '#markup' => '<div' . drupal_attributes($this->build['#attributes']) . '">'
         . $reset_link
         . render($item_list)
         . '</div>'

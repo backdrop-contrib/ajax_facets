@@ -129,9 +129,9 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
     );
 
     $element = array(
-      '#markup' => '<div class="ajax-facets-wrapper facet-wrapper-ajax-ranges ' . $this->build['#attributes']['id'] . '">'
+      '#markup' => '<div' . drupal_attributes($this->build['#attributes']) . '>'
         . $reset_link
-        . '<div ' . drupal_attributes($this->build['#attributes']) . '>'
+        . '<div class="ajax-facets-controls-wrapper">'
         . $min_input
         . $max_input
         . '<div ' . drupal_attributes($slider_attrs) . '></div>'
