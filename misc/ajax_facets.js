@@ -53,6 +53,11 @@
           if (settings.facetapi.view_args[name_display]) {
             Drupal.ajax_facets.queryState['view_args'] = settings.facetapi.view_args[name_display];
           }
+          // Get view dom id.
+          var viewDomId = Drupal.ajax_facets.getViewDomId(settings.facetapi.view_name, settings.facetapi.display_name);
+          if (viewDomId) {
+            Drupal.ajax_facets.queryState['view_dom_id'] = viewDomId;
+          }
         }
 
         if (settings.facetapi.facet_field != undefined) {
@@ -352,6 +357,19 @@
     }, 3000);
   }
 
+  /* Get view dom id for both modes of views - ajax/not ajax. */
+  Drupal.ajax_facets.getViewDomId = function(view_name, display_name) {
+    var classes = $('.view-id-' + view_name + '.view-display-id-' + display_name).attr('class').split(' ');
+    var viewDomId = false;
+    $.each(classes, function(k, val) {
+        if (val.substr(0, 11) == 'view-dom-id') {
+          viewDomId = val.replace('view-dom-id-', '');
+        }
+      }
+    )
+    return viewDomId;
+  }
+
   if (Drupal.ajax) {
     // Command for process search results and facets by ajax.
     Drupal.ajax.prototype.commands.ajax_facets_update_content = function(ajax, response) {
@@ -382,7 +400,6 @@
       }
 
       /* Update results. */
-      var results_updated = false;
       var show_tip = false;
       $.each(response.data.update_results, function (facet_name, mode) {
         if (Drupal.ajax_facets.current_facet_name == facet_name) {

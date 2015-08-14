@@ -24,8 +24,9 @@ function ajax_facets_refresh_facets_content() {
 
     // Execute view query to fill facets.
     $view = views_get_view($name);
-    $view->execute_display($display_id, $view_args);
-    $page = $view->preview($display_id);
+    // Reuse dom id.
+    $view->dom_id = isset($_GET['view_dom_id']) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $_GET['view_dom_id']) : NULL;
+    $page = $view->preview($display_id, $view_args);
 
     $searcher = 'search_api@' . $_GET['index_id'];
     $adapter = facetapi_adapter_load($searcher);
