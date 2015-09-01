@@ -73,6 +73,13 @@ function ajax_facets_refresh_facets_content() {
     }
 
     $commands = array();
+
+    // Render exposed form separately if needed. @see https://www.drupal.org/node/2034029#comment-10211699
+    if ($view->display[$view->current_display]->display_options['exposed_block']) {
+      $exposed_form = $view->display_handler->get_plugin('exposed_form');
+      $result['exposed_form'] = $exposed_form->render_exposed_form(TRUE);
+    }
+
     $commands[] = array(
       'command' => 'ajax_facets_update_content',
       'data' => $result,

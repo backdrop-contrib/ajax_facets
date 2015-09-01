@@ -386,6 +386,13 @@
         }
       }
 
+      // Update the exposed form separately if needed.
+      if (response.data.exposed_form) {
+        var viewId = response.data.views_name + '-' + response.data.display_id;
+        $('#views-exposed-form-' + viewId.replace(/_/g, '-')).replaceWith(response.data.exposed_form)
+      }
+
+      // Update content.
       if (response.data.newContent != undefined && response.data.newContent) {
         for (var id in response.data.newContent) {
           var $blockToReplace = $('#' + id);
@@ -427,6 +434,7 @@
       if (response.data.settings.views != undefined) {
         Drupal.settings.views = response.data.settings.views;
       }
+
       Drupal.attachBehaviors();
       if (show_tip) {
         Drupal.ajax_facets.showTooltip($, response.data);
