@@ -179,9 +179,12 @@
       $('#' + facetWrapperId).find('a.reset-link').hide();
     }
 
-    $('#' + facetWrapperId).find('a.reset-link:not(".processed")').addClass('processed').click(function () {
-      window.location = settings.facetapi.facets[index].resetPath;
-      return false;
+    $('#' + facetWrapperId).find('a.reset-link:not(".processed")').addClass('processed').click(function (event) {
+      var $facet = $(this).parent().find('[data-facet]').first();
+      var facetName = $facet.data('facet');
+      Drupal.ajax_facets.excludeCurrentFacet(facetName);
+      Drupal.ajax_facets.sendAjaxQuery($facet);
+      event.preventDefault();
     });
   };
 
