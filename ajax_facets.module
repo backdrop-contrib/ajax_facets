@@ -328,6 +328,9 @@ function ajax_facets_views_pre_render(&$view) {
       'exposed_input' => array(
         "$view->name:$view->current_display" => $view->exposed_raw_input,
       ),
+      'view_path' => array(
+        "$view->name:$view->current_display" => $view->get_path(),
+      ),
     )
   );
   drupal_add_js($setting, 'setting');

@@ -20,10 +20,15 @@ function ajax_facets_refresh_facets_content() {
 
     $name = $_GET['view_name'];
     $display_id = $_GET['view_display_id'];
-    $view_args = !empty($_GET['view_args']) ? $_GET['view_args'] : array();
+    $view_args = isset($_GET['view_args']) && $_GET['view_args'] !== '' ? explode('/', $_GET['view_args']) : array();
+    $view_path = isset($_GET['view_path']) ? rawurldecode($_GET['view_path']) : NULL;
 
     // Execute view query to fill facets.
     $view = views_get_view($name);
+    // Fix 'q' for paging.
+    if (!empty($view_path)) {
+      $_GET['q'] = $view_path;
+    }
     // Reuse dom id.
     $view->dom_id = isset($_GET['view_dom_id']) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $_GET['view_dom_id']) : NULL;
     $page = $view->preview($display_id, $view_args);
@@ -59,7 +64,7 @@ function ajax_facets_refresh_facets_content() {
               'view_name' => $view->name,
               'view_display_id' => $view->current_display,
               'view_args' => check_plain(implode('/', $view->args)),
-              'view_path' => check_plain($_GET['q']),
+              'view_path' => $view_path,
               // Pass through URL to ensure we get e.g. language prefixes.
               'view_base_path' => $view->get_path(),
               'view_dom_id' => $view->dom_id,

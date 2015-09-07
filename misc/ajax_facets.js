@@ -46,17 +46,28 @@
         }
         // Check view name and display name.
         if (settings.facetapi.view_name != undefined && settings.facetapi.display_name != undefined) {
-          Drupal.ajax_facets.queryState['view_name'] = settings.facetapi.view_name;
-          Drupal.ajax_facets.queryState['view_display_id'] = settings.facetapi.display_name;
-          // Respect view arguments.
-          var name_display = settings.facetapi.view_name + ':' + settings.facetapi.display_name;
-          if (settings.facetapi.view_args[name_display]) {
-            Drupal.ajax_facets.queryState['view_args'] = settings.facetapi.view_args[name_display];
-          }
           // Get view dom id.
           var viewDomId = Drupal.ajax_facets.getViewDomId(settings.facetapi.view_name, settings.facetapi.display_name);
           if (viewDomId) {
             Drupal.ajax_facets.queryState['view_dom_id'] = viewDomId;
+            // View by ajax.
+            if (Drupal.views && Drupal.views.instances['views_dom_id:' + viewDomId]) {
+              $.extend(Drupal.ajax_facets.queryState, Drupal.views.instances['views_dom_id:' + viewDomId].settings);
+            }
+            // View without ajax.
+            else {
+              Drupal.ajax_facets.queryState['view_name'] = settings.facetapi.view_name;
+              Drupal.ajax_facets.queryState['view_display_id'] = settings.facetapi.display_name;
+              // Respect view arguments.
+              var name_display = settings.facetapi.view_name + ':' + settings.facetapi.display_name;
+              if (settings.facetapi.view_args[name_display]) {
+                Drupal.ajax_facets.queryState['view_args'] = settings.facetapi.view_args[name_display];
+              }
+              // Respect view path.
+              if (settings.facetapi.view_path[name_display]) {
+                Drupal.ajax_facets.queryState['view_path'] = settings.facetapi.view_path[name_display];
+              }
+            }
           }
         }
 
