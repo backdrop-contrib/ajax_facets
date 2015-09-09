@@ -80,7 +80,7 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       else {
         // If the item is active or the "show_expanded" setting is selected,
         // show this item as expanded so we see its children.
-        if ($item['#active'] || !empty($settings['show_expanded'])) {
+        if (!empty($item['#active']) || !empty($settings['show_expanded'])) {
           $row['class'][] = 'expanded';
           $row['children'] = $this->buildListItems($item['#item_children']);
         }
@@ -90,7 +90,7 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       }
 
       // Gets theme hook, adds last minute classes.
-      $class = ($item['#active']) ? 'facetapi-active' : 'facetapi-inactive';
+      $class = !empty($item['#active']) ? 'facetapi-active' : 'facetapi-inactive';
       $variables['options']['attributes']['class'][] = $class;
 
       // Set options for ajax query.
@@ -161,7 +161,7 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
    */
   protected function setThemeHooks(array &$build) {
     foreach ($build as $value => &$item) {
-      $item['#theme'] = ($item['#active']) ? 'facetapi_link_active' : 'facetapi_link_inactive';
+      $item['#theme'] = !empty($item['#active']) ? 'facetapi_link_active' : 'facetapi_link_inactive';
       if (!empty($item['#item_children'])) {
         $this->setThemeHooks($item['#item_children']);
       }

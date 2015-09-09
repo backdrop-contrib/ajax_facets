@@ -104,7 +104,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         'data-facet' => $this->settings->facet,
       );
       // Respect current selection.
-      if ($item['#active']) {
+      if (!empty($item['#active'])) {
         $attributes['checked'] = 'checked';
         $have_active = TRUE;
         $active_items[] = $this->key . ':' . $item['#markup'];
@@ -124,7 +124,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
       }
 
       if (!empty($item['#item_children'])) {
-        if ($item['#active'] || !empty($this->settings->settings['show_expanded'])) {
+        if (!empty($item['#active']) || !empty($this->settings->settings['show_expanded'])) {
           $row['class'][] = 'expanded';
           $row['children'] = $this->buildListItems($item['#item_children']);
         } else {

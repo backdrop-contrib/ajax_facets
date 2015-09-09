@@ -281,7 +281,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
         $build = $facet->getBuild();
         $blocks['active_items'][$facet_name] = array();
         foreach ($build as $key => $value) {
-          if ($value['#active']) {
+          if (!empty($value['#active'])) {
             $blocks['active_items'][$facet_name][] = "$facet_name:$key";
           }
         }

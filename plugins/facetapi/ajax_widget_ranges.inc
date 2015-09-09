@@ -40,7 +40,7 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
     $have_active = FALSE;
     foreach ($build as $value => $item) {
       // Respect current selection.
-      if ($item['#active']) {
+      if (!empty($item['#active'])) {
         $items['active_value'] = $value;
         $have_active = TRUE;
         $active_items[] = $this->key . ':' . $item['#markup'];
