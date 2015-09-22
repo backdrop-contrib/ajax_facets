@@ -13,9 +13,6 @@
  */
 class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
 
-
-  public $update_result;
-
   /**
    * Overrides FacetapiWidget::settingsForm().
    */
