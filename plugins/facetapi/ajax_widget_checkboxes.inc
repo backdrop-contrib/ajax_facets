@@ -15,13 +15,6 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
 
 
   public $update_result;
-  /**
-   * Overrides FacetapiWidgetCheckboxLinks::init().
-   */
-  public function init() {
-    parent::init();
-    ajax_facets_add_ajax_js($this->facet);
-  }
 
   /**
    * Overrides FacetapiWidget::settingsForm().
@@ -177,5 +170,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         . render($item_list)
         . '</div>'
     );
+
+    ajax_facets_add_ajax_js($this->facet);
   }
 }

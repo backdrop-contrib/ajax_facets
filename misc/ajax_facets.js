@@ -373,7 +373,11 @@
 
   /* Get view dom id for both modes of views - ajax/not ajax. */
   Drupal.ajax_facets.getViewDomId = function(view_name, display_name) {
-    var classes = $('.view-id-' + view_name + '.view-display-id-' + display_name).attr('class').split(' ');
+    var view = $('.view-id-' + view_name + '.view-display-id-' + display_name);
+    if (view.length < 1) {
+      return false;
+    }
+    var classes = view.attr('class').split(' ');
     var viewDomId = false;
     $.each(classes, function(k, val) {
         if (val.substr(0, 11) == 'view-dom-id') {

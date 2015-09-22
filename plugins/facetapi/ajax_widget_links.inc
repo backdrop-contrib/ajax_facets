@@ -13,11 +13,6 @@
  */
 class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
 
-  public function init() {
-    parent::init();
-    ajax_facets_add_ajax_js($this->facet);
-  }
-
   /**
    * Overrides FacetapiWidget::getDefaultSettings().
    */
@@ -142,6 +137,8 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
         . render($item_list)
         . '</div>'
     );
+
+    ajax_facets_add_ajax_js($this->facet);
   }
 
   /**

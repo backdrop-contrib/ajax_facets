@@ -127,8 +127,8 @@ function ajax_facets_add_ajax_js($facet) {
       'applyPath' => url($search_path, array('query' => $query)),
     );
     drupal_add_js($setting, 'setting');
+    drupal_add_library('system', 'drupal.ajax');
   }
-  drupal_add_library('system', 'drupal.ajax');
 }
 
 /**

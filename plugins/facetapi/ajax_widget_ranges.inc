@@ -11,14 +11,6 @@
 class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
 
   /**
-   * Overrides FacetapiWidgetCheckboxLinks::init().
-   */
-  public function init() {
-    parent::init();
-    ajax_facets_add_ajax_js($this->facet);
-  }
-
-  /**
    * Overrides FacetapiWidget::getDefaultSettings().
    */
   function getDefaultSettings() {
@@ -138,5 +130,7 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
         . '</div>'
         . '</div>'
     );
+
+    ajax_facets_add_ajax_js($this->facet);
   }
 }
