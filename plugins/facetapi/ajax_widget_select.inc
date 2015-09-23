@@ -32,7 +32,12 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       '#title' => t('Default Option Label'),
       '#type' => 'textfield',
       '#default_value' => !empty($this->settings->settings['default_option_label']) ? $this->settings->settings['default_option_label'] : t('Select'),
-     );
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+        ),
+      ),
+    );
    }
 
   /**
