@@ -54,7 +54,7 @@ class FacetapiEmptyBehaviorAjaxFacets extends FacetapiEmptyBehavior {
 
     $class2 = str_replace(array('_', ':'), '-', $this->configName);
     $class2 = str_replace('@', '', $class2);
-    $wrapper = '<div class="' . $class1 . ' facetapi-facet-' . $class2 . '"></div>';
+    $wrapper = '<div class="' . $class1 . ' facetapi-facet-' . $class2 . '" id="facetapi-facet-' . $class2 . '"></div>';
     return array('#markup' => $wrapper);
   }
 }
