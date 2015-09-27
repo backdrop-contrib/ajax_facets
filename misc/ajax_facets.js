@@ -173,13 +173,13 @@
   Drupal.ajax_facets.bindResetLink = function (facetWrapperId, index, settings) {
     var facet_values = Drupal.ajax_facets.getFacetValues();
     if (facet_values[settings.facetapi.facets[index]['facetName']] != undefined) {
-      $('#' + facetWrapperId).find('a.reset-link').show();
+      $('#' + facetWrapperId + '-wrapper').find('a.reset-link').show();
     }
     else {
-      $('#' + facetWrapperId).find('a.reset-link').hide();
+      $('#' + facetWrapperId + '-wrapper').find('a.reset-link').hide();
     }
 
-    $('#' + facetWrapperId).find('a.reset-link:not(".processed")').addClass('processed').click(function (event) {
+    $('#' + facetWrapperId + '-wrapper').find('a.reset-link:not(".processed")').addClass('processed').click(function (event) {
       var $facet = $(this).parent().find('[data-facet]').first();
       var facetName = $facet.data('facet');
       Drupal.ajax_facets.excludeCurrentFacet(facetName);

@@ -277,8 +277,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
     // TODO replace it on facetapi_check_block_visibility() ?
     if ($default_true == empty($facet_search_ids[$search_id])) {
       $blocks['reset_urls'][$facet_name] = ajax_facets_facet_build_reset_path($facet, $adapter);
-      if (!empty($builds[$group][$facet_name])) {
-        $build = $facet->getBuild();
+      if (!empty($builds[$group][$facet_name]) && $build = $facet->getBuild()) {
         $blocks['active_items'][$facet_name] = array();
         foreach ($build as $key => $value) {
           if (!empty($value['#active'])) {
@@ -291,7 +290,8 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
 
         // Skip currently checked facet - we will not refresh them.
         $blocks['facet_blocks'][$builds[$group][$facet_name]['#attributes']['id']] = drupal_render($builds[$group][$facet_name]);
-      } else {
+      }
+      else {
         $facet_name = rawurlencode($facet_name);
         $delta = array_search("$searcher:$realm_name:$facet_name", $map);
         $blocks['hide_blocks'][] = 'block-facetapi-' . strtolower($delta);
