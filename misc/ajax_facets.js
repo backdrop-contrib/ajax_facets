@@ -16,6 +16,8 @@
   Drupal.ajax_facets.facetsSettings = {};
   // Timer for ranges widget.
   Drupal.ajax_facets.timer;
+  // Tooltip timeout handler.
+  Drupal.ajax_facets.tooltipTimeout;
 
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
@@ -360,13 +362,16 @@
 
   /* Show tooltip if facet results are not updated by ajax (in settings). */
   Drupal.ajax_facets.showTooltip = function ($, response) {
+    // Reset the timeout handler to avoid troubles when user is clicking on items very fast.
+    window.clearTimeout(Drupal.ajax_facets.tooltipTimeout);
+
     var pos = $('#' + Drupal.ajax_facets.current_id).offset();
     jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
     jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
     jQuery('#ajax-facets-tooltip').show();
     jQuery('#ajax-facets-tooltip span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
 
-    setTimeout(function () {
+    Drupal.ajax_facets.tooltipTimeout = setTimeout(function () {
       jQuery('#ajax-facets-tooltip').hide(250);
     }, 3000);
   }
