@@ -94,7 +94,7 @@
 
           // Checkboxes.
           if (settings.facetapi.facets[index].widget == 'facetapi_ajax_checkboxes') {
-            $('#' + settings.facetapi.facets[index].id + ' input.facet-multiselect-checkbox:not(.processed)').change(
+            $('#' + settings.facetapi.facets[index].id + '-wrapper input.facet-multiselect-checkbox:not(.processed)').change(
               [settings.facetapi.facets[index]],
               Drupal.ajax_facets.processCheckboxes
             ).addClass('processed');
@@ -102,7 +102,7 @@
 
           // Selectboxes.
           if (settings.facetapi.facets[index].widget == 'facetapi_ajax_select') {
-            $('#' + settings.facetapi.facets[index].id + ' select:not(.processed)').each(function () {
+            $('#' + settings.facetapi.facets[index].id + '-wrapper select:not(.processed)').each(function () {
               $(this).change(
                 [settings.facetapi.facets[index]],
                 Drupal.ajax_facets.processSelectbox
@@ -112,7 +112,7 @@
 
           // Links.
           if (settings.facetapi.facets[index].widget == 'facetapi_ajax_links') {
-            $('#' + settings.facetapi.facets[index].id + ' a:not(.processed)').each(function () {
+            $('#' + settings.facetapi.facets[index].id + '-wrapper a:not(.processed)').each(function () {
               $(this).click(
                 [settings.facetapi.facets[index]],
                 Drupal.ajax_facets.processLink
@@ -122,7 +122,7 @@
 
           // Ranges.
           if (settings.facetapi.facets[index].widget == 'facetapi_ajax_ranges') {
-            $('#' + settings.facetapi.facets[index].id + ' div.slider-wrapper:not(.processed)').each(function () {
+            $('#' + settings.facetapi.facets[index].id + '-wrapper div.slider-wrapper:not(.processed)').each(function () {
               var $sliderWrapper = $(this);
               $sliderWrapper.slider({
                 range: true,
@@ -413,11 +413,11 @@
       // Update content.
       if (response.data.newContent != undefined && response.data.newContent) {
         for (var id in response.data.newContent) {
-          var $blockToReplace = $('#' + id);
+          var $blockToReplace = $('#' + id + '-wrapper');
           if ($blockToReplace.size()) {
             $blockToReplace.replaceWith(response.data.newContent[id]);
           }
-          var $block = $('#' + id).parents('div.block-facetapi:not(:visible)');
+          var $block = $('#' + id + '-wrapper').parents('div.block-facetapi:not(:visible)');
           if ($block.size()) {
             $block.show();
           }

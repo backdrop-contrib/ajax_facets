@@ -65,7 +65,6 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
 
     $items = $this->buildListItems($element);
 
-
     $reset_link = '';
     if (!empty($this->settings->settings['show_reset_link']) && $this->settings->settings['show_reset_link']) {
       $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
@@ -120,8 +119,11 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
       )
     );
 
+    // We cannot use drupal_html_id to save the same id for each facet.
+    $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
+
     $element = array(
-      '#markup' => '<div' . drupal_attributes($this->build['#attributes']) . '>'
+      '#markup' => '<div id="' . $wrapper_id . '">'
         . $reset_link
         . '<div class="ajax-facets-controls-wrapper">'
         . $min_input

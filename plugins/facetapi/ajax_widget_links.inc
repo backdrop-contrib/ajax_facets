@@ -118,12 +118,10 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
 
     $this->setThemeHooks($element);
     // Sets each item's theme hook, builds item list.
-
-    $item_list = $this->buildListItems($element);
-
 	  $item_list = array(
       '#theme' => 'item_list',
-      '#items' => $item_list,
+      '#items' => $this->buildListItems($element),
+      '#attributes' => $this->build['#attributes'],
     );
 
     $reset_link = '';
@@ -131,8 +129,11 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
     }
 
+    // We cannot use drupal_html_id to save the same id for each facet.
+    $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
+
     $element = array(
-      '#markup' => '<div' . drupal_attributes($this->build['#attributes']) . '">'
+      '#markup' => '<div id="' . $wrapper_id . '">'
         . $reset_link
         . render($item_list)
         . '</div>'

@@ -137,8 +137,11 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
     }
 
+    // We cannot use drupal_html_id to save the same id for each facet.
+    $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
+
     $element = array(
-      '#markup' => '<div' . drupal_attributes($this->build['#attributes']) . '>'
+      '#markup' => '<div id="' . $wrapper_id . '">'
         . $reset_link
         . render($select)
         . '</div>'
