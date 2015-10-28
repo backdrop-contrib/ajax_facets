@@ -198,7 +198,7 @@ function ajax_facets_views_ajax_data_alter(&$commands, $view) {
     $blocks = ajax_facets_process_facet_blocks($searcher);
     // Create commands to replace each block. We should use ID's because all facets have it.
     foreach ($blocks['facet_blocks'] as $id => $content) {
-      $commands[] = ajax_command_replace("#$id", $content);
+      $commands[] = ajax_command_replace("#$id-wrapper", $content);
     }
     // Show all blocks
     $commands[] = ajax_command_invoke('div.block-facetapi:not(:visible)', 'show');
