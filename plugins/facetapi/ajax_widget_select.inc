@@ -76,7 +76,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
         $active_items[] = $this->key . ':' . $item['#markup'];
       }
 
-      $items['values'][$item['#indexed_value']] = $prefix . $item['#markup'] . theme('facetapi_count',(array('count' => $item['#count'])));
+      $items['values'][$item['#indexed_value']] = $prefix . $item['#markup'] . ' ' . theme('facetapi_count',(array('count' => $item['#count'])));
 
       if (!empty($item['#item_children'])) {
         $childrens = $this->buildListItems($item['#item_children'], $level);
@@ -124,7 +124,8 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       '#id' => 'ajax-facets-selectbox-' . str_replace(array('_', ' ', ':'), '-', $this->settings->facet),
       '#name' => rawurlencode($this->settings->facet),
       '#attributes' => array(
-        'data-facet' => $this->settings->facet,
+        'data-facet-name' => rawurlencode($this->settings->facet),
+        'data-raw-facet-name' => $this->settings->facet,
       ),
     );
 

@@ -89,9 +89,9 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       $variables['options']['attributes']['class'][] = $class;
 
       // Set options for ajax query.
-      $variables['options']['attributes']['data-name'] = rawurlencode($this->settings->facet);
-      $variables['options']['attributes']['data-value'] = $item['#indexed_value'];
-      $variables['options']['attributes']['data-facet'] = $this->settings->facet;
+      $variables['options']['attributes']['data-facet-value'] = $item['#indexed_value'];
+      $variables['options']['attributes']['data-facet-name'] = rawurlencode($this->settings->facet);
+      $variables['options']['attributes']['data-raw-facet-name'] = $this->settings->facet;
 
       // Themes the link, adds row to items.
       $row['data'] = theme($item['#theme'], $variables);

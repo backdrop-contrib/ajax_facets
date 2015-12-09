@@ -196,7 +196,7 @@
   Drupal.ajax_facets.processSelectbox = function (event) {
 
     var $this = $(this);
-    var facetName = $this.data('facet');
+    var facetName = $this.data('facet-name');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       // Exclude all values for this facet from query.
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
@@ -218,31 +218,32 @@
    */
   Drupal.ajax_facets.processCheckboxes = function (event) {
     var $this = $(this);
-    var facetName = $this.data('facet');
-    var facetCheckboxName = $this.attr('name');
+    var facetName = $this.data('facet-name');
+    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values, avoid it.
+    var rawFacetName = $this.data('raw-facet-name');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       if ($this.is(':checked')) {
         var addCurrentParam = true;
         for (var index in Drupal.ajax_facets.queryState['f']) {
           // If we already have this value in queryState.
-          if (Drupal.ajax_facets.queryState['f'][index] == facetCheckboxName) {
+          if (Drupal.ajax_facets.queryState['f'][index] == name_value) {
             addCurrentParam = false;
           }
         }
         // Add new value if need.
         if (addCurrentParam) {
           // Exclude all other values of this facet from query.
-          if (Drupal.ajax_facets.facetsSettings[facetName].limit_active_items) {
+          if (Drupal.ajax_facets.facetsSettings[rawFacetName].limit_active_items) {
             Drupal.ajax_facets.excludeCurrentFacet(facetName);
           }
-          Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetCheckboxName;
+          Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name_value;
         }
       }
       // If we unset filter, remove it from query.
       else {
         for (var index in Drupal.ajax_facets.queryState['f']) {
-          if (Drupal.ajax_facets.queryState['f'][index] != facetCheckboxName) {
+          if (Drupal.ajax_facets.queryState['f'][index] != name_value) {
             queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
           }
         }
@@ -258,8 +259,9 @@
    */
   Drupal.ajax_facets.processLink = function (event) {
     var $this = $(this);
-    var facetName = $this.data('facet');
-    var name_value = $this.data('name') + ':' + $this.data('value');
+    var facetName = $this.data('facet-name');
+    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values, avoid it.
+    var rawFacetName = $this.data('raw-facet-name');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       /* Handle value - deactivate. */
@@ -281,7 +283,7 @@
         }
         if (addCurrentParam) {
           // Exclude all other values of this facet from query.
-          if (Drupal.ajax_facets.facetsSettings[facetName].limit_active_items) {
+          if (Drupal.ajax_facets.facetsSettings[rawFacetName].limit_active_items) {
             Drupal.ajax_facets.excludeCurrentFacet(facetName);
           }
           Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = name_value;
@@ -299,7 +301,7 @@
   Drupal.ajax_facets.processSlider = function($sliderWrapper, min, max) {
     window.clearTimeout(Drupal.ajax_facets.timer);
     Drupal.ajax_facets.timer = window.setTimeout(function() {
-      var facetName = $sliderWrapper.data('facet');
+      var facetName = $sliderWrapper.data('facet-name');
       if (Drupal.ajax_facets.queryState['f'] != undefined) {
         // Exclude all values for this facet from query.
         Drupal.ajax_facets.excludeCurrentFacet(facetName);
@@ -329,7 +331,7 @@
    */
   Drupal.ajax_facets.sendAjaxQuery = function ($this) {
     Drupal.ajax_facets.current_id = $this.attr('id');
-    Drupal.ajax_facets.current_facet_name = $this.data('facet');
+    Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
     // Render the exposed filter data to send along with the ajax request
