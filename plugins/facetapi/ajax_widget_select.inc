@@ -28,10 +28,10 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    */
   public function settingsForm(&$form, &$form_state) {
     parent::settingsForm($form, $form_state);
-    $form['widget']['widget_settings']['links'][$this->id]['default_option_label'] = array(
+    $form['widget']['widget_settings']['links'][$this->id]['ajax_select_default_option_label'] = array(
       '#title' => t('Default Option Label'),
       '#type' => 'textfield',
-      '#default_value' => !empty($this->settings->settings['default_option_label']) ? $this->settings->settings['default_option_label'] : t('Select'),
+      '#default_value' => !empty($this->settings->settings['ajax_select_default_option_label']) ? $this->settings->settings['ajax_select_default_option_label'] : t('Select'),
       '#states' => array(
         'visible' => array(
           'select[name="widget"]' => array('value' => $this->id),
@@ -60,7 +60,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
 
     // Add default item only once.
     if ($level == 0) {
-      $items['values']['_none'] = t('@label', array('@label' => $settings['default_option_label']));
+      $items['values']['_none'] = t('@label', array('@label' => $settings['ajax_select_default_option_label']));
     }
 
     $prefix = str_repeat('-', $level);
