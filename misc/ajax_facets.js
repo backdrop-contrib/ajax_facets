@@ -128,9 +128,9 @@
               var $sliderWrapper = $(this);
               $sliderWrapper.slider({
                 range: true,
-                min: $sliderWrapper.data('min'),
-                max: $sliderWrapper.data('max'),
-                values: [ $sliderWrapper.data('min-val'), $sliderWrapper.data('max-val') ],
+                min: parseFloat($sliderWrapper.data('min')),
+                max: parseFloat($sliderWrapper.data('max')),
+                values: [ parseFloat($sliderWrapper.data('min-val')), parseFloat($sliderWrapper.data('max-val')) ],
                 slide: function( event, ui ) {
                   Drupal.ajax_facets.processSlider($sliderWrapper, ui.values[0], ui.values[1]);
                 }
@@ -219,7 +219,7 @@
   Drupal.ajax_facets.processCheckboxes = function (event) {
     var $this = $(this);
     var facetName = $this.data('facet-name');
-    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values, avoid it.
+    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values like 4.0 to 4, avoid it.
     var rawFacetName = $this.data('raw-facet-name');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
@@ -260,7 +260,7 @@
   Drupal.ajax_facets.processLink = function (event) {
     var $this = $(this);
     var facetName = $this.data('facet-name');
-    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values, avoid it.
+    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values like 4.0 to 4, avoid it.
     var rawFacetName = $this.data('raw-facet-name');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();

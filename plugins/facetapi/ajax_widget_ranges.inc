@@ -89,8 +89,8 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
     // Get selected min and max for active value.
     if (!empty($items['active_value'])) {
       $values = explode(' TO ', $items['active_value']);
-      $slider_attrs['data-min-val'] = preg_replace('/[^0-9]/', '', $values[0]);
-      $slider_attrs['data-max-val'] = preg_replace('/[^0-9]/', '', $values[1]);
+      $slider_attrs['data-min-val'] = preg_replace('/[^0-9\.]/', '', $values[0]);
+      $slider_attrs['data-max-val'] = preg_replace('/[^0-9\.]/', '', $values[1]);
     }
     // Get selected min and max by default.
     else {
