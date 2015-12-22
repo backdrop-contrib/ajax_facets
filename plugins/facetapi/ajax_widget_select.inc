@@ -60,7 +60,12 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
 
     // Add default item only once.
     if ($level == 0) {
-      $items['values']['_none'] = t('@label', array('@label' => $settings['ajax_select_default_option_label']));
+      $label = $settings['ajax_select_default_option_label'];
+      // Translate through i18n if it's possible.
+      if (function_exists('i18n_string_translate')) {
+        $label = i18n_string_translate(array('ajax_facets', 'facet_label', str_replace(':', '_', $this->key), 'label'), $label);
+      }
+      $items['values']['_none'] = $label;
     }
 
     $prefix = str_repeat('-', $level);

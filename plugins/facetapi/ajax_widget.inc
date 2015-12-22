@@ -67,6 +67,9 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
         . t('More info here !link', array('!link' => l('https://drupal.org/node/2081831', 'https://drupal.org/node/2081831')))
         . '</div>',
     );
+
+    $form['#submit'] = empty($form['#submit']) ? array() : $form['#submit'];
+    $form['#submit'][] = 'ajax_facets_facet_settings_form_submit';
   }
 
   function getFacetAjaxWidgetWrapper() {

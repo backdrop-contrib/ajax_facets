@@ -335,3 +335,34 @@ function ajax_facets_views_pre_render(&$view) {
   );
   drupal_add_js($setting, 'setting');
 }
+
+/**
+ * Implements hook_i18n_string_info().
+ */
+function ajax_facets_i18n_string_info() {
+  $groups['ajax_facets'] = array(
+    'title' => t('Ajax facets'),
+    'description' => t('Translatable ajax facets: label.'),
+    // This group doesn't have strings with format.
+    'format' => FALSE,
+    // This group can list all strings.
+    'list' => TRUE,
+  );
+  return $groups;
+}
+
+/**
+ * Submit handlers for settings form of facet filters.
+ */
+function ajax_facets_facet_settings_form_submit($form, $form_state) {
+  if (!empty($form_state['values']['widget'])) {
+    if ($form_state['values']['widget'] == 'facetapi_ajax_select') {
+      // Update the i18n string if need.
+      if (function_exists('i18n_string_update')) {
+          //array('ajax_facets', 'facet_label', str_replace(':', '_', $form['#facetapi']['facet']['name']), 'label'), $label
+          $name = array('ajax_facets', 'facet_label', str_replace(':', '_', $form['#facetapi']['facet']['name']), 'label');
+          i18n_string_update($name, $form_state['values']['ajax_select_default_option_label']);
+      }
+    }
+  }
+}
