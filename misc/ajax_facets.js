@@ -166,6 +166,10 @@
         }
       }
 
+      // Hide blocks with ajax-facets-empty-behavior.
+      $('.ajax-facets-empty-behavior').parents('.block-facetapi').hide();
+
+      // Add facets tooltip.
       $('body').once(function () {
         $(this).append('<div id="ajax-facets-tooltip"><span></span></div>');
       });
