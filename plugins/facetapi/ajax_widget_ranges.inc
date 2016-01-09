@@ -71,7 +71,7 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
     }
 
     $slider_attrs = array(
-      'id' => 'ajax-facets-ranges-' . str_replace(array('_', ' ', ':'), '-', $this->settings->facet),
+      'data-facet-uuid' => 'ajax-facets-ranges-' . str_replace(array('_', ' ', ':'), '-', $this->settings->facet),
       'data-facet-name' => rawurlencode($this->settings->facet),
       'data-raw-facet-name' => $this->settings->facet,
       'class' => array('slider-wrapper'),

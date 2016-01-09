@@ -66,7 +66,7 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       }
 
       // Add an ID to identify this link.
-      $variables['options']['attributes']['id'] = drupal_html_id('facetapi-link');
+      $variables['options']['attributes']['data-facet-uuid'] = 'ajax-facets-links-' . str_replace(array('_', ' ', ':'), '-', $this->key . '-' . drupal_strtolower($value));
 
       // If the item has no children, it is a leaf.
       if (empty($item['#item_children'])) {

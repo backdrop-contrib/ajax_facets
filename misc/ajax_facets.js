@@ -334,7 +334,7 @@
    * Send ajax.
    */
   Drupal.ajax_facets.sendAjaxQuery = function ($this) {
-    Drupal.ajax_facets.current_id = $this.attr('id');
+    Drupal.ajax_facets.current_id = $this.attr('data-facet-uuid');
     Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
@@ -371,7 +371,7 @@
     // Reset the timeout handler to avoid troubles when user is clicking on items very fast.
     window.clearTimeout(Drupal.ajax_facets.tooltipTimeout);
 
-    var pos = $('#' + Drupal.ajax_facets.current_id).offset();
+    var pos = $('[data-facet-uuid=' + Drupal.ajax_facets.current_id + ']').offset();
     jQuery('#ajax-facets-tooltip').css('top', pos.top - 15);
     jQuery('#ajax-facets-tooltip').css('left', pos.left - jQuery('#ajax-facets-tooltip').width() - 40);
     jQuery('#ajax-facets-tooltip').show();
