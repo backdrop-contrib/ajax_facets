@@ -18,8 +18,8 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    */
   function getDefaultSettings() {
     return array(
-      'selectbox_update_results' => 1,
-      'selectbox_show_reset_link' => 0,
+      "update_results" => 1,
+      "show_reset_link" => 0,
     );
   }
 

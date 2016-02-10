@@ -61,8 +61,8 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     return array(
       'soft_limit' => 20,
       'show_expanded' => 0,
-      'checkboxes_update_results' => 1,
-      'checkboxes_show_reset_link' => 0,
+      'update_results' => 1,
+      'reset_link' => 0,
       'empty_behavior' => 'ajax_facets',
     );
   }
