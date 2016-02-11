@@ -186,8 +186,8 @@
     }
 
     $('#' + facetWrapperId + '-wrapper').find('a.reset-link:not(".processed")').addClass('processed').click(function (event) {
-      var $facet = $(this).parent().find('[data-facet]').first();
-      var facetName = $facet.data('facet');
+      var $facet = $(this).parent().find('[data-facet-name]').first();
+      var facetName = $facet.data('facet-name');
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
       Drupal.ajax_facets.sendAjaxQuery($facet);
       event.preventDefault();
@@ -360,7 +360,7 @@
       var parts = v.split(symbol);
       var value = parts[parts.length - 1];
       var appendix = symbol + value;
-      var key = v.substr(0, v.length - appendix.length);
+      var key = decodeURIComponent(v.substr(0, v.length - appendix.length));
       facets_values[key] = value;
     });
     return facets_values;
