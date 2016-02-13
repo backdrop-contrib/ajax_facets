@@ -8,7 +8,8 @@ Contents:
 1. ABOUT
 2. INSTALLATION
 3. REQUIREMENTS
-4. CREDITS
+4. CONFIGURATION
+5. CREDITS
 
 1. ABOUT
 ========
@@ -39,7 +40,19 @@ Module search_api - http://drupal.org/project/search_api
 
 This module was well tested with modules search_api_solr and search_api_db
 
-4. CREDITS
+4. CONFIGURATION
+================
+
+Can be a lot of cases, how to configure and use this module.
+But the simplest way is the next:
+1. Install modules search_api, facetapi, search_api_solr/search_api_db and search_api_views
+2. Create and configure Search server in Drupal.
+3. Create Search Index, configure it. Add some fields into index and select few of them as facets. Select one of four ajax widgets for your facets. Enable option "Update results by ajax" for your facet.
+4. Create view based on your search index. Fastest way is select type of display "Page". Enable Ajax for your views display.
+5. Put block of your facet on the page where will be placed your view with search results.
+Important - view should be processed earlier than facet block will be rendered. Otherwise facets will not work.
+
+5. CREDITS
 ==========
 
 Project page: http://drupal.org/project/ajax_facets
