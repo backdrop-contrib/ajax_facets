@@ -8,6 +8,8 @@
   Drupal.ajax_facets.queryState = null;
   // State of each facet.
   Drupal.ajax_facets.facetQueryState = null;
+  // Determine if it is first page load. Will be reset in Drupal.ajax_facets.initHistoryState.
+  Drupal.ajax_facets.firstLoad = true;
   // HTML ID of element of current facet.
   Drupal.ajax_facets.current_id = null;
   // Current changed facet.
@@ -35,8 +37,7 @@
       if (!Drupal.ajax_facets.queryState) {
         if (settings.facetapi.defaultQuery != undefined && settings.facetapi.defaultQuery) {
           Drupal.ajax_facets.queryState = {'f': settings.facetapi.defaultQuery};
-        }
-        else {
+        } else {
           Drupal.ajax_facets.queryState = {'f': []};
         }
         // We will send original search path to server to get back proper reset links.
@@ -180,8 +181,7 @@
     var facet_values = Drupal.ajax_facets.getFacetValues();
     if (facet_values[settings.facetapi.facets[index]['facetName']] != undefined) {
       $('#' + facetWrapperId + '-wrapper').find('a.reset-link').show();
-    }
-    else {
+    } else {
       $('#' + facetWrapperId + '-wrapper').find('a.reset-link').hide();
     }
 
@@ -189,7 +189,7 @@
       var $facet = $(this).parent().find('[data-facet-name]').first();
       var facetName = $facet.data('facet-name');
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
-      Drupal.ajax_facets.sendAjaxQuery($facet);
+      Drupal.ajax_facets.sendAjaxQuery($facet, true);
       event.preventDefault();
     });
   };
@@ -198,7 +198,6 @@
    * Callback for onClick event for widget selectbox.
    */
   Drupal.ajax_facets.processSelectbox = function (event) {
-
     var $this = $(this);
     var facetName = $this.data('facet-name');
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
@@ -208,13 +207,12 @@
       /* Default value. */
       if ($this.find(":selected").val() == '_none') {
         delete Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length];
-      }
-      else {
+      } else {
         Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':' + $this.find(":selected").val();
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this);
+    Drupal.ajax_facets.sendAjaxQuery($this, true);
   };
 
   /**
@@ -255,7 +253,7 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this);
+    Drupal.ajax_facets.sendAjaxQuery($this, true);
   };
 
   /**
@@ -295,7 +293,7 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this);
+    Drupal.ajax_facets.sendAjaxQuery($this, true);
     event.preventDefault();
   };
 
@@ -304,16 +302,19 @@
    */
   Drupal.ajax_facets.processSlider = function($sliderWrapper, min, max) {
     window.clearTimeout(Drupal.ajax_facets.timer);
-    Drupal.ajax_facets.timer = window.setTimeout(function() {
-      var facetName = $sliderWrapper.data('facet-name');
-      if (Drupal.ajax_facets.queryState['f'] != undefined) {
-        // Exclude all values for this facet from query.
-        Drupal.ajax_facets.excludeCurrentFacet(facetName);
-        Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
-      }
+    Drupal.ajax_facets.timer = window.setTimeout(
+      function() {
+        var facetName = $sliderWrapper.data('facet-name');
+        if (Drupal.ajax_facets.queryState['f'] != undefined) {
+          // Exclude all values for this facet from query.
+          Drupal.ajax_facets.excludeCurrentFacet(facetName);
+          Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
+        }
 
-      Drupal.ajax_facets.sendAjaxQuery($sliderWrapper);
-    }, 600);
+        Drupal.ajax_facets.sendAjaxQuery($sliderWrapper, true);
+      },
+      600
+    );
   }
 
   /**
@@ -333,7 +334,9 @@
   /**
    * Send ajax.
    */
-  Drupal.ajax_facets.sendAjaxQuery = function ($this) {
+  Drupal.ajax_facets.sendAjaxQuery = function ($this, pushStateNeeded) {
+    Drupal.ajax_facets.initHistoryState($this);
+
     Drupal.ajax_facets.current_id = $this.attr('data-facet-uuid');
     Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
     Drupal.ajax_facets.beforeAjax();
@@ -349,6 +352,20 @@
       submit : {'ajax_facets' : data}
     };
     var ajax = new Drupal.ajax(false, false, settings);
+    ajax.success = function(response, status) {
+      // Push new state only on successful ajax response.
+      if (pushStateNeeded) {
+        var stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.basePath + Drupal.settings.pathPrefix + Drupal.settings.facetapi.searchPath),
+        state = {
+          current_id: Drupal.ajax_facets.current_id,
+          current_facet_name: Drupal.ajax_facets.current_facet_name,
+          facets: Drupal.ajax_facets.queryState['f']
+        };
+        Drupal.ajax_facets.pushState(state, document.title, stateUrl);
+      }
+      // Pass back to original method.
+      Drupal.ajax.prototype.success.call(this, response, status);
+    };
     ajax.eventResponse(ajax, {});
   },
 
@@ -397,6 +414,199 @@
       }
     )
     return viewDomId;
+  }
+
+  /**
+   * Returns query string with selected facets.
+   */
+  Drupal.ajax_facets.getFacetsQueryUrl = function (baseUrl) {
+    var query = {
+      'f': []
+    };
+
+    // Clone variable.
+    $.extend(true, query.f, Drupal.ajax_facets.queryState.f);
+
+    // Facetapi module has a bug when facet name encodes twice.
+    // For example to get this facet work 'category:name:pineapple' it should be 'category%253Aname%3Apineapple'.
+    // It means that first ':' was encoded twice. Why we don't patch facetapi? Because a lot of sites have already
+    // used facetapi module and they links (with wrong encoded facets names) has been indexed by search engines
+    // like Bing or Google. So we just bring this behaviour to ajax_facets module.
+    // Encode each facet filter name (it have already encoded once in FacetapiAjaxWidgetCheckboxes::buildListItems()).
+    for (var filter in query.f) {
+      query.f[filter] = encodeURI(query.f[filter]);
+    }
+
+    if (Drupal.ajax_facets.queryState.query) {
+      query.query = Drupal.ajax_facets.queryState.query;
+    }
+
+    if (Drupal.ajax_facets.queryState.order) {
+      query.order = Drupal.ajax_facets.queryState.order;
+      query.sort = Drupal.ajax_facets.queryState.sort;
+    }
+
+    if (Drupal.ajax_facets.queryState.pages) {
+      query.pages = Drupal.ajax_facets.queryState.pages;
+    }
+
+    // Respect existing query parameters in url.
+    // Merge respected parameters with facet parameters recursively without duplicates.
+    $.extend(true, query, Drupal.ajax_facets.simplifyObject(Drupal.ajax_facets.getAdditionalQueryParameters()));
+
+    // Add query string to base url.
+    if (!$.isEmptyObject(query)) {
+      baseUrl += '?' + decodeURIComponent($.param(query));
+    }
+
+    return baseUrl;
+  };
+
+  /**
+   * Returns additional (not facet) query parameters from current url.
+   */
+  Drupal.ajax_facets.getAdditionalQueryParameters = function () {
+    var result = {};
+
+    // If we have GET params.
+    if (window.location.href.indexOf('?') != -1) {
+      var respectedParameters = window.location.href.split('?')[1].split('&');
+
+      // Get all query parameters in array.
+      for (var i = 0; i < respectedParameters.length; i++) {
+        var pair = respectedParameters[i].split('=');
+
+        // Remove brackets from multiple parameter.
+        pair[0] = pair[0].replace('[]', '');
+
+        // We interested only in additional parameters but not in facet parameters.
+        if (pair[0] != 'f') {
+          if (!result[pair[0]]) {
+            result[pair[0]] = [];
+            result[pair[0]].push(pair[1]);
+          } else {
+            result[pair[0]].push(pair[1]);
+          }
+        }
+      }
+    }
+
+    return result;
+  };
+
+  /**
+   * Returns simplified object.
+   *
+   * If object has array property with only one element then that array will be turn into simple value instead of array.
+   */
+  Drupal.ajax_facets.simplifyObject = function (obj) {
+    for (var name in obj) {
+      if (obj[name].length === 1) {
+        obj[name] = obj[name][0];
+      }
+    }
+
+    return obj;
+  };
+
+  /**
+   * Initialize the history state. We only want to do this on the initial page
+   * load but we can't call it until after a facet has been clicked because we
+   * need to communicate which one is being "deactivated" for our ajax success
+   * handler.
+   */
+  Drupal.ajax_facets.initHistoryState = function ($facet) {
+    // Set the initial state only initial page load.
+    if (Drupal.ajax_facets.firstLoad) {
+      Drupal.ajax_facets.firstLoad = false;
+
+      // If history.js available - use it.
+      if (Drupal.settings.facetapi.isHistoryJsExists) {
+        History.replaceState({
+          current_id: $facet.attr('id'),
+          current_facet_name: $facet.data('facet'),
+          facets: Drupal.ajax_facets.queryState['f']
+        }, null, null);
+      } else {
+        // Fallback to HTML5 history object.
+        if (typeof history.replaceState != 'undefined') {
+          history.replaceState({
+            current_id: $facet.attr('id'),
+            current_facet_name: $facet.data('facet'),
+            facets: Drupal.ajax_facets.queryState['f']
+          }, null, null);
+        }
+      }
+    }
+  };
+
+  /**
+   * Pushes new state to browser history.
+   *
+   * History.js library fires "statechange" event even on API push/replace calls.
+   * So before pushing new state to history we should unbind from this event and after bind again.
+   */
+  Drupal.ajax_facets.pushState = function (state, title, stateUrl) {
+    // If history.js available - use it.
+    if (Drupal.settings.facetapi.isHistoryJsExists) {
+      var $window = $(window);
+
+      $window.unbind('statechange', Drupal.ajax_facets.reactOnStateChange);
+      History.pushState(state, title, stateUrl);
+      $window.bind('statechange', Drupal.ajax_facets.reactOnStateChange);
+    } else {
+      // Fallback to HTML5 history object.
+      if (typeof history.pushState != 'undefined') {
+        history.pushState(state, title, stateUrl);
+      }
+    }
+  };
+
+  /**
+   * Callback for back/forward browser buttons.
+   */
+  Drupal.ajax_facets.reactOnStateChange = function () {
+    var state = null,
+      facets = [],
+      current_id = '';
+
+    // If history.js available - use it.
+    if (Drupal.settings.facetapi.isHistoryJsExists) {
+      state = History.getState();
+
+      facets = state.data.facets;
+      current_id = state.data.current_id;
+    } else {
+      // Fallback to HTML5 history object.
+      if (typeof history.pushState != 'undefined') {
+        state = history.state;
+
+        facets = state.facets;
+        current_id = state.current_id;
+      }
+    }
+
+    Drupal.ajax_facets.queryState['f'] = facets;
+    Drupal.ajax_facets.sendAjaxQuery($('#' + current_id), false);
+  };
+
+  // If user opened new page and then clicked browser's back button then would not be fired "statechange" event.
+  // So we need to bind on 'statechange' event and react only once.
+  // All farther work does Drupal.ajax_facets.pushState() function.
+  // If history.js Adapter available - use it to bind "statechange" event.
+  if (typeof History.Adapter != 'undefined') {
+    History.Adapter.bind(window, 'statechange', function () {
+      if (Drupal.ajax_facets.firstLoad) {
+        Drupal.ajax_facets.reactOnStateChange();
+      }
+    });
+  } else {
+    // Fallback to default HTML5 event.
+    window.onpopstate = function () {
+      if (Drupal.ajax_facets.firstLoad) {
+        Drupal.ajax_facets.reactOnStateChange();
+      }
+    };
   }
 
   if (Drupal.ajax) {

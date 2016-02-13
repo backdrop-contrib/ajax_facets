@@ -93,6 +93,7 @@ function ajax_facets_add_ajax_js($facet) {
   static $included = FALSE;
   if (!$included) {
     $included = TRUE;
+    $history_js_exists = FALSE;
     $module_path = drupal_get_path('module', 'ajax_facets');
     drupal_add_js($module_path . '/misc/ajax_facets.js');
     drupal_add_css($module_path . '/misc/ajax_facets.css');
@@ -103,6 +104,16 @@ function ajax_facets_add_ajax_js($facet) {
     $views = search_api_current_search();
     $view_name = '';
     $display_name = '';
+
+    // Add history.js file if exists.
+    if (module_exists('libraries')) {
+      $history_js_path = libraries_get_path('history.js');
+
+      if ($history_js_path) {
+        $history_js_exists = TRUE;
+        drupal_add_js($history_js_path . '/scripts/bundled/html4+html5/jquery.history.js', array('group' => JS_LIBRARY));
+      }
+    }
 
     if (!empty($views)) {
       // Get display from current search.
@@ -125,6 +136,7 @@ function ajax_facets_add_ajax_js($facet) {
       'display_name' => $display_name,
       'facet_field' => $facet['map options']['field']['key'],
       'applyPath' => url($search_path, array('query' => $query)),
+      'isHistoryJsExists' => $history_js_exists,
     );
     drupal_add_js($setting, 'setting');
     drupal_add_library('system', 'drupal.ajax');
