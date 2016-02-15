@@ -207,6 +207,9 @@
   Drupal.ajax_facets.processSelectbox = function (event) {
     var $this = $(this);
     var facetName = $this.data('facet-name');
+    // Init history.
+    Drupal.ajax_facets.initHistoryState($this);
+    // If facets are already defined in queryState.
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       // Exclude all values for this facet from query.
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
@@ -230,6 +233,9 @@
     var facetName = $this.data('facet-name');
     var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values like 4.0 to 4, avoid it.
     var rawFacetName = $this.data('raw-facet-name');
+    // Init history.
+    Drupal.ajax_facets.initHistoryState($this);
+    // If facets are already defined in queryState.
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       if ($this.is(':checked')) {
@@ -271,6 +277,9 @@
     var facetName = $this.data('facet-name');
     var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values like 4.0 to 4, avoid it.
     var rawFacetName = $this.data('raw-facet-name');
+    // Init history.
+    Drupal.ajax_facets.initHistoryState($this);
+    // If facets are already defined in queryState.
     if (Drupal.ajax_facets.queryState['f'] != undefined) {
       var queryNew = new Array();
       /* Handle value - deactivate. */
@@ -312,6 +321,9 @@
     Drupal.ajax_facets.timer = window.setTimeout(
       function() {
         var facetName = $sliderWrapper.data('facet-name');
+        // Init history.
+        Drupal.ajax_facets.initHistoryState($sliderWrapper);
+        // If facets are already defined in queryState.
         if (Drupal.ajax_facets.queryState['f'] != undefined) {
           // Exclude all values for this facet from query.
           Drupal.ajax_facets.excludeCurrentFacet(facetName);
@@ -342,8 +354,6 @@
    * Send ajax.
    */
   Drupal.ajax_facets.sendAjaxQuery = function ($this, pushStateNeeded) {
-    Drupal.ajax_facets.initHistoryState($this);
-
     Drupal.ajax_facets.current_id = $this.attr('data-facet-uuid');
     Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
     Drupal.ajax_facets.beforeAjax();
