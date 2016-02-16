@@ -540,7 +540,7 @@
       // If history.js available - use it.
       if (Drupal.settings.facetapi.isHistoryJsExists) {
         History.replaceState({
-          current_id: $facet.attr('id'),
+          current_id: $facet.data('facet-uuid'),
           current_facet_name: $facet.data('facet'),
           facets: Drupal.ajax_facets.queryState['f']
         }, null, null);
@@ -548,7 +548,7 @@
         // Fallback to HTML5 history object.
         if (typeof history.replaceState != 'undefined') {
           history.replaceState({
-            current_id: $facet.attr('id'),
+            current_id: $facet.data('facet-uuid'),
             current_facet_name: $facet.data('facet'),
             facets: Drupal.ajax_facets.queryState['f']
           }, null, null);
@@ -604,7 +604,7 @@
     }
 
     Drupal.ajax_facets.queryState['f'] = facets;
-    Drupal.ajax_facets.sendAjaxQuery($('#' + current_id), false);
+    Drupal.ajax_facets.sendAjaxQuery($('[data-facet-uuid="' + current_id + '"]'), false);
   };
 
   // If user opened new page and then clicked browser's back button then would not be fired "statechange" event.
