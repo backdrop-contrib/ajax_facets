@@ -88,15 +88,13 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     $active_items = array();
 
     foreach ($build as $value => $item) {
-      $uuid = 'ajax-facets-checkboxes-' . str_replace(array('_', ' ', ':'), '-', $this->key . '-' . drupal_strtolower($value));
-
       $row = array('class' => array());
       $attributes = array(
         'class' => array('facet-multiselect-checkbox'),
         'data-facet-value' => $value,
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
-        'data-facet-uuid' => $uuid,
+        'data-facet-uuid' => $this->getAjaxFacetsUuid($value),
       );
       // Respect current selection.
       if (!empty($item['#active'])) {
@@ -107,7 +105,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
       }
 
       $checkbox = array(
-        '#id' => $uuid,// Needs to make label clickable.
+        '#id' => $this->getAjaxFacetsUuid($value),
         '#name' => rawurlencode($this->key),
         '#type' => 'checkbox',
         '#title' => $item['#markup'] . ' ' . theme('facetapi_count',(array('count' => $item['#count']))),

@@ -72,7 +72,25 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
     $form['#submit'][] = 'ajax_facets_facet_settings_form_submit';
   }
 
-  function getFacetAjaxWidgetWrapper() {
-    return drupal_html_class("$this->id-wrapper");
+  /**
+   * Returns uuid for the facet widget.
+   * It's need to identify the facet option.
+   * @param null $value
+   *   Some facets have many separate input elements. For example checkboxes or links.
+   *   We need $value to identify each option.
+   */
+  protected function getAjaxFacetsUuid($value = NULL) {
+    switch ($this->id) {
+      case 'facetapi_ajax_select':
+      case 'facetapi_ajax_ranges':
+        return str_replace('_', '-', $this->id) . '-' . str_replace(array('_', ' ', ':'), '-', $this->key);
+        break;
+
+      case 'facetapi_ajax_links':
+      case 'facetapi_ajax_checkboxes':
+        return str_replace('_', '-', $this->id) . '-' . str_replace(array('_', ' ', ':'), '-', $this->key . '-' . drupal_strtolower($value));
+        break;
+    }
   }
+
 }

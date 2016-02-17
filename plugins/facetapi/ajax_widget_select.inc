@@ -113,7 +113,6 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    */
   public function execute() {
     $element = &$this->build[$this->facet['field alias']];
-
     $items = $this->buildListItems($element);
 
     // If name is empty - use label.
@@ -130,7 +129,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       '#attributes' => array(
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
-        'data-facet-uuid' => 'ajax-facets-selectbox-' . str_replace(array('_', ' ', ':'), '-', $this->settings->facet),
+        'data-facet-uuid' => $this->getAjaxFacetsUuid(),
       ),
     );
 
