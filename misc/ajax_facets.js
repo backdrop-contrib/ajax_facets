@@ -101,13 +101,6 @@
               [settings.facetapi.facets[index]],
               Drupal.ajax_facets.processCheckboxes
             ).addClass('processed');
-
-            // Make label of the checkbox clickable.
-            $('#' + settings.facetapi.facets[index].id + '-wrapper ul li').click(
-              function () {
-                $(this).find('input').trigger('click');
-              }
-            );
           }
 
           // Selectboxes.
