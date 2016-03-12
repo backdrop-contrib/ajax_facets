@@ -1,6 +1,6 @@
 name = Ajax facet filters
 description = Ajax facet filters.
-dependencies[] = facetapi
+dependencies[] = facetapi (>=7.x-1.4)
 dependencies[] = search_api
 dependencies[] = views
 package = Search Toolkit
