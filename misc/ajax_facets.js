@@ -177,6 +177,22 @@
     }
   };
 
+  Drupal.behaviors.ajax_facets_block = {
+    attach: function (context, settings) {
+      // Reset all link.
+      $('a.ajax-facets-reset-all-link:not(.processed)').bind('click', function (e) {
+        e.preventDefault();
+
+        // Clear all facets from queryState facets array.
+        Drupal.ajax_facets.queryState.f = [];
+
+        // Send ajax query with first found facet.
+        Drupal.ajax_facets.sendAjaxQuery($('[data-facet-name]').first(), true);
+      }).addClass('processed');
+    }
+  };
+
+
   Drupal.ajax_facets.bindResetLink = function (facetWrapperId, index, settings) {
     var facet_values = Drupal.ajax_facets.getFacetValues();
     var $facetWrapper = $('#' + facetWrapperId + '-wrapper');

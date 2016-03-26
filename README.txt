@@ -53,6 +53,7 @@ But the simplest way is the next:
   Enable Ajax for your views display.
 5. Put block of your facet on the page where will be placed your view with search results.
   Important - view should be processed earlier than facet block will be rendered. Otherwise facets will not work.
+6. Put "Ajax facets block" block on the page if you want to have "Reset all facets" link.
 
 Module has integration with HTML5 browser history API. If you want to get this feature work for HTML4 browsers
 you should install libraries module (https://www.drupal.org/project/libraries)
