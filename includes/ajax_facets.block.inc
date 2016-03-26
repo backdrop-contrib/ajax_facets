@@ -27,8 +27,7 @@ function ajax_facets_block_configure($delta = '') {
       $form['ajax_facets_reset_all_link_text'] = array(
         '#type' => 'textfield',
         '#title' => t('"Reset all facets" link text'),
-        // @todo add support for i18n
-        '#default_value' => variable_get('ajax_facets_reset_all_link_text', t('Reset all facets')),
+        '#default_value' => ajax_facets_reset_link_text(),
       );
 
       break;
@@ -44,6 +43,16 @@ function ajax_facets_block_save($delta = '', $edit = array()) {
   switch ($delta) {
     case 'ajax_facets_block':
       variable_set('ajax_facets_reset_all_link_text', $edit['ajax_facets_reset_all_link_text']);
+      // Update the i18n string if need.
+      if (function_exists('i18n_string_update')) {
+        $name = array(
+          'ajax_facets',
+          'ajax_facets_block',
+          'facet_reset_all_link_text',
+          'text'
+        );
+        i18n_string_update($name, $edit['ajax_facets_reset_all_link_text']);
+      }
       break;
   }
 }
@@ -57,7 +66,7 @@ function ajax_facets_block_view($delta = '') {
   switch ($delta) {
     case 'ajax_facets_block':
       $block['content'] = array(
-        '#markup' => l(variable_get('ajax_facets_reset_all_link_text', t('Reset all facets')), '<front>', array(
+        '#markup' => l(ajax_facets_reset_link_text(), '<front>', array(
           'attributes' => array(
             'class' => array(
               'ajax-facets-reset-all-link',
@@ -70,4 +79,23 @@ function ajax_facets_block_view($delta = '') {
   }
 
   return $block;
+}
+
+/**
+ * Returns text for Ajax Facets reset link.
+ */
+function ajax_facets_reset_link_text() {
+  $text = variable_get('ajax_facets_reset_all_link_text', t('Reset all facets'));
+  if (function_exists('i18n_string_translate')) {
+    $text = i18n_string_translate(
+      array(
+        'ajax_facets',
+        'ajax_facets_block',
+        'facet_reset_all_link_text',
+        'text'
+      ),
+      $text
+    );
+  }
+  return $text;
 }

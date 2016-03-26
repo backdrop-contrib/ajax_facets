@@ -4,7 +4,7 @@
  *  Ajax facets implementation.
  */
 
-require_once __DIR__ . '/ajax_facets.block.inc';
+require_once __DIR__ . '/includes/ajax_facets.block.inc';
 
 /**
  * Implements hook_menu().
