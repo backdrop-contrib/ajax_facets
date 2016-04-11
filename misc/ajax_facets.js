@@ -483,7 +483,17 @@
 
     // Add query string to base url.
     if (!$.isEmptyObject(query)) {
-      baseUrl += '?' + decodeURIComponent($.param(query));
+      // Clear empty items.
+      for (var item in query) {
+        if (typeof query[item] == 'undefined' || query[item].length == 0) {
+          delete query[item];
+        }
+      }
+      var params = $.param(query);
+      // If we have params.
+      if (params.length) {
+        baseUrl += '?' + decodeURIComponent(params);
+      }
     }
 
     return baseUrl;
