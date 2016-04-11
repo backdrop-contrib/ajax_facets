@@ -66,7 +66,7 @@ function ajax_facets_block_view($delta = '') {
   switch ($delta) {
     case 'ajax_facets_block':
       $block['content'] = array(
-        '#markup' => l(ajax_facets_reset_link_text(), '<front>', array(
+        '#markup' => l(ajax_facets_reset_link_text(), current_path(), array(
           'attributes' => array(
             'class' => array(
               'ajax-facets-reset-all-link',
