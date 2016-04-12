@@ -654,7 +654,7 @@
       }
       // After Ajax success we should update reset, apply link to handle proper redirects.
       if (response.data.resetUrls && Drupal.settings.facetapi.facets) {
-        for (index in Drupal.settings.facetapi.facets) {
+        for (var index in Drupal.settings.facetapi.facets) {
           if (response.data.resetUrls[Drupal.settings.facetapi.facets[index].facetName]) {
             // Update path from response.
             Drupal.settings.facetapi.facets[index].resetPath = response.data.resetUrls[Drupal.settings.facetapi.facets[index].facetName];
