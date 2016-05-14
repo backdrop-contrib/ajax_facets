@@ -132,7 +132,7 @@ function ajax_facets_add_ajax_js($facet) {
     $facet = $facet->getFacet();
     $setting['facetapi'] = array(
       'defaultQuery' => isset($_GET[$filter_key]) ? $_GET[$filter_key] : '',
-      'searchPath' => $search_path,
+      'searchUrl' => url($search_path),
       'index_id' => $facet['map options']['index id'],
       'view_name' => $view_name,
       'display_name' => $display_name,
