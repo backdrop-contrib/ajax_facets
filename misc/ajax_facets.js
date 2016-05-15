@@ -514,7 +514,7 @@
         var pair = respectedParameters[i].split('=');
 
         // Remove brackets from multiple parameter.
-        pair[0] = pair[0].replace('[]', '');
+        pair[0] = pair[0].replace(/\[\d*\]/, '');
 
         // We interested only in additional parameters but not in facet parameters.
         if (pair[0] != 'f') {
