@@ -35,11 +35,11 @@
   Drupal.behaviors.ajax_facets = {
     attach: function (context, settings) {
       if (!Drupal.ajax_facets.queryState) {
-        if (settings.facetapi.defaultQuery) {
-          Drupal.ajax_facets.queryState = {'f': settings.facetapi.defaultQuery};
-        } else {
-          Drupal.ajax_facets.queryState = {'f': []};
-        }
+        // Add property for views and set data about facet values.
+        Drupal.ajax_facets.queryState = {
+          'views': new Array(),
+          'f': settings.facetapi.defaultQuery ? settings.facetapi.defaultQuery : []
+        };
         // We will send original search path to server to get back proper reset links.
         if (settings.facetapi.searchPath) {
           Drupal.ajax_facets.queryState['searchPath'] = settings.facetapi.searchPath;
@@ -47,43 +47,48 @@
         if (settings.facetapi.index_id) {
           Drupal.ajax_facets.queryState['index_id'] = settings.facetapi.index_id;
         }
-        // Check view name and display name.
-        if (settings.facetapi.view_name && settings.facetapi.display_name) {
-          // Get view dom id.
-          var viewDomId = Drupal.ajax_facets.getViewDomId(settings.facetapi.view_name, settings.facetapi.display_name);
-          if (viewDomId) {
-            Drupal.ajax_facets.queryState['view_dom_id'] = viewDomId;
-            // View by ajax.
-            if (Drupal.views && Drupal.views.instances['views_dom_id:' + viewDomId]) {
-              $.extend(Drupal.ajax_facets.queryState, Drupal.views.instances['views_dom_id:' + viewDomId].settings);
-            }
-            // View without ajax.
-            else {
-              Drupal.ajax_facets.queryState['view_name'] = settings.facetapi.view_name;
-              Drupal.ajax_facets.queryState['view_display_id'] = settings.facetapi.display_name;
-              // Respect view arguments.
-              var name_display = settings.facetapi.view_name + ':' + settings.facetapi.display_name;
-              if (settings.facetapi.view_args[name_display]) {
-                Drupal.ajax_facets.queryState['view_args'] = settings.facetapi.view_args[name_display];
+        // Check view name and display name for all views.
+        if (settings.facetapi.views) {
+          $.each(settings.facetapi.views, function(key, view) {
+            Drupal.ajax_facets.queryState['views'][key] = {};
+            // Get view dom id.
+            var viewDomId = Drupal.ajax_facets.getViewDomId(settings, key);
+            if (viewDomId) {
+              // Take settings from view if it works by AJAX.
+              if (Drupal.views && Drupal.views.instances['views_dom_id:' + viewDomId]) {
+                $.extend(Drupal.ajax_facets.queryState['views'][key], Drupal.views.instances['views_dom_id:' + viewDomId].settings);
               }
-              // Respect view path.
-              if (settings.facetapi.view_path[name_display]) {
-                Drupal.ajax_facets.queryState['view_path'] = settings.facetapi.view_path[name_display];
+              // If this view doesn't use ajax.
+              else {
+                Drupal.ajax_facets.queryState['views'][key] = {
+                  'view_dom_id': viewDomId,
+                  'view_name': view.view_name,
+                  'view_display_id': view.view_display_id
+                };
+                // Respect view arguments.
+                var nameDisplay = view.view_name + ':' + view.view_display_id;
+                if (settings.facetapi.view_args[nameDisplay]) {
+                  Drupal.ajax_facets.queryState['views'][key]['view_args'] = settings.facetapi.view_args[nameDisplay];
+                }
+                // Respect view path.
+                if (settings.facetapi.view_path[nameDisplay]) {
+                  Drupal.ajax_facets.queryState['views'][key]['view_path'] = settings.facetapi.view_path[nameDisplay];
+                }
               }
             }
-          }
+
+            // Respect arguments in exposed form.
+            if (view.view_name && view.view_display_id) {
+              var nameDisplay = view.view_name + ':' + view.view_display_id;
+              if (settings.facetapi.exposed_input[nameDisplay]) {
+                $.extend(Drupal.ajax_facets.queryState, settings.facetapi.exposed_input[nameDisplay]);
+              }
+            }
+          });
         }
 
         if (settings.facetapi.facet_field) {
           Drupal.ajax_facets.queryState['facet_field'] = settings.facetapi.facet_field;
-        }
-      }
-
-      // Respect arguments in exposed form.
-      if (settings.facetapi.view_name && settings.facetapi.display_name) {
-        var name_display = settings.facetapi.view_name + ':' + settings.facetapi.display_name;
-        if (settings.facetapi.exposed_input[name_display]) {
-          $.extend(Drupal.ajax_facets.queryState, settings.facetapi.exposed_input[name_display]);
         }
       }
 
@@ -369,10 +374,12 @@
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
     // Render the exposed filter data to send along with the ajax request
-    var exposedFormId = '#views-exposed-form-' + Drupal.ajax_facets.queryState['view_name'] + '-' + Drupal.ajax_facets.queryState['display_name'];
-    exposedFormId = exposedFormId.replace(/\_/g, '-');
-    $.each($(exposedFormId).serializeArray(), function (index, value) {
-      data[value.name] = value.value;
+    $.each(Drupal.ajax_facets.queryState.views, function(key, view) {
+      var exposedFormId = '#views-exposed-form-' + view.view_name + '-' + view.view_display_id;
+      exposedFormId = exposedFormId.replace(/\_/g, '-');
+      $.each($(exposedFormId).serializeArray(), function (index, value) {
+        data[value.name] = value.value;
+      });
     });
     var settings = {
       url : encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh'),
@@ -428,19 +435,15 @@
   };
 
   /* Get view dom id for both modes of views - ajax/not ajax. */
-  Drupal.ajax_facets.getViewDomId = function(view_name, display_name) {
-    var view = $('.view-id-' + view_name + '.view-display-id-' + display_name);
-    if (view.length < 1) {
-      return false;
-    }
-    var classes = view.attr('class').split(' ');
-    var viewDomId = false;
-    $.each(classes, function(k, val) {
-      if (val.substr(0, 11) == 'view-dom-id') {
-        viewDomId = val.replace('view-dom-id-', '');
+  Drupal.ajax_facets.getViewDomId = function(settings, key) {
+    var nameDisplay = settings.facetapi.views[key].view_name + ':' + settings.facetapi.views[key].view_display_id;
+    if (settings.facetapi.view_dom_id[nameDisplay]) {
+      var view = $('.view-dom-id-' + settings.facetapi.view_dom_id[nameDisplay]);
+      if (view.length > 0) {
+        return settings.facetapi.view_dom_id[nameDisplay]
       }
-    });
-    return viewDomId;
+    }
+    return false;
   };
 
   /**
@@ -631,18 +634,14 @@
   // So we need to bind on 'statechange' event and react only once.
   // All farther work does Drupal.ajax_facets.pushState() function.
   // If history.js Adapter available - use it to bind "statechange" event.
-  if (History.Adapter) {
+  if (History.Adapter && Drupal.ajax_facets.firstLoad) {
     History.Adapter.bind(window, 'statechange', function () {
-      if (Drupal.ajax_facets.firstLoad) {
-        Drupal.ajax_facets.reactOnStateChange();
-      }
+      Drupal.ajax_facets.reactOnStateChange();
     });
   } else {
     // Fallback to default HTML5 event.
     window.onpopstate = function () {
-      if (Drupal.ajax_facets.firstLoad) {
-        Drupal.ajax_facets.reactOnStateChange();
-      }
+      Drupal.ajax_facets.reactOnStateChange();
     };
   }
 
@@ -660,12 +659,6 @@
             Drupal.settings.facetapi.facets[index].resetPath = response.data.resetUrls[Drupal.settings.facetapi.facets[index].facetName];
           }
         }
-      }
-
-      // Update the exposed form separately if needed.
-      if (response.data.exposed_form) {
-        var viewId = response.data.views_name + '-' + response.data.display_id;
-        $('#views-exposed-form-' + viewId.replace(/_/g, '-')).replaceWith(response.data.exposed_form)
       }
 
       // Update content.
@@ -688,12 +681,22 @@
         if (Drupal.ajax_facets.current_facet_name == facet_name) {
           /* Update by ajax. */
           if (mode) {
-            $('.view-id-' + response.data.views_name + '.view-display-id-' + response.data.display_id).replaceWith(response.data.views_content);
+            $.each(response.data.views, function(key, view) {
+              $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
+            });
           }
           /* Update by link. */
           else {
             show_tip = true;
           }
+        }
+      });
+
+      // Update the exposed form separately if needed.
+      $.each(response.data.views, function(key, view) {
+        if (view.exposed_form) {
+          var viewId = view.views_name + '-' + view.views_display_id;
+          $('#views-exposed-form-' + viewId.replace(/_/g, '-')).replaceWith(view.exposed_form);
         }
       });
 

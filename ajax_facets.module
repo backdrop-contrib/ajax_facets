@@ -103,9 +103,8 @@ function ajax_facets_add_ajax_js($facet) {
     $filter_key = $facet->getAdapter()->getUrlProcessor()->getFilterKey();
     // Note that we add in query only filter params and exclude pages and etc...
     $query = (isset($_GET[$filter_key])) ? array($filter_key => $_GET[$filter_key]) : array();
-    $views = search_api_current_search();
-    $view_name = '';
-    $display_name = '';
+    $current_views = search_api_current_search();
+    $processable_views = [];
 
     // Add history.js file if exists.
     if (module_exists('libraries')) {
@@ -117,14 +116,16 @@ function ajax_facets_add_ajax_js($facet) {
       }
     }
 
-    if (!empty($views)) {
-      // Get display from current search.
-      if (empty($view_name) || empty($display_name)) {
-        $keys = array_keys($views);
-        foreach ($keys as $key) {
-          if (substr_count($key, 'search_api_views')) {
-            list(, $view_name, $display_name) = explode(':', $key);
-          }
+    if (!empty($current_views)) {
+      // Get displays from current search.
+      $keys = array_keys($current_views);
+      foreach ($keys as $key) {
+        if (substr_count($key, 'search_api_views')) {
+          $parts = explode(':', $key);
+          $processable_views[] = array(
+            'view_name' => $parts[1],
+            'view_display_id' => $parts[2]
+          );
         }
       }
     }
@@ -134,8 +135,7 @@ function ajax_facets_add_ajax_js($facet) {
       'defaultQuery' => isset($_GET[$filter_key]) ? $_GET[$filter_key] : '',
       'searchUrl' => url($search_path),
       'index_id' => $facet['map options']['index id'],
-      'view_name' => $view_name,
-      'display_name' => $display_name,
+      'views' => $processable_views,
       'facet_field' => $facet['map options']['field']['key'],
       'applyPath' => url($search_path, array('query' => $query)),
       'isHistoryJsExists' => $history_js_exists,
@@ -333,20 +333,21 @@ function ajax_facets_form_facetapi_facet_display_form_alter(&$form, $form_state)
  * Implements hook_views_pre_render().
  */
 function ajax_facets_views_pre_render(&$view) {
+  // We use static because we should collect data from all the views.
+  static $setting;
+
   // Save settings of rendered views, to use them in request for AJAX facets.
-  $setting = array(
-    'facetapi' => array(
-      'view_args' => array(
-        "$view->name:$view->current_display" => $view->args,
-      ),
-      'exposed_input' => array(
-        "$view->name:$view->current_display" => $view->exposed_raw_input,
-      ),
-      'view_path' => array(
-        "$view->name:$view->current_display" => $view->get_path(),
-      ),
-    )
-  );
+  $name_display = $base = "$view->name:$view->current_display";
+  $i = 0;
+  // Use unique key as in search_api_current_search().
+  while (isset($setting['facetapi']['view_args'][$name_display])) {
+    $name_display = $base . '-' . ++$i;
+  }
+  $setting['facetapi']['view_args'][$name_display] = $view->args;
+  $setting['facetapi']['exposed_input'][$name_display] = $view->exposed_raw_input;
+  $setting['facetapi']['view_path'][$name_display] = $view->get_path();
+  $setting['facetapi']['view_dom_id'][$name_display] = $view->dom_id;
+
   drupal_add_js($setting, 'setting');
 }
 
