@@ -382,7 +382,7 @@
     ajax.success = function(response, status) {
       // Push new state only on successful ajax response.
       if (pushStateNeeded) {
-        var stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.basePath + Drupal.settings.pathPrefix + Drupal.settings.facetapi.searchPath),
+        var stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.facetapi.searchUrl),
         state = {
           current_id: Drupal.ajax_facets.current_id,
           current_facet_name: Drupal.ajax_facets.current_facet_name,
