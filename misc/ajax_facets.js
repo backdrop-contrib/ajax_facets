@@ -634,14 +634,18 @@
   // So we need to bind on 'statechange' event and react only once.
   // All farther work does Drupal.ajax_facets.pushState() function.
   // If history.js Adapter available - use it to bind "statechange" event.
-  if (History.Adapter && Drupal.ajax_facets.firstLoad) {
+  if (History.Adapter) {
     History.Adapter.bind(window, 'statechange', function () {
-      Drupal.ajax_facets.reactOnStateChange();
+      if (Drupal.ajax_facets.firstLoad) {
+        Drupal.ajax_facets.reactOnStateChange();
+      }
     });
   } else {
     // Fallback to default HTML5 event.
     window.onpopstate = function () {
-      Drupal.ajax_facets.reactOnStateChange();
+      if (Drupal.ajax_facets.firstLoad) {
+        Drupal.ajax_facets.reactOnStateChange();
+      }
     };
   }
 
