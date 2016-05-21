@@ -17,7 +17,9 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
    * Overrides FacetapiWidget::settingsForm().
    */
   function settingsForm(&$form, &$form_state) {
-    $form['widget']['widget_settings']['links'][$this->id]['wrapper_container'] = array(
+    $settings = $this->settings->settings;
+
+    $form['widget']['widget_settings']['ajax'][$this->id]['wrapper_container'] = array(
       '#type' => 'container',
       '#states' => array(
         'visible' => array(
@@ -29,7 +31,7 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
     $form['widget']['widget_settings']['ajax'][$this->id]['update_results'] = array(
       '#type' => 'checkbox',
       '#title' => t('Update results by ajax'),
-      '#default_value' => !empty($this->settings->settings['update_results']),
+      '#default_value' => !empty($settings['update_results']),
       '#description' => t('If active, then search results will be updated by AJAX when facet was changed.
        If not active, then after than facet will be updated, user will see special popup with link for filter results.'),
       '#states' => array(
@@ -42,8 +44,8 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
     $form['widget']['widget_settings']['ajax'][$this->id]['show_reset_link'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display reset link'),
-      '#default_value' => !empty($this->settings->settings['show_reset_link']),
-      '#description' => t('Display link for reset facet.'),
+      '#default_value' => !empty($settings['show_reset_link']),
+      '#description' => t('Display the link to reset facet.'),
       '#states' => array(
         'visible' => array(
           'select[name="widget"]' => array('value' => $this->id),
@@ -51,7 +53,19 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
       ),
     );
 
-    $form['widget']['widget_settings']['links'][$this->id]['wrapper_container']['wrapper_code'] = array(
+    $form['widget']['widget_settings']['ajax'][$this->id]['reset_link_text'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Reset link text'),
+      '#default_value' => !empty($settings['reset_link_text']) ? $settings['reset_link_text'] : 'Reset filter',
+      '#states' => array(
+        'visible' => array(
+          'select[name="widget"]' => array('value' => $this->id),
+          ':input[name="show_reset_link"]' => array('checked' => TRUE),
+        ),
+      ),
+    );
+
+    $form['widget']['widget_settings']['ajax'][$this->id]['wrapper_container']['wrapper_code'] = array(
       '#type' => 'markup',
       '#markup' => '<div class="form-item messages warning">'
         . t(
@@ -69,7 +83,9 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
     );
 
     $form['#submit'] = empty($form['#submit']) ? array() : $form['#submit'];
-    $form['#submit'][] = 'ajax_facets_facet_settings_form_submit';
+    if (array_search('ajax_facets_facet_settings_form_submit', $form['#submit']) === FALSE) {
+      $form['#submit'][] = 'ajax_facets_facet_settings_form_submit';
+    }
   }
 
   /**
@@ -93,4 +109,65 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
     }
   }
 
+  /**
+   * Implements FacetapiWidget::execute().
+   *
+   * Transforms the render array into something that can be themed by
+   * theme_item_list().
+   *
+   * @see FacetapiWidgetLinks::setThemeHooks()
+   * @see FacetapiWidgetLinks::buildListItems()
+   */
+  public function execute() {
+    $element = &$this->build[$this->facet['field alias']];
+
+    // Sets each item's theme hook, builds item list.
+    $this->setThemeHooks($element);
+    $item_list = array(
+      '#theme' => 'item_list',
+      '#items' => $this->buildListItems($element),
+      '#attributes' => $this->build['#attributes'],
+    );
+
+    // We cannot use drupal_html_id to save the same id for each facet.
+    $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
+
+    $element = array(
+      '#markup' => '<div id="' . $wrapper_id . '">'
+        . $this->getResetLink()
+        . render($item_list)
+        . '</div>'
+    );
+
+    ajax_facets_add_ajax_js($this->facet);
+  }
+
+  /**
+   * Creates reset link for ajax facets.
+   */
+  protected function getResetLink() {
+    $settings = $this->settings->settings;
+    $reset_link = '';
+    if (!empty($settings['show_reset_link']) && $settings['reset_link_text']) {
+      // Support for i18n.
+      if (function_exists('i18n_string_translate')) {
+        $text = i18n_string_translate(
+          array(
+            'ajax_facets',
+            'reset_link_text',
+            str_replace(':', '_', $this->key),
+            'value'
+          ),
+          $settings['reset_link_text']
+        );
+      }
+      // Pure text.
+      else {
+        $text = $settings['reset_link_text'];
+      }
+      $reset_link = '<a class="reset-link" href="#">' . $text . '</a>';
+    }
+
+    return $reset_link;
+  }
 }

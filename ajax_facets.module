@@ -370,13 +370,31 @@ function ajax_facets_i18n_string_info() {
  * Submit handlers for settings form of facet filters.
  */
 function ajax_facets_facet_settings_form_submit($form, $form_state) {
-  if (!empty($form_state['values']['widget'])) {
-    if ($form_state['values']['widget'] == 'facetapi_ajax_select') {
-      // Update the i18n string if need.
-      if (function_exists('i18n_string_update')) {
-          //array('ajax_facets', 'facet_label', str_replace(':', '_', $form['#facetapi']['facet']['name']), 'label'), $label
-          $name = array('ajax_facets', 'facet_label', str_replace(':', '_', $form['#facetapi']['facet']['name']), 'label');
-          i18n_string_update($name, $form_state['values']['ajax_select_default_option_label']);
+  $values = $form_state['values'];
+  // Update the i18n strings if need.
+  if (function_exists('i18n_string_update')) {
+    if (!empty($values['widget'])) {
+      if ($values['widget'] == 'facetapi_ajax_select') {
+        // Label for the default option of ajax facets select widget..
+        $name = array(
+          'ajax_facets',
+          'facet_label',
+          str_replace(':', '_', $form['#facetapi']['facet']['name']),
+          'label'
+        );
+        i18n_string_update($name, $values['ajax_select_default_option_label']);
+      }
+
+      // Reset link text.
+      if ($values['show_reset_link'] && !empty($values['reset_link_text'])) {
+        // Text for the reset link.
+        $reset_link_text = array(
+          'ajax_facets',
+          'reset_link_text',
+          str_replace(':', '_', $form['#facetapi']['facet']['name']),
+          'value'
+        );
+        i18n_string_update($reset_link_text, $values['reset_link_text']);
       }
     }
   }

@@ -65,11 +65,6 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
 
     $items = $this->buildListItems($element);
 
-    $reset_link = '';
-    if (!empty($this->settings->settings['show_reset_link']) && $this->settings->settings['show_reset_link']) {
-      $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
-    }
-
     $slider_attrs = array(
       'data-facet-uuid' => $this->getAjaxFacetsUuid(),
       'data-facet-name' => rawurlencode($this->settings->facet),
@@ -124,7 +119,7 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
 
     $element = array(
       '#markup' => '<div id="' . $wrapper_id . '">'
-        . $reset_link
+        . $this->getResetLink()
         . '<div class="ajax-facets-controls-wrapper">'
         . $min_input
         . $max_input

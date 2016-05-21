@@ -105,44 +105,6 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
   }
 
   /**
-   * Implements FacetapiWidget::execute().
-   *
-   * Transforms the render array into something that can be themed by
-   * theme_item_list().
-   *
-   * @see FacetapiWidgetLinks::setThemeHooks()
-   * @see FacetapiWidgetLinks::buildListItems()
-   */
-  public function execute() {
-    $element = &$this->build[$this->facet['field alias']];
-
-    $this->setThemeHooks($element);
-    // Sets each item's theme hook, builds item list.
-	  $item_list = array(
-      '#theme' => 'item_list',
-      '#items' => $this->buildListItems($element),
-      '#attributes' => $this->build['#attributes'],
-    );
-
-    $reset_link = '';
-    if (!empty($this->settings->settings['show_reset_link']) && $this->settings->settings['show_reset_link']) {
-      $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
-    }
-
-    // We cannot use drupal_html_id to save the same id for each facet.
-    $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
-
-    $element = array(
-      '#markup' => '<div id="' . $wrapper_id . '">'
-        . $reset_link
-        . render($item_list)
-        . '</div>'
-    );
-
-    ajax_facets_add_ajax_js($this->facet);
-  }
-
-  /**
    * Recursive function that sets each item's theme hook.
    *
    * The indivual items will be rendered by different theme hooks depending on

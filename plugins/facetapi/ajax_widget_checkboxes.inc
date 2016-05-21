@@ -139,42 +139,4 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     $this->jsSettings['limit_active_items'] = $facet_settings->settings['limit_active_items'];
     return $items;
   }
-
-  /**
-   * Implements FacetapiWidget::execute().
-   *
-   * Transforms the render array into something that can be themed by
-   * theme_item_list().
-   *
-   * @see FacetapiWidgetLinks::setThemeHooks()
-   * @see FacetapiWidgetLinks::buildListItems()
-   */
-  public function execute() {
-    $element = &$this->build[$this->facet['field alias']];
-
-    // Sets each item's theme hook, builds item list.
-    $this->setThemeHooks($element);
-    $item_list = array(
-      '#theme' => 'item_list',
-      '#items' => $this->buildListItems($element),
-      '#attributes' => $this->build['#attributes'],
-    );
-
-    $reset_link = '';
-    if (!empty($this->settings->settings['show_reset_link']) && $this->settings->settings['show_reset_link']) {
-      $reset_link = '<a class="reset-link" href="#">' . t('Reset filter') . '</a>';
-    }
-
-    // We cannot use drupal_html_id to save the same id for each facet.
-    $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
-
-    $element = array(
-      '#markup' => '<div id="' . $wrapper_id . '">'
-        . $reset_link
-        . render($item_list)
-        . '</div>'
-    );
-
-    ajax_facets_add_ajax_js($this->facet);
-  }
 }

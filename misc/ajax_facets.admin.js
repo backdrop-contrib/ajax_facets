@@ -23,6 +23,12 @@ Drupal.behaviors.ajax_facets_admin = {
         $('input[name="show_reset_link"]').removeAttr('checked');
       }
     });
+
+    // Ensures ALL "reset link text" textfields are updated.
+    // @see http://drupal.org/node/735528
+    $('input[name="reset_link_text"]').change(function() {
+      $('input[name="reset_link_text"]').val($(this).val());
+    });
   }
 }
 
