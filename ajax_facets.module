@@ -104,7 +104,7 @@ function ajax_facets_add_ajax_js($facet) {
     // Note that we add in query only filter params and exclude pages and etc...
     $query = (isset($_GET[$filter_key])) ? array($filter_key => $_GET[$filter_key]) : array();
     $current_views = search_api_current_search();
-    $processable_views = [];
+    $processable_views = array();
 
     // Add history.js file if exists.
     if (module_exists('libraries')) {
