@@ -11,7 +11,7 @@
   // Determine if it is first page load. Will be reset in Drupal.ajax_facets.initHistoryState.
   Drupal.ajax_facets.firstLoad = true;
   // HTML ID of element of current facet.
-  Drupal.ajax_facets.current_id = null;
+  Drupal.ajax_facets.current_facet_id = null;
   // Current changed facet.
   Drupal.ajax_facets.current_facet_name = null;
   // Settings of each ajax facet.
@@ -369,8 +369,12 @@
    * Send ajax.
    */
   Drupal.ajax_facets.sendAjaxQuery = function ($this, pushStateNeeded) {
-    Drupal.ajax_facets.current_id = $this.attr('data-facet-uuid');
-    Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
+    // Read current facet.
+    if ($this.lengh) {
+      Drupal.ajax_facets.current_facet_id = $this.attr('data-facet-uuid');
+      Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
+    }
+
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
     // Render the exposed filter data to send along with the ajax request
@@ -391,7 +395,7 @@
       if (pushStateNeeded) {
         var stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.facetapi.searchUrl),
         state = {
-          current_id: Drupal.ajax_facets.current_id,
+          current_facet_id: Drupal.ajax_facets.current_facet_id,
           current_facet_name: Drupal.ajax_facets.current_facet_name,
           facets: Drupal.ajax_facets.queryState['f']
         };
@@ -422,7 +426,7 @@
     // Reset the timeout handler to avoid troubles when user is clicking on items very fast.
     window.clearTimeout(Drupal.ajax_facets.tooltipTimeout);
 
-    var pos = $('[data-facet-uuid=' + Drupal.ajax_facets.current_id + ']').offset();
+    var pos = $('[data-facet-uuid=' + Drupal.ajax_facets.current_facet_id + ']').offset();
     var $tooltip = $('#ajax-facets-tooltip');
     $tooltip.css('top', pos.top - 15);
     $tooltip.css('left', pos.left - $tooltip.width() - 40);
@@ -563,7 +567,7 @@
       // If history.js available - use it.
       if (Drupal.settings.facetapi.isHistoryJsExists) {
         History.replaceState({
-          current_id: $facet.data('facet-uuid'),
+          current_facet_id: $facet.data('facet-uuid'),
           current_facet_name: $facet.data('facet'),
           facets: Drupal.ajax_facets.queryState['f']
         }, null, null);
@@ -571,7 +575,7 @@
         // Fallback to HTML5 history object.
         if (history.replaceState) {
           history.replaceState({
-            current_id: $facet.data('facet-uuid'),
+            current_facet_id: $facet.data('facet-uuid'),
             current_facet_name: $facet.data('facet'),
             facets: Drupal.ajax_facets.queryState['f']
           }, null, null);
@@ -608,26 +612,30 @@
   Drupal.ajax_facets.reactOnStateChange = function () {
     var state = null,
       facets = [],
-      current_id = '';
+      current_facet_id = '',
+      elem = '';
 
     // If history.js available - use it.
     if (Drupal.settings.facetapi.isHistoryJsExists) {
       state = History.getState();
 
       facets = state.data.facets;
-      current_id = state.data.current_id;
+      current_facet_id = state.data.current_facet_id;
     } else {
       // Fallback to HTML5 history object.
       if (history.pushState) {
         state = history.state;
 
         facets = state.facets;
-        current_id = state.current_id;
+        current_facet_id = state.current_facet_id;
       }
     }
 
-    Drupal.ajax_facets.queryState['f'] = facets;
-    Drupal.ajax_facets.sendAjaxQuery($('[data-facet-uuid="' + current_id + '"]'), false);
+    Drupal.ajax_facets.queryState['f'] = facets ? facets : [];
+    // @todo handle the case with []. When facets are empty, let's try to ready them from new pushed state.
+    // @todo don't forget that pushed url should be equal to search url. Otherwise do nothing.
+    // Check element. Current facet ID can be empty. For example when state will be changed not by module ajax_facets.
+    Drupal.ajax_facets.sendAjaxQuery($('[data-facet-uuid="' + current_facet_id + '"]'), false);
   };
 
   // If user opened new page and then clicked browser's back button then would not be fired "statechange" event.
@@ -682,17 +690,28 @@
       /* Update results. */
       var show_tip = false;
       $.each(response.data.update_results, function (facet_name, mode) {
-        if (Drupal.ajax_facets.current_facet_name == facet_name) {
-          /* Update by ajax. */
-          if (mode) {
-            $.each(response.data.views, function(key, view) {
-              $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
-            });
+        if (Drupal.ajax_facets.current_facet_name) {
+          if (Drupal.ajax_facets.current_facet_name == facet_name) {
+            /* Update by ajax. */
+            if (mode) {
+              $.each(response.data.views, function (key, view) {
+                $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
+              });
+            }
+            /* Update by link. */
+            else {
+              show_tip = true;
+            }
           }
-          /* Update by link. */
-          else {
-            show_tip = true;
-          }
+        }
+        // Emulate correct work if we want to update results not through the clicking on the facet.
+        // For example pushState from 3rd party script.
+        // Option with tooltip is not supported for this case because we can't know should we update
+        // results or no if we don't have facet name.
+        else {
+          $.each(response.data.views, function (key, view) {
+            $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
+          });
         }
       });
 
