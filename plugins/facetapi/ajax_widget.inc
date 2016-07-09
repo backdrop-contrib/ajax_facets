@@ -60,7 +60,6 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
       '#states' => array(
         'visible' => array(
           'select[name="widget"]' => array('value' => $this->id),
-          ':input[name="show_reset_link"]' => array('checked' => TRUE),
         ),
       ),
     );
@@ -148,7 +147,7 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
   protected function getResetLink() {
     $settings = $this->settings->settings;
     $reset_link = '';
-    if (!empty($settings['show_reset_link']) && $settings['reset_link_text']) {
+    if (!empty($settings['show_reset_link']) && !empty($settings['reset_link_text'])) {
       // Support for i18n.
       if (function_exists('i18n_string_translate')) {
         $text = i18n_string_translate(
