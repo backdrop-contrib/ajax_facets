@@ -370,7 +370,7 @@
    */
   Drupal.ajax_facets.sendAjaxQuery = function ($this, pushStateNeeded) {
     // Read current facet.
-    if ($this.lengh) {
+    if ($this.length) {
       Drupal.ajax_facets.current_facet_id = $this.attr('data-facet-uuid');
       Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
     }
