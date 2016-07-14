@@ -616,43 +616,39 @@
 
     // If history.js available - use it.
     if (Drupal.settings.facetapi.isHistoryJsExists) {
-      state = History.getState();
-
-      facets = state.data.facets;
-      current_facet_id = state.data.current_facet_id;
+      if (state = History.getState()) {
+        facets = state.data.facets;
+        current_facet_id = state.data.current_facet_id;
+      }
     } else {
       // Fallback to HTML5 history object.
       if (history.pushState) {
-        state = history.state;
-
-        facets = state.facets;
-        current_facet_id = state.current_facet_id;
+        if (state = history.state) {
+          facets = state.facets;
+          current_facet_id = state.current_facet_id;
+        }
       }
     }
 
-    Drupal.ajax_facets.queryState['f'] = facets ? facets : [];
-    // @todo handle the case with []. When facets are empty, let's try to ready them from new pushed state.
-    // @todo don't forget that pushed url should be equal to search url. Otherwise do nothing.
-    // Check element. Current facet ID can be empty. For example when state will be changed not by module ajax_facets.
-    Drupal.ajax_facets.sendAjaxQuery($('[data-facet-uuid="' + current_facet_id + '"]'), false);
+    // Do something only if paths are match and current_facet_id is defined.
+    if (window.location.pathname == Drupal.settings.facetapi.searchUrl && current_facet_id) {
+      Drupal.ajax_facets.queryState['f'] = facets;
+      Drupal.ajax_facets.sendAjaxQuery($('[data-facet-uuid="' + current_facet_id + '"]'), false);
+    }
   };
 
   // If user opened new page and then clicked browser's back button then would not be fired "statechange" event.
   // So we need to bind on 'statechange' event and react only once.
   // All farther work does Drupal.ajax_facets.pushState() function.
   // If history.js Adapter available - use it to bind "statechange" event.
-  if (History.Adapter) {
+  if (History.Adapter && Drupal.ajax_facets.firstLoad) {
     History.Adapter.bind(window, 'statechange', function () {
-      if (Drupal.ajax_facets.firstLoad) {
-        Drupal.ajax_facets.reactOnStateChange();
-      }
+      Drupal.ajax_facets.reactOnStateChange();
     });
   } else {
     // Fallback to default HTML5 event.
     window.onpopstate = function () {
-      if (Drupal.ajax_facets.firstLoad) {
-        Drupal.ajax_facets.reactOnStateChange();
-      }
+      Drupal.ajax_facets.reactOnStateChange();
     };
   }
 
