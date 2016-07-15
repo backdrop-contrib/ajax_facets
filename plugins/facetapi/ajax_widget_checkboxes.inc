@@ -104,11 +104,16 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         $row['class'][] = 'facetapi-active';
       }
 
+      // Show/hide counts according to the settings.
+      if(!empty($this->settings->settings['display_count'])) {
+        $item['#markup'] .= ' ' . theme('facetapi_count', (array('count' => $item['#count'])));
+      }
+
       $checkbox = array(
         '#id' => $this->getAjaxFacetsUuid($value),
         '#name' => rawurlencode($this->key),
         '#type' => 'checkbox',
-        '#title' => $item['#markup'] . ' ' . theme('facetapi_count',(array('count' => $item['#count']))),
+        '#title' => $item['#markup'],
         '#attributes' => $attributes,
       );
       $row['data'] = drupal_render($checkbox);

@@ -81,7 +81,11 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
         $active_items[] = $this->key . ':' . $item['#markup'];
       }
 
-      $items['values'][$item['#indexed_value']] = $prefix . $item['#markup'] . ' ' . theme('facetapi_count',(array('count' => $item['#count'])));
+      $items['values'][$item['#indexed_value']] = $prefix . $item['#markup'];
+      // Show/hide counts according to the settings.
+      if (!empty($this->settings->settings['display_count'])) {
+        $items['values'][$item['#indexed_value']] .= ' ' . theme('facetapi_count',(array('count' => $item['#count'])));
+      }
 
       if (!empty($item['#item_children'])) {
         $childrens = $this->buildListItems($item['#item_children'], $level);

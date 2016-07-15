@@ -52,7 +52,7 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       $variables = array(
         'text' => $item['#markup'],
         'path' => $item['#path'],
-        'count' => $item['#count'],
+        'count' => !empty($settings['display_count']) ? $item['#count'] : NULL,
         'options' => array(
           'attributes' => $attributes,
           'html' => $item['#html'],

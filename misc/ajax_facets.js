@@ -703,7 +703,6 @@
         // For example pushState from 3rd party script.
         // Option with tooltip is not supported for this case because we can't know should we update
         // results or no if we don't have facet name.
-        // @todo I think this approach can be improved.
         else {
           $.each(response.data.views, function (key, view) {
             $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
