@@ -27,10 +27,10 @@
   // You can use it to make actions after the ajax has updated the content.
   Drupal.ajax_facets.afterContentUpdateCallbacks = {};
 
-  Drupal.ajax_facets.beforeAjax = function (context, settings, element) {
+  Drupal.ajax_facets.beforeAjax = function () {
     $.each(Drupal.ajax_facets.beforeAjaxCallbacks, function () {
       if ($.isFunction(this)) {
-        this(context, settings, element);
+        this();
       }
     });
   };
