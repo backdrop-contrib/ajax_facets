@@ -24,10 +24,21 @@
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
 
+  // You can use it to make actions after the ajax has updated the content.
+  Drupal.ajax_facets.afterContentUpdateCallbacks = {};
+
   Drupal.ajax_facets.beforeAjax = function (context, settings, element) {
     $.each(Drupal.ajax_facets.beforeAjaxCallbacks, function () {
       if ($.isFunction(this)) {
         this(context, settings, element);
+      }
+    });
+  };
+
+  Drupal.ajax_facets.afterContentUpdate = function () {
+    $.each(Drupal.ajax_facets.afterContentUpdateCallbacks, function () {
+      if ($.isFunction(this)) {
+        this();
       }
     });
   };
@@ -731,6 +742,9 @@
       if (response.data.settings.views) {
         Drupal.settings.views = response.data.settings.views;
       }
+
+      // We add this here so we can run custom code after content updates
+      Drupal.ajax_facets.afterContentUpdate();
 
       Drupal.attachBehaviors();
       if (show_tip) {
