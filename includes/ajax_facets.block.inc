@@ -27,7 +27,13 @@ function ajax_facets_block_configure($delta = '') {
       $form['ajax_facets_reset_all_link_text'] = array(
         '#type' => 'textfield',
         '#title' => t('"Reset all facets" link text'),
-        '#default_value' => ajax_facets_reset_link_text(),
+        '#default_value' => ajax_facets_block_link_text('reset'),
+      );
+
+      $form['ajax_facets_submit_all_link_text'] = array(
+        '#type' => 'textfield',
+        '#title' => t('"Submit all facets" link text'),
+        '#default_value' => ajax_facets_block_link_text('submit'),
       );
 
       break;
@@ -43,15 +49,25 @@ function ajax_facets_block_save($delta = '', $edit = array()) {
   switch ($delta) {
     case 'ajax_facets_block':
       variable_set('ajax_facets_reset_all_link_text', $edit['ajax_facets_reset_all_link_text']);
+      variable_set('ajax_facets_submit_all_link_text', $edit['ajax_facets_submit_all_link_text']);
       // Update the i18n string if need.
       if (function_exists('i18n_string_update')) {
         $name = array(
           'ajax_facets',
           'ajax_facets_block',
           'facet_reset_all_link_text',
-          'text'
+          'text',
         );
         i18n_string_update($name, $edit['ajax_facets_reset_all_link_text']);
+
+        $name = array(
+          'ajax_facets',
+          'ajax_facets_submit_block',
+          'facet_submit_all_link_text',
+          'text',
+        );
+
+        i18n_string_update($name, $edit['ajax_facets_submit_all_link_text']);
       }
       break;
   }
@@ -65,14 +81,40 @@ function ajax_facets_block_view($delta = '') {
 
   switch ($delta) {
     case 'ajax_facets_block':
-      $block['content'] = array(
-        '#markup' => l(ajax_facets_reset_link_text(), current_path(), array(
+      $reset_link = l(
+        ajax_facets_block_link_text('reset'),
+        current_path(),
+        array(
           'attributes' => array(
             'class' => array(
               'ajax-facets-reset-all-link',
             ),
           ),
-        )),
+        )
+      );
+
+      $submit_link = l(
+        ajax_facets_block_link_text('submit'),
+        current_path(),
+        array(
+          'attributes' => array(
+            'class' => array(
+              'ajax-facets-submit-all-link',
+            ),
+          ),
+        )
+      );
+
+      $block['content'] = array(
+        '#markup' => theme(
+          'item_list',
+          array(
+            'items' => array(
+              $reset_link,
+              $submit_link
+            )
+          )
+        )
       );
 
       break;
@@ -84,18 +126,37 @@ function ajax_facets_block_view($delta = '') {
 /**
  * Returns text for Ajax Facets reset link.
  */
-function ajax_facets_reset_link_text() {
-  $text = variable_get('ajax_facets_reset_all_link_text', t('Reset all facets'));
-  if (function_exists('i18n_string_translate')) {
-    $text = i18n_string_translate(
-      array(
-        'ajax_facets',
-        'ajax_facets_block',
-        'facet_reset_all_link_text',
-        'text'
-      ),
-      $text
-    );
+function ajax_facets_block_link_text($type) {
+  $text = '';
+  if ($type == 'reset') {
+    $text = variable_get('ajax_facets_reset_all_link_text', t('Reset all facets'));
+    if (function_exists('i18n_string_translate')) {
+      $text = i18n_string_translate(
+        array(
+          'ajax_facets',
+          'ajax_facets_block',
+          'facet_reset_all_link_text',
+          'text'
+        ),
+        $text
+      );
+    }
   }
+  elseif ($type == 'submit') {
+    $text = variable_get('ajax_facets_submit_all_link_text', t('Submit all facets'));
+
+    if (function_exists('i18n_string_translate')) {
+      $text = i18n_string_translate(
+        array(
+          'ajax_facets',
+          'ajax_facets_submit_block',
+          'facet_submit_all_link_text',
+          'text',
+        ),
+        $text
+      );
+    }
+  }
+
   return $text;
 }

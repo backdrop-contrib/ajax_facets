@@ -178,27 +178,6 @@ function ajax_facets_facet_build_reset_path($facet, $adapter) {
 }
 
 /**
- * Return Drupal formed url for apply current facets state.
- */
-function ajax_facets_facet_build_apply_path($adapter) {
-  $params = $adapter->getUrlProcessor()->fetchParams();
-  $unset_keys = array('searchPath', 'q', 'page');
-  // Remove default params from redirect.
-  foreach ($unset_keys as $key) {
-    if (isset($params[$key])) {
-      unset($params[$key]);
-    }
-  }
-  // Remove empty filter key.
-  $filter_key = $adapter->getUrlProcessor()->getFilterKey();
-  if (isset($params[$filter_key]) && empty($params[$filter_key])) {
-    unset($params[$filter_key]);
-  }
-  $url_params = !empty($params) ? array('query' => $params) : array();
-  return url((!empty($_GET['searchPath']) ? $_GET['searchPath'] : $adapter->getSearchPath()), $url_params);
-}
-
-/**
  * Implementation of hook_views_ajax_data_alter()
  */
 function ajax_facets_views_ajax_data_alter(&$commands, $view) {
@@ -310,11 +289,6 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
         $delta = array_search("$searcher:$realm_name:$facet_name", $map);
         $blocks['hide_blocks'][] = 'block-facetapi-' . strtolower($delta);
       }
-
-      // Settings for update view.
-      $facet_settings = $facet->getSettings($realm);
-      $update_results = !empty($facet_settings->settings['update_results']) ? $facet_settings->settings['update_results'] : 0;
-      $blocks['update_results'][$facet_name] = $update_results;
     }
   }
 

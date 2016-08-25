@@ -18,7 +18,6 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
    */
   function getDefaultSettings() {
     return array(
-      "update_results" => 1,
       "show_reset_link" => 0,
     );
   }
@@ -64,9 +63,6 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
       if (!$item['#count']) {
         $variables['options']['attributes']['class'][] = 'facetapi-zero-results';
       }
-
-      // It's need to identify the facet option.
-      $variables['options']['attributes']['data-facet-uuid'] = $this->getAjaxFacetsUuid($value);
 
       // If the item has no children, it is a leaf.
       if (empty($item['#item_children'])) {

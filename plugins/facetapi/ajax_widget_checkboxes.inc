@@ -61,7 +61,6 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     return array(
       'soft_limit' => 20,
       'show_expanded' => 0,
-      'update_results' => 1,
       'reset_link' => 0,
       'empty_behavior' => 'ajax_facets',
     );
@@ -94,7 +93,6 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         'data-facet-value' => $value,
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
-        'data-facet-uuid' => $this->getAjaxFacetsUuid($value),
       );
       // Respect current selection.
       if (!empty($item['#active'])) {

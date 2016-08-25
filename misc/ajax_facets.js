@@ -10,16 +10,14 @@
   Drupal.ajax_facets.facetQueryState = null;
   // Determine if it is first page load. Will be reset in Drupal.ajax_facets.initHistoryState.
   Drupal.ajax_facets.firstLoad = true;
-  // HTML ID of element of current facet.
-  Drupal.ajax_facets.current_facet_id = null;
-  // Current changed facet.
-  Drupal.ajax_facets.current_facet_name = null;
   // Settings of each ajax facet.
   Drupal.ajax_facets.facetsSettings = {};
   // Timer for ranges widget.
   Drupal.ajax_facets.timer;
-  // Tooltip timeout handler.
-  Drupal.ajax_facets.tooltipTimeout;
+  // Buttons for ajax facets.
+  Drupal.ajax_facets.ajax_facets_buttons = false;
+  // Force update of the results
+  Drupal.ajax_facets.force_update_results = false;
 
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
@@ -36,6 +34,7 @@
   };
 
   Drupal.ajax_facets.afterContentUpdate = function () {
+    Drupal.ajax_facets.force_update_results = false;
     $.each(Drupal.ajax_facets.afterContentUpdateCallbacks, function () {
       if ($.isFunction(this)) {
         this();
@@ -185,26 +184,35 @@
 
       // Hide blocks with ajax-facets-empty-behavior.
       $('.ajax-facets-empty-behavior').parents('.block-facetapi').hide();
-
-      // Add facets tooltip.
-      $('body').once(function () {
-        $(this).append('<div id="ajax-facets-tooltip"><span></span></div>');
-      });
     }
   };
 
   Drupal.behaviors.ajax_facets_block = {
     attach: function (context, settings) {
       // Reset all link.
-      $('a.ajax-facets-reset-all-link:not(.processed)').bind('click', function (e) {
+      $('.ajax-facets-reset-all-link:not(.processed)').bind('click', function (e) {
         e.preventDefault();
 
         // Clear all facets from queryState facets array.
         Drupal.ajax_facets.queryState.f = [];
 
         // Send ajax query with first found facet.
-        Drupal.ajax_facets.sendAjaxQuery($('[data-facet-name]').first(), true);
+        Drupal.ajax_facets.force_update_results = true;
+        Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: true});
       }).addClass('processed');
+
+      var $submitLink = $('.ajax-facets-submit-all-link:not(.processed)');
+      if ($submitLink.length) {
+        // Submit link found.
+        Drupal.ajax_facets.ajax_facets_buttons = true;
+        // Submit all link.
+        $submitLink.bind('click', function (e) {
+          e.preventDefault();
+          // Send ajax query with first found facet.
+          Drupal.ajax_facets.force_update_results = true;
+          Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: true});
+        }).addClass('processed');
+      }
     }
   };
 
@@ -222,7 +230,7 @@
       var $facet = $(this).parent().find('[data-facet-name]').first();
       var facetName = $facet.data('facet-name');
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
-      Drupal.ajax_facets.sendAjaxQuery($facet, true);
+      Drupal.ajax_facets.sendAjaxQuery($facet, {pushStateNeeded: true});
       event.preventDefault();
     });
   };
@@ -248,7 +256,7 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this, true);
+    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
   };
 
   /**
@@ -292,7 +300,7 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this, true);
+    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
   };
 
   /**
@@ -335,7 +343,7 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery($this, true);
+    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
     event.preventDefault();
   };
 
@@ -356,7 +364,7 @@
           Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
         }
 
-        Drupal.ajax_facets.sendAjaxQuery($sliderWrapper, true);
+        Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
       },
       600
     );
@@ -379,17 +387,12 @@
   /**
    * Send ajax.
    */
-  Drupal.ajax_facets.sendAjaxQuery = function ($this, pushStateNeeded) {
-    // Read current facet.
-    if ($this.length) {
-      Drupal.ajax_facets.current_facet_id = $this.attr('data-facet-uuid');
-      Drupal.ajax_facets.current_facet_name = $this.data('raw-facet-name');
-    }
-
+  Drupal.ajax_facets.sendAjaxQuery = function (options) {
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
     // Render the exposed filter data to send along with the ajax request
-    $.each(Drupal.ajax_facets.queryState.views, function(key, view) {
+
+    $.each(Drupal.ajax_facets.queryState.views, function (key, view) {
       var exposedFormId = '#views-exposed-form-' + view.view_name + '-' + view.view_display_id;
       exposedFormId = exposedFormId.replace(/\_/g, '-');
       $.each($(exposedFormId).serializeArray(), function (index, value) {
@@ -397,20 +400,14 @@
       });
     });
     var settings = {
-      url : encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh'),
-      submit : {'ajax_facets' : data}
+      url: encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh'),
+      submit: {'ajax_facets': data}
     };
     var ajax = new Drupal.ajax(false, false, settings);
-    ajax.success = function(response, status) {
+    ajax.success = function (response, status) {
       // Push new state only on successful ajax response.
-      if (pushStateNeeded) {
-        var stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.facetapi.searchUrl),
-        state = {
-          current_facet_id: Drupal.ajax_facets.current_facet_id,
-          current_facet_name: Drupal.ajax_facets.current_facet_name,
-          facets: Drupal.ajax_facets.queryState['f']
-        };
-        Drupal.ajax_facets.pushState(state, document.title, stateUrl);
+      if (options.pushStateNeeded) {
+        Drupal.ajax_facets.pushState();
       }
       // Pass back to original method.
       Drupal.ajax.prototype.success.call(this, response, status);
@@ -430,23 +427,6 @@
       facets_values[key] = value;
     });
     return facets_values;
-  };
-
-  /* Show tooltip if facet results are not updated by ajax (in settings). */
-  Drupal.ajax_facets.showTooltip = function ($, response) {
-    // Reset the timeout handler to avoid troubles when user is clicking on items very fast.
-    window.clearTimeout(Drupal.ajax_facets.tooltipTimeout);
-
-    var pos = $('[data-facet-uuid=' + Drupal.ajax_facets.current_facet_id + ']').offset();
-    var $tooltip = $('#ajax-facets-tooltip');
-    $tooltip.css('top', pos.top - 15);
-    $tooltip.css('left', pos.left - $tooltip.width() - 40);
-    $tooltip.show();
-    $tooltip.find('span').html(Drupal.t('Found:') + ' ' + '<a href="' + response.applyUrl + '">' + response.total_results + '</a>');
-
-    Drupal.ajax_facets.tooltipTimeout = setTimeout(function () {
-      $tooltip.hide(250);
-    }, 3000);
   };
 
   /* Get view dom id for both modes of views - ajax/not ajax. */
@@ -578,16 +558,12 @@
       // If history.js available - use it.
       if (Drupal.settings.facetapi.isHistoryJsExists) {
         History.replaceState({
-          current_facet_id: $facet.data('facet-uuid'),
-          current_facet_name: $facet.data('facet'),
           facets: Drupal.ajax_facets.queryState['f']
         }, null, null);
       } else {
         // Fallback to HTML5 history object.
         if (history.replaceState) {
           history.replaceState({
-            current_facet_id: $facet.data('facet-uuid'),
-            current_facet_name: $facet.data('facet'),
             facets: Drupal.ajax_facets.queryState['f']
           }, null, null);
         }
@@ -601,7 +577,12 @@
    * History.js library fires "statechange" event even on API push/replace calls.
    * So before pushing new state to history we should unbind from this event and after bind again.
    */
-  Drupal.ajax_facets.pushState = function (state, title, stateUrl) {
+  Drupal.ajax_facets.pushState = function () {
+    var stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.facetapi.searchUrl),
+      state = {
+        facets: Drupal.ajax_facets.queryState['f']
+      },
+      title = document.title;
     // If history.js available - use it.
     if (Drupal.settings.facetapi.isHistoryJsExists) {
       var $window = $(window);
@@ -622,29 +603,27 @@
    */
   Drupal.ajax_facets.reactOnStateChange = function () {
     var state = null,
-      facets = [],
-      current_facet_id = '';
+      facets = [];
 
     // If history.js available - use it.
     if (Drupal.settings.facetapi.isHistoryJsExists) {
       if (state = History.getState()) {
         facets = state.data.facets;
-        current_facet_id = state.data.current_facet_id;
       }
     } else {
       // Fallback to HTML5 history object.
       if (history.pushState) {
         if (state = history.state) {
           facets = state.facets;
-          current_facet_id = state.current_facet_id;
         }
       }
     }
 
-    // Do something only if paths are match and current_facet_id is defined.
-    if (window.location.pathname == Drupal.settings.facetapi.searchUrl && current_facet_id) {
+    // Do something only if paths are match and facets is defined.
+    if (window.location.pathname == Drupal.settings.facetapi.searchUrl && facets) {
       Drupal.ajax_facets.queryState['f'] = facets;
-      Drupal.ajax_facets.sendAjaxQuery($('[data-facet-uuid="' + current_facet_id + '"]'), false);
+      Drupal.ajax_facets.force_update_results = true;
+      Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: false});
     }
   };
 
@@ -693,41 +672,22 @@
         }
       }
 
-      /* Update results. */
-      var show_tip = false;
-      $.each(response.data.update_results, function (facet_name, mode) {
-        if (Drupal.ajax_facets.current_facet_name) {
-          if (Drupal.ajax_facets.current_facet_name == facet_name) {
-            /* Update by ajax. */
-            if (mode) {
-              $.each(response.data.views, function (key, view) {
-                $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
-              });
-            }
-            /* Update by link. */
-            else {
-              show_tip = true;
-            }
-          }
-        }
-        // Emulate correct work if we want to update results not through the clicking on the facet.
-        // For example pushState from 3rd party script.
-        // Option with tooltip is not supported for this case because we can't know should we update
-        // results or no if we don't have facet name.
-        else {
-          $.each(response.data.views, function (key, view) {
-            $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
-          });
-        }
-      });
+      /* Update results if we have they and ajax facets buttons are not enabled or force mode is enabled. */
+      var buttons_exist = Drupal.ajax_facets.ajax_facets_buttons,
+        force_update_results = Drupal.ajax_facets.force_update_results;
+      if (!buttons_exist || force_update_results) {
+        $.each(response.data.views, function (key, view) {
+          $('.view-dom-id-' + view.view_dom_id).replaceWith(view.content);
+        });
 
-      // Update the exposed form separately if needed.
-      $.each(response.data.views, function(key, view) {
-        if (view.exposed_form) {
-          var viewId = view.views_name + '-' + view.views_display_id;
-          $('#views-exposed-form-' + viewId.replace(/_/g, '-')).replaceWith(view.exposed_form);
-        }
-      });
+        // Update the exposed form separately if needed.
+        $.each(response.data.views, function(key, view) {
+          if (view.exposed_form) {
+            var viewId = view.views_name + '-' + view.views_display_id;
+            $('#views-exposed-form-' + viewId.replace(/_/g, '-')).replaceWith(view.exposed_form);
+          }
+        });
+      }
 
       // As some blocks could be empty in results of filtering - hide them.
       if (response.data.hideBlocks) {
@@ -747,9 +707,6 @@
       Drupal.ajax_facets.afterContentUpdate();
 
       Drupal.attachBehaviors();
-      if (show_tip) {
-        Drupal.ajax_facets.showTooltip($, response.data);
-      }
     };
   }
 })(jQuery);

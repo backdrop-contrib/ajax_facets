@@ -18,7 +18,6 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    */
   function getDefaultSettings() {
     return array(
-      "update_results" => 1,
       "show_reset_link" => 0,
     );
   }
@@ -133,7 +132,6 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       '#attributes' => array(
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
-        'data-facet-uuid' => $this->getAjaxFacetsUuid(),
       ),
     );
 

@@ -28,19 +28,6 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
       ),
     );
 
-    $form['widget']['widget_settings']['ajax'][$this->id]['update_results'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Update results by ajax'),
-      '#default_value' => !empty($settings['update_results']),
-      '#description' => t('If active, then search results will be updated by AJAX when facet was changed.
-       If not active, then after than facet will be updated, user will see special popup with link for filter results.'),
-      '#states' => array(
-        'visible' => array(
-          'select[name="widget"]' => array('value' => $this->id),
-        ),
-      ),
-    );
-
     $form['widget']['widget_settings']['ajax'][$this->id]['show_reset_link'] = array(
       '#type' => 'checkbox',
       '#title' => t('Display reset link'),

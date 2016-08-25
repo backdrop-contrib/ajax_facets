@@ -15,7 +15,6 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
    */
   function getDefaultSettings() {
     return array(
-      'update_results' => 1,
       'show_reset_link' => 0,
     );
   }
@@ -66,7 +65,6 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
     $items = $this->buildListItems($element);
 
     $slider_attrs = array(
-      'data-facet-uuid' => $this->getAjaxFacetsUuid(),
       'data-facet-name' => rawurlencode($this->settings->facet),
       'data-raw-facet-name' => $this->settings->facet,
       'class' => array('slider-wrapper'),

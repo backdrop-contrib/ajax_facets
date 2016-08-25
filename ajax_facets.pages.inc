@@ -49,10 +49,6 @@ function ajax_facets_refresh_facets_content() {
         'content' => $view->preview($received_view['view_display_id'], $view_args),
       );
 
-      // Actually total results can work correctly only with one view.
-      // There are no way to select TRUE value from several views.
-      $total_results = $view->total_rows;
-
       // @see template_preprocess_views_view();
       // Update settings when view will be reloaded. Specifically $view->dom_id.
       if ($view->use_ajax) {
@@ -79,19 +75,15 @@ function ajax_facets_refresh_facets_content() {
 
 
     $searcher = 'search_api@' . $_GET['index_id'];
-    $adapter = facetapi_adapter_load($searcher);
     $blocks = ajax_facets_process_facet_blocks($searcher);
 
     $result = array(
-      'applyUrl' => ajax_facets_facet_build_apply_path($adapter),
       'resetUrls' => $blocks['reset_urls'],
       'newContent' => $blocks['facet_blocks'],
       'hideBlocks' => $blocks['hide_blocks'],
       'activeItems' => $blocks['active_items'],
       'views' => $processed_views,
       'facets' => $facet_query,
-      'update_results' => $blocks['update_results'],
-      'total_results' => $total_results,
       'settings' => !empty($views_settings['views']['ajaxViews']) ? $views_settings : array(),
     );
 
