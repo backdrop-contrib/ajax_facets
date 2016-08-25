@@ -9,7 +9,8 @@ Contents:
 2. INSTALLATION
 3. REQUIREMENTS
 4. CONFIGURATION
-5. CREDITS
+5. MODES OF WORK
+6. CREDITS
 
 1. ABOUT
 ========
@@ -53,13 +54,24 @@ But the simplest way is the next:
   Enable Ajax for your views display.
 5. Put block of your facet on the page where will be placed your view with search results.
   Important - view should be processed earlier than facet block will be rendered. Otherwise facets will not work.
-6. Put "Ajax facets block" block on the page if you want to have "Reset all facets" link.
+6. Put "Ajax facets block" block on the page if you want to have buttons "Reset all facets" and "Submit all facets".
 
 Module has integration with HTML5 browser history API. If you want to get this feature work for HTML4 browsers
 you should install libraries module (https://www.drupal.org/project/libraries)
 and download history.js (https://github.com/browserstate/history.js) library.
 
-5. CREDITS
+5. MODES OF WORK
+================
+Mode of immediate updating of the results - enabled by default.
+When you will put blocks of the ajax facets on the page with search results,
+but do not put the block with ajax facets buttons, the facets will be updated immediately.
+
+Mode of updating by demand - disabled by default.
+If you will put blocks of the ajax facets and block with ajax facets buttons on the page with search results,
+the facets will be updated right after any filtering. But search results will be updated only after
+ the click on the button "Submit all facets".
+
+6. CREDITS
 ==========
 
 Project page: http://drupal.org/project/ajax_facets
