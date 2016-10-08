@@ -391,7 +391,6 @@
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
     // Render the exposed filter data to send along with the ajax request
-
     $.each(Drupal.ajax_facets.queryState.views, function (key, view) {
       var exposedFormId = '#views-exposed-form-' + view.view_name + '-' + view.view_display_id;
       exposedFormId = exposedFormId.replace(/\_/g, '-');
@@ -399,6 +398,10 @@
         data[value.name] = value.value;
       });
     });
+
+    // Notify Drupal do we need search results or not.
+    data.searchResultsNeeded = options.pushStateNeeded;
+
     var settings = {
       url: encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh'),
       submit: {'ajax_facets': data}

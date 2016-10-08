@@ -36,6 +36,15 @@ function ajax_facets_refresh_facets_content() {
 
       // Execute view query to fill facets.
       $view = views_get_view($received_view['view_name']);
+      // Check, do we need search results or not.
+      if (isset($_GET['searchResultsNeeded'])) {
+        if ($_GET['searchResultsNeeded'] == 'false') {
+          // If we don't need search results, then we have to set limit as '0'.
+          // It have to be string but not integer due the logic in search_api_views.
+          $view->set_items_per_page('0');
+        }
+        unset($_GET['searchResultsNeeded']);
+      }
       // Reuse dom id.
       $view->dom_id = isset($received_view['view_dom_id']) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $received_view['view_dom_id']) : NULL;
 
