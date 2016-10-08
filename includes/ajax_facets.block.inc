@@ -160,3 +160,14 @@ function ajax_facets_block_link_text($type) {
 
   return $text;
 }
+
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function ajax_facets_preprocess_block(&$variables) {
+  if (!empty($variables['block']->module) && $variables['block']->module == 'facetapi') {
+    // Add BEM style classes to facet blocks. These classes are using for some selectors.
+    $variables['classes_array'][] = 'block--ajax_facets';
+  }
+}

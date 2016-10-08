@@ -183,7 +183,7 @@
       }
 
       // Hide blocks with ajax-facets-empty-behavior.
-      $('.ajax-facets-empty-behavior').parents('.block-facetapi').hide();
+      $('.ajax-facets-empty-behavior').parents('.block--ajax_facets').hide();
     }
   };
 
@@ -665,7 +665,7 @@
           if ($blockToReplace.size()) {
             $blockToReplace.replaceWith(response.data.newContent[id]);
           }
-          var $block = $('#' + id + '-wrapper').parents('div.block-facetapi:not(:visible)');
+          var $block = $('#' + id + '-wrapper').parents('div.block--ajax_facets:not(:visible)');
           if ($block.size()) {
             $block.show();
           }

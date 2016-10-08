@@ -194,7 +194,7 @@ function ajax_facets_views_ajax_data_alter(&$commands, $view) {
       $commands[] = ajax_command_replace("#$id-wrapper", $content);
     }
     // Show all blocks
-    $commands[] = ajax_command_invoke('div.block-facetapi:not(:visible)', 'show');
+    $commands[] = ajax_command_invoke('div.block--ajax_facets:not(:visible)', 'show');
     // Hide empty blocks
     foreach ($blocks['hide_blocks'] as $block_id) {
       $commands[] = ajax_command_invoke("#$block_id", 'hide');
