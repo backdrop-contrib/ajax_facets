@@ -156,10 +156,10 @@
               var $sliderWrapperParent = $sliderWrapper.parent();
               $sliderWrapperParent.find("input[type='text']").each(function() {
                 $(this).change(function() {
-                  var min = $sliderWrapperParent.find('.ajax-facets-slider-amount-min').val();
-                  var max = $sliderWrapperParent.find('.ajax-facets-slider-amount-max').val();
+                  var min = parseFloat($sliderWrapperParent.find('.ajax-facets-slider-amount-min').val());
+                  var max = parseFloat($sliderWrapperParent.find('.ajax-facets-slider-amount-max').val());
                   // If values are numeric and min less than max.
-                  if (!isNaN(parseFloat(min)) && isFinite(min) && !isNaN(parseFloat(max)) && isFinite(max) && min < max) {
+                  if (isFinite(min) && isFinite(max) && min < max) {
                     $sliderWrapper.slider('values', 0, min);
                     $sliderWrapper.slider('values', 1, max);
                     Drupal.ajax_facets.processSlider($sliderWrapper, min, max);
