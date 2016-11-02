@@ -60,7 +60,7 @@ function ajax_facets_facetapi_widgets() {
       'handler' => array(
         'label' => 'Ajax links',
         'class' => 'FacetapiAjaxWidgetLinks',
-        'query types' => array('term'),
+        'query types' => array('term', 'date_range'),
       ),
     ),
     'facetapi_ajax_ranges' => array(
