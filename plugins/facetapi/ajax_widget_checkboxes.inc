@@ -94,6 +94,13 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
       );
+
+      // Mark as disabled if count is 0.
+      if ($item['#count'] == 0) {
+        $attributes['disabled'] = 'disabled';
+        $row['class'][] = 'facetapi-disabled';
+      }
+
       // Respect current selection.
       if (!empty($item['#active'])) {
         $attributes['checked'] = 'checked';

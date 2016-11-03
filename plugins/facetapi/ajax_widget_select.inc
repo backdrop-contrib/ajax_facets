@@ -55,7 +55,9 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
     $settings = $this->settings->settings;
 
     // Builds rows.
-    $items = array();
+    $items = array(
+      '#disabled_items' => array(),
+    );
 
     // Add default item only once.
     if ($level == 0) {
@@ -81,6 +83,12 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       }
 
       $items['values'][$item['#indexed_value']] = $prefix . $item['#markup'];
+
+      // Mark as disabled if count is 0.
+      if ($item['#count'] == 0) {
+        $items['#disabled_items'][$item['#indexed_value']] = TRUE;
+      }
+
       // Show/hide counts according to the settings.
       if (!empty($this->settings->settings['display_count'])) {
         $items['values'][$item['#indexed_value']] .= ' ' . theme('facetapi_count',(array('count' => $item['#count'])));
@@ -133,6 +141,8 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
       ),
+      '#theme' => 'ajax_facets_select',
+      '#disabled_items' => $items['#disabled_items'],
     );
 
     if (!empty($items['active_value'])) {
