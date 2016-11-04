@@ -104,6 +104,7 @@ function ajax_facets_refresh_facets_content() {
 
     // Allow other modules to add, change or delete commands.
     drupal_alter('ajax_facets_data', $commands, $view);
+    drupal_add_http_header('Content-Type', 'application/json; charset=utf-8');
     print ajax_render($commands);
     drupal_exit();
   }
