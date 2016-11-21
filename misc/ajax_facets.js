@@ -12,8 +12,6 @@
   Drupal.ajax_facets.firstLoad = true;
   // Settings of each ajax facet.
   Drupal.ajax_facets.facetsSettings = {};
-  // Timer for ranges widget.
-  Drupal.ajax_facets.timer;
   // Buttons for ajax facets.
   Drupal.ajax_facets.ajax_facets_buttons = false;
   // Force update of the results
@@ -147,7 +145,7 @@
                 min: parseFloat($sliderWrapper.data('min')),
                 max: parseFloat($sliderWrapper.data('max')),
                 values: [ parseFloat($sliderWrapper.data('min-val')), parseFloat($sliderWrapper.data('max-val')) ],
-                slide: function( event, ui ) {
+                stop: function( event, ui ) {
                   Drupal.ajax_facets.processSlider($sliderWrapper, ui.values[0], ui.values[1]);
                 }
               }).addClass('processed');
@@ -351,23 +349,17 @@
    * Callback for slide event for widget ranges.
    */
   Drupal.ajax_facets.processSlider = function($sliderWrapper, min, max) {
-    window.clearTimeout(Drupal.ajax_facets.timer);
-    Drupal.ajax_facets.timer = window.setTimeout(
-      function() {
-        var facetName = $sliderWrapper.data('facet-name');
-        // Init history.
-        Drupal.ajax_facets.initHistoryState($sliderWrapper);
-        // If facets are already defined in queryState.
-        if (Drupal.ajax_facets.queryState['f']) {
-          // Exclude all values for this facet from query.
-          Drupal.ajax_facets.excludeCurrentFacet(facetName);
-          Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
-        }
+    var facetName = $sliderWrapper.data('facet-name');
+    // Init history.
+    Drupal.ajax_facets.initHistoryState($sliderWrapper);
+    // If facets are already defined in queryState.
+    if (Drupal.ajax_facets.queryState['f']) {
+      // Exclude all values for this facet from query.
+      Drupal.ajax_facets.excludeCurrentFacet(facetName);
+      Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
+    }
 
-        Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
-      },
-      600
-    );
+    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
   };
 
   /**
