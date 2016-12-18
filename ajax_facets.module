@@ -43,7 +43,7 @@ function ajax_facets_theme() {
  * Implements hook_facetapi_widgets().
  */
 function ajax_facets_facetapi_widgets() {
-  $query_type = array('term', 'date_range');
+  $query_type = array('term', 'date', 'date_range');
   $widgets = array(
     // Custom widget to handle ajax-refreshed facets.
     'facetapi_ajax_checkboxes' => array(
