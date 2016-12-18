@@ -31,11 +31,11 @@
     });
   };
 
-  Drupal.ajax_facets.afterContentUpdate = function () {
+  Drupal.ajax_facets.afterContentUpdate = function (ajax, response) {
     Drupal.ajax_facets.force_update_results = false;
     $.each(Drupal.ajax_facets.afterContentUpdateCallbacks, function () {
       if ($.isFunction(this)) {
-        this();
+        this(ajax, response);
       }
     });
   };
@@ -699,7 +699,7 @@
       }
 
       // We add this here so we can run custom code after content updates
-      Drupal.ajax_facets.afterContentUpdate();
+      Drupal.ajax_facets.afterContentUpdate(ajax, response);
 
       Drupal.attachBehaviors();
     };
