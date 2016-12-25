@@ -196,7 +196,10 @@
 
         // Send ajax query with first found facet.
         Drupal.ajax_facets.force_update_results = true;
-        Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: true});
+        Drupal.ajax_facets.sendAjaxQuery({
+          pushStateNeeded: true,
+          searchResultsNeeded: true
+        });
       }).addClass('processed');
 
       var $submitLink = $('.ajax-facets-submit-all-link:not(.processed)');
@@ -208,7 +211,10 @@
           e.preventDefault();
           // Send ajax query with first found facet.
           Drupal.ajax_facets.force_update_results = true;
-          Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: true});
+          Drupal.ajax_facets.sendAjaxQuery({
+            pushStateNeeded: true,
+            searchResultsNeeded: true
+          });
         }).addClass('processed');
       }
     }
@@ -228,7 +234,10 @@
       var $facet = $(this).parent().find('[data-facet-name]').first();
       var facetName = $facet.data('facet-name');
       Drupal.ajax_facets.excludeCurrentFacet(facetName);
-      Drupal.ajax_facets.sendAjaxQuery($facet, {pushStateNeeded: true});
+      Drupal.ajax_facets.sendAjaxQuery({
+        pushStateNeeded: true,
+        searchResultsNeeded: true
+      });
       event.preventDefault();
     });
   };
@@ -254,7 +263,10 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
+    Drupal.ajax_facets.sendAjaxQuery({
+      pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
+      searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
+    });
   };
 
   /**
@@ -298,7 +310,10 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
+    Drupal.ajax_facets.sendAjaxQuery({
+      pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
+      searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
+    });
   };
 
   /**
@@ -341,7 +356,10 @@
       }
     }
 
-    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
+    Drupal.ajax_facets.sendAjaxQuery({
+      pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
+      searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
+    });
     event.preventDefault();
   };
 
@@ -359,7 +377,10 @@
       Drupal.ajax_facets.queryState['f'][Drupal.ajax_facets.queryState['f'].length] = facetName + ':[' + min + ' TO ' + max + ']';
     }
 
-    Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons});
+    Drupal.ajax_facets.sendAjaxQuery({
+      pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
+      searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
+    });
   };
 
   /**
@@ -392,7 +413,7 @@
     });
 
     // Notify Drupal do we need search results or not.
-    data.searchResultsNeeded = options.pushStateNeeded;
+    data.searchResultsNeeded = options.searchResultsNeeded;
 
     var settings = {
       url: encodeURI(Drupal.settings.basePath + Drupal.settings.pathPrefix + 'ajax/ajax_facets/refresh'),
@@ -618,7 +639,10 @@
     if (window.location.pathname == Drupal.settings.facetapi.searchUrl && facets) {
       Drupal.ajax_facets.queryState['f'] = facets;
       Drupal.ajax_facets.force_update_results = true;
-      Drupal.ajax_facets.sendAjaxQuery({pushStateNeeded: false});
+      Drupal.ajax_facets.sendAjaxQuery({
+        pushStateNeeded: false,
+        searchResultsNeeded: true
+      });
     }
   };
 
@@ -627,9 +651,7 @@
   // All farther work does Drupal.ajax_facets.pushState() function.
   // If history.js Adapter available - use it to bind "statechange" event.
   if (History.Adapter && Drupal.ajax_facets.firstLoad) {
-    History.Adapter.bind(window, 'statechange', function () {
-      Drupal.ajax_facets.reactOnStateChange();
-    });
+    History.Adapter.bind(window, 'statechange', Drupal.ajax_facets.reactOnStateChange);
   } else {
     // Fallback to default HTML5 event.
     window.onpopstate = function () {
@@ -654,7 +676,7 @@
       }
 
       // Update content.
-      if (response.data.newContent && response.data.newContent) {
+      if (response.data.newContent) {
         for (var id in response.data.newContent) {
           var $blockToReplace = $('#' + id + '-wrapper');
           if ($blockToReplace.size()) {
