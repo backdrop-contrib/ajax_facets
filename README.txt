@@ -51,7 +51,10 @@ But the simplest way is the next:
 3. Create Search Index, configure it. Add some fields into index and select few of them as facets.
   Select one of four ajax widgets for your facets. Enable option "Update results by ajax" for your facet.
 4. Create view based on your search index. Fastest way is select type of display "Page".
-  Enable Ajax for your views display.
+  Setting "Access" should be configured for your views display if you want to use them with ajax facets.
+  It shouldn't have value "none". Otherwise, user will receive error "Search results cannot be filtered, please
+  contact site administrator." each time, when he would try to filter results.
+  Also, you should enable Ajax for your views display.
 5. Put block of your facet on the page where will be placed your view with search results.
   Important - view should be processed earlier than facet block will be rendered. Otherwise facets will not work.
 6. Put "Ajax facets block" block on the page if you want to have buttons "Reset all facets" and "Submit all facets".
