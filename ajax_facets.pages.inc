@@ -57,22 +57,40 @@ function ajax_facets_refresh_facets_content() {
       $name = $received_view['view_name'];
       $dis_id = $received_view['view_display_id'];
       $access = FALSE;
+
       // Check that access to this display is restricted.
+      $is_restricted = FALSE;
       if (!empty($view->display[$dis_id]->display_options['access'])) {
         // And that restriction is not "none".
         if ($view->display[$dis_id]->display_options['access']['type'] !== 'none') {
-          // Check that we have an access to this display.
-          if ($view->access($dis_id)) {
-            $processed_views[$key] = array(
-              'view_name' => $name,
-              'view_display_id' => $dis_id,
-              'view_dom_id' => $view->dom_id,
-              'content' => $view->preview($dis_id, $view_args),
-            );
-            $access = TRUE;
-          }
+          $is_restricted = TRUE;
         }
       }
+      // Maybe display uses access settings for a default display.
+      else if (!isset($view->display[$dis_id]->display_options['access'])
+        && !empty($view->display['default']->display_options['access'])) {
+        // And that restriction is not "none".
+        if ($view->display['default']->display_options['access']['type'] !== 'none') {
+          $is_restricted = TRUE;
+        }
+      }
+
+      // If an access has been restricted, we can process this view.
+      // If access is not restricted, then malefactor can load these views
+      // by ids and it will be a security hole.
+      if ($is_restricted) {
+        // Check that we have an access to this display.
+        if ($view->access($dis_id)) {
+          $processed_views[$key] = array(
+            'view_name' => $name,
+            'view_display_id' => $dis_id,
+            'view_dom_id' => $view->dom_id,
+            'content' => $view->preview($dis_id, $view_args),
+          );
+          $access = TRUE;
+        }
+      }
+
       // We are processing views on demand by name.
       // To do not let abuse this functionality.
       // We can process only that views which have access settings.
