@@ -81,12 +81,12 @@ function ajax_facets_refresh_facets_content() {
       if ($is_restricted) {
         // Check that we have an access to this display.
         if ($view->access($dis_id)) {
-          $processed_views[$key] = array(
+          $processed_views[$key] = [
             'view_name' => $name,
             'view_display_id' => $dis_id,
             'view_dom_id' => $view->dom_id,
             'content' => $view->preview($dis_id, $view_args),
-          );
+          ];
           $access = TRUE;
         }
       }
@@ -95,12 +95,15 @@ function ajax_facets_refresh_facets_content() {
       // To do not let abuse this functionality.
       // We can process only that views which have access settings.
       if (!$access) {
-        $commands = array(
+        $commands = [
           ajax_command_alert(
             t('Search results cannot be filtered, please contact site administrator.')
           ),
-        );
-        watchdog('access denied', 'Search results cannot be filtered for view - "%view_name", display - "%display_id"', array('%view_name' => $name, '%display_id' => $dis_id), WATCHDOG_WARNING);
+        ];
+        watchdog('access denied', 'Search results cannot be filtered for view - "%view_name", display - "%display_id"', [
+          '%view_name' => $name,
+          '%display_id' => $dis_id,
+        ], WATCHDOG_WARNING);
         ajax_facets_send_commands($commands);
       }
 
