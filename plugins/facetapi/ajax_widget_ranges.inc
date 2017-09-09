@@ -14,9 +14,9 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
    * Overrides FacetapiWidget::getDefaultSettings().
    */
   function getDefaultSettings() {
-    return array(
+    return [
       'show_reset_link' => 0,
-    );
+    ];
   }
 
   /**
@@ -25,9 +25,9 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
   function buildListItems($build, $level = 0) {
 
     // Builds rows.
-    $items = array();
+    $items = [];
 
-    $active_items = array();
+    $active_items = [];
     $have_active = FALSE;
     foreach ($build as $value => $item) {
       // Respect current selection.
@@ -64,11 +64,11 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
 
     $items = $this->buildListItems($element);
 
-    $slider_attrs = array(
+    $slider_attrs = [
       'data-facet-name' => rawurlencode($this->settings->facet),
       'data-raw-facet-name' => $this->settings->facet,
-      'class' => array('slider-wrapper'),
-    );
+      'class' => ['slider-wrapper'],
+    ];
 
     // Get min and max values.
     $raw_values = array_keys($element);
@@ -96,26 +96,26 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
 
     $min_input = theme(
       'ajax_facets_ranges_input',
-      array(
+      [
         'title' => t('From:'),
-        'attributes' => array('class' => 'ajax-facets-slider-amount-min'),
+        'attributes' => ['class' => 'ajax-facets-slider-amount-min'],
         'value' => $slider_attrs['data-min-val'],
-      )
+      ]
     );
 
     $max_input = theme(
       'ajax_facets_ranges_input',
-      array(
+      [
         'title' => t('To:'),
-        'attributes' => array('class' => 'ajax-facets-slider-amount-max'),
+        'attributes' => ['class' => 'ajax-facets-slider-amount-max'],
         'value' => $slider_attrs['data-max-val'],
-      )
+      ]
     );
 
     // We cannot use drupal_html_id to save the same id for each facet.
     $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
 
-    $element = array(
+    $element = [
       '#markup' => '<div id="' . $wrapper_id . '">'
         . $this->getResetLink()
         . '<div class="ajax-facets-controls-wrapper">'
@@ -124,7 +124,7 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
         . '<div ' . drupal_attributes($slider_attrs) . '></div>'
         . '</div>'
         . '</div>'
-    );
+    ];
 
     ajax_facets_add_ajax_js($this->facet);
   }

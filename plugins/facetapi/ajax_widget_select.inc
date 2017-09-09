@@ -17,9 +17,9 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    * Overrides FacetapiWidget::getDefaultSettings().
    */
   function getDefaultSettings() {
-    return array(
+    return [
       "show_reset_link" => 0,
-    );
+    ];
   }
 
   /**
@@ -27,17 +27,17 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
    */
   public function settingsForm(&$form, &$form_state) {
     parent::settingsForm($form, $form_state);
-    $form['widget']['widget_settings']['links'][$this->id]['ajax_select_default_option_label'] = array(
+    $form['widget']['widget_settings']['links'][$this->id]['ajax_select_default_option_label'] = [
       '#title' => t('Default Option Label'),
       '#type' => 'textfield',
       '#default_value' => !empty($this->settings->settings['ajax_select_default_option_label']) ? $this->settings->settings['ajax_select_default_option_label'] : t('Select'),
-      '#states' => array(
-        'visible' => array(
-          'select[name="widget"]' => array('value' => $this->id),
-        ),
-      ),
-    );
-   }
+      '#states' => [
+        'visible' => [
+          'select[name="widget"]' => ['value' => $this->id],
+        ],
+      ],
+    ];
+  }
 
   /**
    * Transforms the render array for use with theme_item_list().
@@ -55,16 +55,16 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
     $settings = $this->settings->settings;
 
     // Builds rows.
-    $items = array(
-      '#disabled_items' => array(),
-    );
+    $items = [
+      '#disabled_items' => [],
+    ];
 
     // Add default item only once.
     if ($level == 0) {
       $label = $settings['ajax_select_default_option_label'];
       // Translate through i18n if it's possible.
       if (function_exists('i18n_string_translate')) {
-        $label = i18n_string_translate(array('ajax_facets', 'facet_label', str_replace(':', '_', $this->key), 'label'), $label);
+        $label = i18n_string_translate(['ajax_facets', 'facet_label', str_replace(':', '_', $this->key), 'label'], $label);
       }
       $items['values']['_none'] = $label;
     }
@@ -72,7 +72,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
     $prefix = str_repeat('-', $level);
     $level++;
 
-    $active_items = array();
+    $active_items = [];
     $have_active = FALSE;
     foreach ($build as $value => $item) {
       // Respect current selection.
@@ -91,7 +91,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
 
       // Show/hide counts according to the settings.
       if (!empty($this->settings->settings['display_count'])) {
-        $items['values'][$item['#indexed_value']] .= ' ' . theme('facetapi_count',(array('count' => $item['#count'])));
+        $items['values'][$item['#indexed_value']] .= ' ' . theme('facetapi_count',(['count' => $item['#count']]));
       }
 
       if (!empty($item['#item_children'])) {
@@ -132,18 +132,18 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       $items['name'] = $facet['label'];
     }
 
-    $select = array(
+    $select = [
       '#type' => 'select',
       '#title' => $this->build['#title'],
       '#options' => $items['values'],
       '#name' => rawurlencode($this->settings->facet),
-      '#attributes' => array(
+      '#attributes' => [
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
-      ),
+      ],
       '#theme' => 'ajax_facets_select',
       '#disabled_items' => $items['#disabled_items'],
-    );
+    ];
 
     if (!empty($items['active_value'])) {
       $select['#value'] = $items['active_value'];
@@ -152,12 +152,12 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
     // We cannot use drupal_html_id to save the same id for each facet.
     $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
 
-    $element = array(
+    $element = [
       '#markup' => '<div id="' . $wrapper_id . '">'
         . $this->getResetLink()
         . render($select)
         . '</div>'
-    );
+    ];
 
     ajax_facets_add_ajax_js($this->facet);
   }

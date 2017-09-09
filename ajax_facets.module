@@ -10,16 +10,16 @@ require_once __DIR__ . '/includes/ajax_facets.block.inc';
  * Implements hook_menu().
  */
 function ajax_facets_menu() {
-  $items = array();
+  $items = [];
 
-  $items['ajax/ajax_facets/refresh'] = array(
+  $items['ajax/ajax_facets/refresh'] = [
     'title' => 'Callback to update facets content',
     'page callback' => 'ajax_facets_refresh_facets_content',
-    'access arguments' => array('access content'),
+    'access arguments' => ['access content'],
     'delivery callback' => 'ajax_deliver',
     'type' => MENU_CALLBACK,
     'file' => 'ajax_facets.pages.inc',
-  );
+  ];
 
   return $items;
 }
@@ -28,53 +28,53 @@ function ajax_facets_menu() {
  * Implements hook_theme().
  */
 function ajax_facets_theme() {
-  return array(
-    'ajax_facets_ranges_input' => array(
-      'variables' => array('title' => NULL, 'attributes' => array(), 'value' => NULL),
+  return [
+    'ajax_facets_ranges_input' => [
+      'variables' => ['title' => NULL, 'attributes' => [], 'value' => NULL],
       'file' => 'ajax_facets.theme.inc',
-    ),
-    'ajax_facets_select' => array(
+    ],
+    'ajax_facets_select' => [
       'render element' => 'element',
-    ),
-  );
+    ],
+  ];
 }
 
 /**
  * Implements hook_facetapi_widgets().
  */
 function ajax_facets_facetapi_widgets() {
-  $query_type = array('term', 'date', 'date_range');
-  $widgets = array(
+  $query_type = ['term', 'date', 'date_range'];
+  $widgets = [
     // Custom widget to handle ajax-refreshed facets.
-    'facetapi_ajax_checkboxes' => array(
-      'handler' => array(
+    'facetapi_ajax_checkboxes' => [
+      'handler' => [
         'label' => 'Ajax multiple checkboxes',
         'class' => 'FacetapiAjaxWidgetCheckboxes',
         'query types' => $query_type,
-      ),
-    ),
-    'facetapi_ajax_select' => array(
-      'handler' => array(
+      ],
+    ],
+    'facetapi_ajax_select' => [
+      'handler' => [
         'label' => 'Ajax selectbox',
         'class' => 'FacetapiAjaxWidgetSelect',
         'query types' => $query_type,
-      ),
-    ),
-    'facetapi_ajax_links' => array(
-      'handler' => array(
+      ],
+    ],
+    'facetapi_ajax_links' => [
+      'handler' => [
         'label' => 'Ajax links',
         'class' => 'FacetapiAjaxWidgetLinks',
         'query types' => $query_type,
-      ),
-    ),
-    'facetapi_ajax_ranges' => array(
-      'handler' => array(
+      ],
+    ],
+    'facetapi_ajax_ranges' => [
+      'handler' => [
         'label' => 'Ajax ranges',
         'class' => 'FacetapiAjaxWidgetRanges',
-        'query types' => array('term'),
-      ),
-    ),
-  );
+        'query types' => ['term'],
+      ],
+    ],
+  ];
 
   return $widgets;
 }
@@ -84,14 +84,14 @@ function ajax_facets_facetapi_widgets() {
  * Implements hook_facetapi_empty_behaviors().
  */
 function ajax_facets_facetapi_empty_behaviors() {
-  return array(
-    'ajax_facets' => array(
-      'handler' => array(
+  return [
+    'ajax_facets' => [
+      'handler' => [
         'label' => t('Display ajax_facets wrapper'),
         'class' => 'FacetapiEmptyBehaviorAjaxFacets',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**
@@ -108,9 +108,9 @@ function ajax_facets_add_ajax_js($facet) {
     $search_path = $facet->getAdapter()->getSearchPath();
     $filter_key = $facet->getAdapter()->getUrlProcessor()->getFilterKey();
     // Note that we add in query only filter params and exclude pages and etc...
-    $query = (isset($_GET[$filter_key])) ? array($filter_key => $_GET[$filter_key]) : array();
+    $query = (isset($_GET[$filter_key])) ? [$filter_key => $_GET[$filter_key]] : [];
     $current_views = search_api_current_search();
-    $processable_views = array();
+    $processable_views = [];
 
     // Add history.js file if exists.
     if (module_exists('libraries')) {
@@ -118,7 +118,7 @@ function ajax_facets_add_ajax_js($facet) {
 
       if ($history_js_path) {
         $history_js_exists = TRUE;
-        drupal_add_js($history_js_path . '/scripts/bundled/html4+html5/jquery.history.js', array('group' => JS_LIBRARY));
+        drupal_add_js($history_js_path . '/scripts/bundled/html4+html5/jquery.history.js', ['group' => JS_LIBRARY]);
       }
     }
 
@@ -128,24 +128,24 @@ function ajax_facets_add_ajax_js($facet) {
       foreach ($keys as $key) {
         if (substr_count($key, 'search_api_views')) {
           $parts = explode(':', $key);
-          $processable_views[] = array(
+          $processable_views[] = [
             'view_name' => $parts[1],
             'view_display_id' => $parts[2]
-          );
+          ];
         }
       }
     }
 
     $facet = $facet->getFacet();
-    $setting['facetapi'] = array(
+    $setting['facetapi'] = [
       'defaultQuery' => isset($_GET[$filter_key]) ? $_GET[$filter_key] : '',
       'searchUrl' => url($search_path),
       'index_id' => $facet['map options']['index id'],
       'views' => $processable_views,
       'facet_field' => $facet['map options']['field']['key'],
-      'applyPath' => url($search_path, array('query' => $query)),
+      'applyPath' => url($search_path, ['query' => $query]),
       'isHistoryJsExists' => $history_js_exists,
-    );
+    ];
     drupal_add_js($setting, 'setting');
     drupal_add_library('system', 'drupal.ajax');
   }
@@ -157,8 +157,8 @@ function ajax_facets_add_ajax_js($facet) {
 function ajax_facets_facet_build_reset_path($facet, $adapter) {
   $params = $adapter->getUrlProcessor()->fetchParams();
   $filter_key = $adapter->getUrlProcessor()->getFilterKey();
-  $clean_params = array();
-  $url_params = array();
+  $clean_params = [];
+  $url_params = [];
 
   // Build query params except current facet filters.
   if (!empty($params[$filter_key])) {
@@ -167,12 +167,12 @@ function ajax_facets_facet_build_reset_path($facet, $adapter) {
         $clean_params[] = $param;
       }
     }
-    $url_params = array();
+    $url_params = [];
     if (!empty($clean_params)) {
-      $url_params = array('query' => array($filter_key => $clean_params));
+      $url_params = ['query' => [$filter_key => $clean_params]];
     }
 
-    $unset_keys = array('searchPath', 'q', 'page', $filter_key);
+    $unset_keys = ['searchPath', 'q', 'page', $filter_key];
     // Remove default params from redirect.
     foreach ($params as $key => $value) {
       if (!in_array($key, $unset_keys)) {
@@ -209,11 +209,11 @@ function ajax_facets_views_ajax_data_alter(&$commands, $view) {
     // page requests knows which facets are enabled
     $facet_query = !empty($_GET['f']) ? $_GET['f'] : '';
     if ($facet_query) {
-      $settings = array(
-        'views' => array(
-          'ajax_path' => url('views/ajax', array('query' => array('f' => $facet_query))),
-        ),
-      );
+      $settings = [
+        'views' => [
+          'ajax_path' => url('views/ajax', ['query' => ['f' => $facet_query]]),
+        ],
+      ];
       // We need to put this at the head of the commands so that it runs before
       // the views commands. This is because ajax_render() in ajax.inc prepends
       // it's own settings command to the commands array which will change
@@ -240,19 +240,19 @@ function ajax_facets_views_ajax_data_alter(&$commands, $view) {
 function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
 
   $map = facetapi_get_delta_map();
-  $facets_to_proceed = array();
+  $facets_to_proceed = [];
   $enabled_facets = facetapi_get_enabled_facets($searcher, $realm_name);
   foreach ($enabled_facets as $facet) {
     $facets_to_proceed[] = $facet['name'];
   }
 
   // Our return array
-  $blocks = array(
-    'facet_blocks' => array(),
-    'hide_blocks' => array(),
-    'reset_urls' => array(),
-    'active_items' => array(),
-  );
+  $blocks = [
+    'facet_blocks' => [],
+    'hide_blocks' => [],
+    'reset_urls' => [],
+    'active_items' => [],
+  ];
 
   $group = $searcher . ':' . $realm_name;
   $realm = facetapi_realm_load($realm_name);
@@ -264,20 +264,20 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
 
   // Process facets.
   foreach ($facets_to_proceed as $facet_name) {
-    $facet = $adapter->getFacet(array('name' => $facet_name));
+    $facet = $adapter->getFacet(['name' => $facet_name]);
     //$facet->getSettings($builds[$group])->settings['facet_search_ids']
     //search_api_views:search_results:page
     // First check if the facet is enabled for this search.
     $settings = $facet->getSettings()->settings;
 
     $default_true = isset($settings['default_true']) ? $settings['default_true'] : TRUE;
-    $facet_search_ids = isset($settings['facet_search_ids']) ? $settings['facet_search_ids'] : array();
+    $facet_search_ids = isset($settings['facet_search_ids']) ? $settings['facet_search_ids'] : [];
     // If facet is enabled for this search id.
     // TODO replace it on facetapi_check_block_visibility() ?
     if ($default_true == empty($facet_search_ids[$search_id])) {
       $blocks['reset_urls'][$facet_name] = ajax_facets_facet_build_reset_path($facet, $adapter);
       if (!empty($builds[$group][$facet_name]) && $build = $facet->getBuild()) {
-        $blocks['active_items'][$facet_name] = array();
+        $blocks['active_items'][$facet_name] = [];
         foreach ($build as $key => $value) {
           if (!empty($value['#active'])) {
             $blocks['active_items'][$facet_name][] = "$facet_name:$key";
@@ -335,14 +335,14 @@ function ajax_facets_views_pre_render(&$view) {
  * Implements hook_i18n_string_info().
  */
 function ajax_facets_i18n_string_info() {
-  $groups['ajax_facets'] = array(
+  $groups['ajax_facets'] = [
     'title' => t('Ajax facets'),
     'description' => t('Translatable ajax facets: label.'),
     // This group doesn't have strings with format.
     'format' => FALSE,
     // This group can list all strings.
     'list' => TRUE,
-  );
+  ];
   return $groups;
 }
 
@@ -356,24 +356,24 @@ function ajax_facets_facet_settings_form_submit($form, $form_state) {
     if (!empty($values['widget'])) {
       if ($values['widget'] == 'facetapi_ajax_select') {
         // Label for the default option of ajax facets select widget..
-        $name = array(
+        $name = [
           'ajax_facets',
           'facet_label',
           str_replace(':', '_', $form['#facetapi']['facet']['name']),
           'label'
-        );
+        ];
         i18n_string_update($name, $values['ajax_select_default_option_label']);
       }
 
       // Reset link text.
       if ($values['show_reset_link'] && !empty($values['reset_link_text'])) {
         // Text for the reset link.
-        $reset_link_text = array(
+        $reset_link_text = [
           'ajax_facets',
           'reset_link_text',
           str_replace(':', '_', $form['#facetapi']['facet']['name']),
           'value'
-        );
+        ];
         i18n_string_update($reset_link_text, $values['reset_link_text']);
       }
     }
@@ -386,8 +386,8 @@ function ajax_facets_facet_settings_form_submit($form, $form_state) {
  */
 function theme_ajax_facets_select($variables) {
   $element = $variables['element'];
-  element_set_attributes($element, array('id', 'name', 'size'));
-  _form_set_class($element, array('form-select'));
+  element_set_attributes($element, ['id', 'name', 'size']);
+  _form_set_class($element, ['form-select']);
 
   return '<select' . drupal_attributes($element['#attributes']) . '>' . ajax_facets_form_select_options($element) . '</select>';
 }

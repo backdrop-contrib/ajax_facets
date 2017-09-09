@@ -9,7 +9,7 @@
  * Implements hook_requirements().
  */
 function ajax_facets_requirements($phase) {
-  $requirements = array();
+  $requirements = [];
   $t = get_t();
 
   switch ($phase) {
@@ -28,12 +28,12 @@ function ajax_facets_requirements($phase) {
         }
       }
 
-      $requirements['ajax_facets_message'] = array(
+      $requirements['ajax_facets_message'] = [
         'title' => $t('Ajax Facets'),
         'description' => $description,
         'value' => $value,
         'severity' => REQUIREMENT_INFO,
-      );
+      ];
       break;
   }
 

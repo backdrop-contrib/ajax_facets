@@ -20,31 +20,31 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
     parent::settingsForm($form, $form_state);
 
     if ($this->facet['hierarchy callback']) {
-      $form['widget']['widget_settings']['links'][$this->id]['show_expanded'] = array(
+      $form['widget']['widget_settings']['links'][$this->id]['show_expanded'] = [
         '#type' => 'checkbox',
         '#title' => t('Expand hierarchy'),
         '#default_value' => !empty($this->settings->settings['show_expanded']),
         '#description' => t('Show the entire tree regardless of whether the parent items are active.'),
-        '#states' => array(
-          'visible' => array(
-            'select[name="widget"]' => array('value' => $this->id),
-          ),
-        ),
-      );
+        '#states' => [
+          'visible' => [
+            'select[name="widget"]' => ['value' => $this->id],
+          ],
+        ],
+      ];
     }
 
-    $form['widget']['widget_settings']['links'][$this->id]['soft_limit'] = array(
+    $form['widget']['widget_settings']['links'][$this->id]['soft_limit'] = [
       '#type' => 'select',
       '#title' => t('Soft limit'),
       '#default_value' => $this->settings->settings['soft_limit'],
-      '#options' => array(0 => t('No limit')) + drupal_map_assoc(array(50, 40, 30, 20, 15, 10, 5, 3)),
+      '#options' => [0 => t('No limit')] + drupal_map_assoc([50, 40, 30, 20, 15, 10, 5, 3]),
       '#description' => t('Limits the number of displayed facets via JavaScript.'),
-      '#states' => array(
-        'visible' => array(
-          'select[name="widget"]' => array('value' => $this->id),
-        ),
-      ),
-    );
+      '#states' => [
+        'visible' => [
+          'select[name="widget"]' => ['value' => $this->id],
+        ],
+      ],
+    ];
 
     $last = end($form['widget']['widget_settings']['links']);
     foreach ($form['widget']['widget_settings']['links'] as $id => $element) {
@@ -58,12 +58,12 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
    * Overrides FacetapiWidget::getDefaultSettings().
    */
   function getDefaultSettings() {
-    return array(
+    return [
       'soft_limit' => 20,
       'show_expanded' => 0,
       'reset_link' => 0,
       'empty_behavior' => 'ajax_facets',
-    );
+    ];
   }
 
   /**
@@ -82,18 +82,18 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
 
     $have_active = FALSE;
     // Builds rows.
-    $items = array();
+    $items = [];
     $items_count = count($build);
-    $active_items = array();
+    $active_items = [];
 
     foreach ($build as $value => $item) {
-      $row = array('class' => array());
-      $attributes = array(
-        'class' => array('facet-multiselect-checkbox'),
+      $row = ['class' => []];
+      $attributes = [
+        'class' => ['facet-multiselect-checkbox'],
         'data-facet-value' => $value,
         'data-facet-name' => rawurlencode($this->settings->facet),
         'data-raw-facet-name' => $this->settings->facet,
-      );
+      ];
 
       // Mark as disabled if count is 0.
       if ($item['#count'] == 0) {
@@ -111,16 +111,16 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
 
       // Show/hide counts according to the settings.
       if(!empty($this->settings->settings['display_count'])) {
-        $item['#markup'] .= ' ' . theme('facetapi_count', (array('count' => $item['#count'])));
+        $item['#markup'] .= ' ' . theme('facetapi_count', (['count' => $item['#count']]));
       }
 
-      $checkbox = array(
+      $checkbox = [
         '#id' => $this->getAjaxFacetsUuid($value),
         '#name' => rawurlencode($this->key),
         '#type' => 'checkbox',
         '#title' => $item['#markup'],
         '#attributes' => $attributes,
-      );
+      ];
       $row['data'] = drupal_render($checkbox);
       if ($items_count == 1) {
         $row['class'][] = 'single-leaf';

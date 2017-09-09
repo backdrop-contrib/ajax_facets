@@ -20,13 +20,13 @@ function ajax_facets_refresh_facets_content() {
 
     $facet_query = !empty($_GET['f']) ? $_GET['f'] : '';
     $received_views = $_GET['views'];
-    $processed_views = array();
-    $views_settings = array(
-      'views' => array(
-        'ajax_path' => url('views/ajax', array('query' => array('f' => $facet_query))),
-        'ajaxViews' => array(),
-      ),
-    );
+    $processed_views = [];
+    $views_settings = [
+      'views' => [
+        'ajax_path' => url('views/ajax', ['query' => ['f' => $facet_query]]),
+        'ajaxViews' => [],
+      ],
+    ];
 
     // Attempt to process all the received views.
     foreach ($received_views as $key => $received_view) {
@@ -51,7 +51,7 @@ function ajax_facets_refresh_facets_content() {
       // Reuse dom id.
       $view->dom_id = isset($received_view['view_dom_id']) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $received_view['view_dom_id']) : NULL;
 
-      $view_args = !empty($received_view['view_args']) ? explode('/', $received_view['view_args']) : array();
+      $view_args = !empty($received_view['view_args']) ? explode('/', $received_view['view_args']) : [];
 
       // Prepare data to update certain view.
       $name = $received_view['view_name'];
@@ -110,7 +110,7 @@ function ajax_facets_refresh_facets_content() {
       // @see template_preprocess_views_view();
       // Update settings when view will be reloaded. Specifically $view->dom_id.
       if ($view->use_ajax) {
-        $views_settings['views']['ajaxViews']['views_dom_id:' . $view->dom_id] = array(
+        $views_settings['views']['ajaxViews']['views_dom_id:' . $view->dom_id] = [
           'view_name' => $view->name,
           'view_display_id' => $view->current_display,
           'view_args' => check_plain(implode('/', $view->args)),
@@ -121,7 +121,7 @@ function ajax_facets_refresh_facets_content() {
           // To fit multiple views on a page, the programmer may have
           // overridden the display's pager_element.
           'pager_element' => isset($view->query->pager) ? $view->query->pager->get_pager_id() : 0,
-        );
+        ];
       }
 
       // Render exposed form separately if needed.
@@ -135,21 +135,21 @@ function ajax_facets_refresh_facets_content() {
     $searcher = 'search_api@' . $_GET['index_id'];
     $blocks = ajax_facets_process_facet_blocks($searcher);
 
-    $result = array(
+    $result = [
       'resetUrls' => $blocks['reset_urls'],
       'newContent' => $blocks['facet_blocks'],
       'hideBlocks' => $blocks['hide_blocks'],
       'activeItems' => $blocks['active_items'],
       'views' => $processed_views,
       'facets' => $facet_query,
-      'settings' => !empty($views_settings['views']['ajaxViews']) ? $views_settings : array(),
-    );
+      'settings' => !empty($views_settings['views']['ajaxViews']) ? $views_settings : [],
+    ];
 
-    $commands = array();
-    $commands[] = array(
+    $commands = [];
+    $commands[] = [
       'command' => 'ajax_facets_update_content',
       'data' => $result,
-    );
+    ];
 
     ajax_facets_send_commands($commands, $view);
   }

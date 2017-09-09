@@ -49,6 +49,6 @@ class FacetapiEmptyBehaviorAjaxFacets extends FacetapiEmptyBehavior {
     $id = drupal_html_class("facetapi-facet-$facet_widget_build[0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}-wrapper");
     $class2 = drupal_html_class("facetapi-facet-$facet_widget_build[0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}");
     $wrapper = '<div class="ajax-facets-empty-behavior ' . $class1 . ' ' . $class2 . '" id="' . $id . '"></div>';
-    return array('#markup' => $wrapper);
+    return ['#markup' => $wrapper];
   }
 }

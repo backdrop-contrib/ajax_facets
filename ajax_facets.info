@@ -5,6 +5,7 @@ dependencies[] = search_api
 dependencies[] = views
 package = Search Toolkit
 core = 7.x
+php = 5.4
 
 files[] = plugins/facetapi/ajax_widget.inc
 files[] = plugins/facetapi/ajax_widget_checkboxes.inc

@@ -17,9 +17,9 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
    * Overrides FacetapiWidget::getDefaultSettings().
    */
   function getDefaultSettings() {
-    return array(
+    return [
       "show_reset_link" => 0,
-    );
+    ];
   }
 
   /**
@@ -39,25 +39,25 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
     $settings = $this->settings->settings;
 
     // Initializes links attributes, adds rel="nofollow" if configured.
-    $attributes = ($settings['nofollow']) ? array('rel' => 'nofollow') : array();
-    $attributes += array('class' => $this->getItemClasses());
+    $attributes = ($settings['nofollow']) ? ['rel' => 'nofollow'] : [];
+    $attributes += ['class' => $this->getItemClasses()];
 
     // Builds rows.
-    $items = array();
+    $items = [];
     foreach ($build as $value => $item) {
-      $row = array('class' => array());
+      $row = ['class' => []];
 
       // Initializes variables passed to theme hook.
-      $variables = array(
+      $variables = [
         'text' => $item['#markup'],
         'path' => $item['#path'],
         'count' => !empty($settings['display_count']) ? $item['#count'] : NULL,
-        'options' => array(
+        'options' => [
           'attributes' => $attributes,
           'html' => $item['#html'],
           'query' => $item['#query'],
-        ),
-      );
+        ],
+      ];
 
       // Adds the facetapi-zero-results class to items that have no results.
       if (!$item['#count']) {
@@ -131,6 +131,6 @@ class FacetapiAjaxWidgetLinks extends FacetapiAjaxWidget {
    * Sets the base class for checkbox facet items.
    */
   public function getItemClasses() {
-    return array();
+    return [];
   }
 }
