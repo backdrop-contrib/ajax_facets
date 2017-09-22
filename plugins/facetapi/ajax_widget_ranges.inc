@@ -73,59 +73,67 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
     // Get min and max values.
     $raw_values = array_keys($element);
     $raw_values = array_filter($raw_values, 'is_numeric');
-    $global_min = min($raw_values);
-    $global_max = max($raw_values);
 
-    $slider_attrs['data-min'] = $global_min;
-    $slider_attrs['data-max'] = $global_max;
+    // Check that we have values for the facet widget.
+    if (!empty($raw_values)) {
+      $global_min = min($raw_values);
+      $global_max = max($raw_values);
 
-    // Get selected min and max for active value.
-    if (!empty($items['active_value'])) {
-      $values = explode(' TO ', $items['active_value']);
-      $slider_attrs['data-min-val'] = preg_replace('/[^0-9\.]/', '', $values[0]);
-      $slider_attrs['data-max-val'] = preg_replace('/[^0-9\.]/', '', $values[1]);
+      $slider_attrs['data-min'] = $global_min;
+      $slider_attrs['data-max'] = $global_max;
+
+      // Get selected min and max for active value.
+      if (!empty($items['active_value'])) {
+        $values = explode(' TO ', $items['active_value']);
+        $slider_attrs['data-min-val'] = preg_replace('/[^0-9\.]/', '', $values[0]);
+        $slider_attrs['data-max-val'] = preg_replace('/[^0-9\.]/', '', $values[1]);
+      }
+      // Get selected min and max by default.
+      else {
+        $slider_attrs['data-min-val'] = $global_min;
+        $slider_attrs['data-max-val'] = $global_max;
+      }
+
+      // @todo move it into the other place?
+      drupal_add_library('system', 'ui.slider');
+
+      $min_input = theme(
+        'ajax_facets_ranges_input',
+        [
+          'title' => t('From:'),
+          'attributes' => ['class' => 'ajax-facets-slider-amount-min'],
+          'value' => $slider_attrs['data-min-val'],
+        ]
+      );
+
+      $max_input = theme(
+        'ajax_facets_ranges_input',
+        [
+          'title' => t('To:'),
+          'attributes' => ['class' => 'ajax-facets-slider-amount-max'],
+          'value' => $slider_attrs['data-max-val'],
+        ]
+      );
+
+      // We cannot use drupal_html_id to save the same id for each facet.
+      $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
+
+      $element = [
+        '#markup' => '<div id="' . $wrapper_id . '">'
+          . $this->getResetLink()
+          . '<div class="ajax-facets-controls-wrapper">'
+          . $min_input
+          . $max_input
+          . '<div ' . drupal_attributes($slider_attrs) . '></div>'
+          . '</div>'
+          . '</div>'
+      ];
+
+      ajax_facets_add_ajax_js($this->facet);
     }
-    // Get selected min and max by default.
+    // We don't have data for facet widget, hide it.
     else {
-      $slider_attrs['data-min-val'] = $global_min;
-      $slider_attrs['data-max-val'] = $global_max;
+      $element = [];
     }
-
-    // @todo move it into the other place?
-    drupal_add_library('system', 'ui.slider');
-
-    $min_input = theme(
-      'ajax_facets_ranges_input',
-      [
-        'title' => t('From:'),
-        'attributes' => ['class' => 'ajax-facets-slider-amount-min'],
-        'value' => $slider_attrs['data-min-val'],
-      ]
-    );
-
-    $max_input = theme(
-      'ajax_facets_ranges_input',
-      [
-        'title' => t('To:'),
-        'attributes' => ['class' => 'ajax-facets-slider-amount-max'],
-        'value' => $slider_attrs['data-max-val'],
-      ]
-    );
-
-    // We cannot use drupal_html_id to save the same id for each facet.
-    $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
-
-    $element = [
-      '#markup' => '<div id="' . $wrapper_id . '">'
-        . $this->getResetLink()
-        . '<div class="ajax-facets-controls-wrapper">'
-        . $min_input
-        . $max_input
-        . '<div ' . drupal_attributes($slider_attrs) . '></div>'
-        . '</div>'
-        . '</div>'
-    ];
-
-    ajax_facets_add_ajax_js($this->facet);
   }
 }
