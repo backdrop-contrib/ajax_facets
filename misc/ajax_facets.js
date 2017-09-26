@@ -447,7 +447,10 @@
 
   /* Get view dom id for both modes of views - ajax/not ajax. */
   Drupal.ajax_facets.getViewDomId = function(settings, key) {
-    var nameDisplay = settings.facetapi.views[key].view_name + ':' + settings.facetapi.views[key].view_display_id;
+    // We use facetapi_view_display_id to find data in settings settings.facetapi.view_dom_id,
+    // because it can has there values like view_dom_id + numeric suffix
+    // if the same views display used several times on the page.
+    var nameDisplay = settings.facetapi.views[key].view_name + ':' + settings.facetapi.views[key].facetapi_view_display_id;
     if (settings.facetapi.view_dom_id[nameDisplay]) {
       var view = $('.view-dom-id-' + settings.facetapi.view_dom_id[nameDisplay]);
       if (view.length > 0) {

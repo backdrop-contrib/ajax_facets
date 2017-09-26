@@ -109,8 +109,25 @@ function ajax_facets_add_ajax_js($facet) {
     $filter_key = $facet->getAdapter()->getUrlProcessor()->getFilterKey();
     // Note that we add in query only filter params and exclude pages and etc...
     $query = (isset($_GET[$filter_key])) ? [$filter_key => $_GET[$filter_key]] : [];
-    $current_views = search_api_current_search();
+    $search_results = search_api_current_search();
     $processable_views = [];
+
+    // Process $search_results if we have them.
+    if (!empty($search_results)) {
+      // Get displays from current search.
+      foreach ($search_results as $key => $result) {
+        if (substr_count($key, 'search_api_views')) {
+          $facetapi_parts = explode(':', $key);
+          $views_parts = explode(':', $result[0]->getOption('search id'));
+          $processable_views[] = [
+            'view_name' => $views_parts[1],
+            'view_display_id' => $views_parts[2],
+            // Used to identify viewsDomId in settings.facetapi.
+            'facetapi_view_display_id' => $facetapi_parts[2]
+          ];
+        }
+      }
+    }
 
     // Add history.js file if exists.
     if (module_exists('libraries')) {
@@ -119,20 +136,6 @@ function ajax_facets_add_ajax_js($facet) {
       if ($history_js_path) {
         $history_js_exists = TRUE;
         drupal_add_js($history_js_path . '/scripts/bundled/html4+html5/jquery.history.js', ['group' => JS_LIBRARY]);
-      }
-    }
-
-    if (!empty($current_views)) {
-      // Get displays from current search.
-      $keys = array_keys($current_views);
-      foreach ($keys as $key) {
-        if (substr_count($key, 'search_api_views')) {
-          $parts = explode(':', $key);
-          $processable_views[] = [
-            'view_name' => $parts[1],
-            'view_display_id' => $parts[2]
-          ];
-        }
       }
     }
 
