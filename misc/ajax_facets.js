@@ -712,9 +712,17 @@
       // As some blocks could be empty in results of filtering - hide them.
       if (response.data.hideBlocks) {
         for (var id in response.data.hideBlocks) {
+          // Search for drupal blocks (id="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
           var $block = $('#' + response.data.hideBlocks[id]);
           if ($block.size()) {
             $block.hide();
+          }
+          // Search for panel panes (class="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
+          else {
+            var $pane = $('.' + response.data.hideBlocks[id]);
+            if ($pane.size()) {
+              $pane.hide();
+            }
           }
         }
       }

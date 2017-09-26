@@ -167,7 +167,26 @@ function ajax_facets_block_link_text($type) {
  */
 function ajax_facets_preprocess_block(&$variables) {
   if (!empty($variables['block']->module) && $variables['block']->module == 'facetapi') {
-    // Add BEM style classes to facet blocks. These classes are using for some selectors.
+    // Add BEM style class to facet block.
+    // This class is using to show hidden facet block.
     $variables['classes_array'][] = 'block--ajax_facets';
+  }
+}
+
+/**
+ * Implements hook_preprocess_panels_pane().
+ */
+function ajax_facets_preprocess_panels_pane(&$variables) {
+  // Add special class to identify panels pane as block by module ajax facets.
+  if (!empty($variables['content']['#facet'])) {
+    // subtype should contain something like "facetapi-ZsnSXo0R09p45W7e4f70B4qN67wJgjZQ".
+    if (!empty($variables['pane']->subtype)) {
+      // Add BEM style class to facet block.
+      // This class is using to show hidden facet block.
+      $variables['classes_array'][] = 'block--ajax_facets';
+      // We set class but not ID, because drupal blocks have such ID by default,
+      // but panes can have other ID and it can be a cause of potential problems.
+      $variables['classes_array'][] = strtolower("block-{$variables['pane']->subtype}");
+    }
   }
 }
