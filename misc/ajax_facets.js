@@ -423,7 +423,7 @@
     ajax.success = function (response, status) {
       // Push new state only on successful ajax response.
       if (options.pushStateNeeded) {
-        Drupal.ajax_facets.pushState();
+        Drupal.ajax_facets.writeState(false);
       }
       // Pass back to original method.
       Drupal.ajax.prototype.success.call(this, response, status);
@@ -573,46 +573,42 @@
     // Set the initial state only initial page load.
     if (Drupal.ajax_facets.firstLoad) {
       Drupal.ajax_facets.firstLoad = false;
-
-      // If history.js available - use it.
-      if (Drupal.settings.facetapi.isHistoryJsExists) {
-        History.replaceState({
-          facets: Drupal.ajax_facets.queryState['f']
-        }, null, null);
-      } else {
-        // Fallback to HTML5 history object.
-        if (history.replaceState) {
-          history.replaceState({
-            facets: Drupal.ajax_facets.queryState['f']
-          }, null, null);
-        }
-      }
+      Drupal.ajax_facets.writeState(true);
     }
   };
 
   /**
-   * Pushes new state to browser history.
+   * Writes new state to browser history, either as a push or replace call.
    *
    * History.js library fires "statechange" event even on API push/replace calls.
    * So before pushing new state to history we should unbind from this event and after bind again.
+   *
+   * @param {boolean} replace Set to true to replace state, rather than push it.
    */
-  Drupal.ajax_facets.pushState = function () {
-    var stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.facetapi.searchUrl),
+  Drupal.ajax_facets.writeState = function (replace) {
+    var stateUrl = null,
       state = {
         facets: Drupal.ajax_facets.queryState['f']
       },
-      title = document.title;
+      title = document.title,
+      method = 'replaceState';
+
+    if (replace !== true) {
+      stateUrl = Drupal.ajax_facets.getFacetsQueryUrl(Drupal.settings.facetapi.searchUrl);
+      method = 'pushState';
+    }
+
     // If history.js available - use it.
     if (Drupal.settings.facetapi.isHistoryJsExists) {
       var $window = $(window);
 
       $window.unbind('statechange', Drupal.ajax_facets.reactOnStateChange);
-      History.pushState(state, title, stateUrl);
+      History[method](state, title, stateUrl);
       $window.bind('statechange', Drupal.ajax_facets.reactOnStateChange);
     } else {
       // Fallback to HTML5 history object.
-      if (history.pushState) {
-        history.pushState(state, title, stateUrl);
+      if (history[method]) {
+        history[method](state, title, stateUrl);
       }
     }
   };
@@ -639,7 +635,7 @@
     }
 
     // Do something only if paths are match and facets is defined.
-    if (window.location.pathname == Drupal.settings.facetapi.searchUrl && facets) {
+    if (window.location.pathname === Drupal.settings.facetapi.searchUrl && facets) {
       Drupal.ajax_facets.queryState['f'] = facets;
       Drupal.ajax_facets.force_update_results = true;
       Drupal.ajax_facets.sendAjaxQuery({
