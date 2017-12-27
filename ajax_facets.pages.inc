@@ -18,6 +18,7 @@ function ajax_facets_refresh_facets_content() {
     unset($_POST['ajax_html_ids']);
     unset($_POST['ajax_facets']);
 
+    $total_results = 0;
     $facet_query = !empty($_GET['f']) ? $_GET['f'] : '';
     $received_views = $_GET['views'];
     $processed_views = [];
@@ -130,6 +131,10 @@ function ajax_facets_refresh_facets_content() {
         $exposed_form = $view->display_handler->get_plugin('exposed_form');
         $processed_views[$key]['exposed_form'] = $exposed_form->render_exposed_form(TRUE);
       }
+
+      // Actually total results can work correctly only with one view.
+      // There are no way to select TRUE value from several views.
+      $total_results = $view->total_rows;
     }
 
     $searcher = 'search_api@' . $_GET['index_id'];
@@ -143,6 +148,7 @@ function ajax_facets_refresh_facets_content() {
       'views' => $processed_views,
       'facets' => $facet_query,
       'settings' => !empty($views_settings['views']['ajaxViews']) ? $views_settings : [],
+      'total_results' => $total_results,
     ];
 
     $commands = [];

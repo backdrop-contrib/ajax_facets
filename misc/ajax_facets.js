@@ -16,6 +16,10 @@
   Drupal.ajax_facets.ajax_facets_buttons = false;
   // Force update of the results
   Drupal.ajax_facets.force_update_results = false;
+  // Tooltip timeout handler.
+  Drupal.ajax_facets.tooltipTimeout;
+  // Name of the facet which was clicked.
+  Drupal.ajax_facets.current_facet_name = undefined;
 
   // You can use it for freeze facet form elements while ajax is processing.
   Drupal.ajax_facets.beforeAjaxCallbacks = {};
@@ -182,6 +186,11 @@
 
       // Hide blocks with ajax-facets-empty-behavior.
       $('.ajax-facets-empty-behavior').parents('.block--ajax_facets').hide();
+
+      // Add facets tooltip.
+      $('body').once(function () {
+        $(this).append('<div id="ajax-facets-tooltip"><span></span></div>');
+      });
     }
   };
 
@@ -246,8 +255,8 @@
    * Callback for onClick event for widget selectbox.
    */
   Drupal.ajax_facets.processSelectbox = function (event) {
-    var $this = $(this);
-    var facetName = $this.data('facet-name');
+    var $this = $(this),
+      facetName = $this.data('facet-name');
     // Init history.
     Drupal.ajax_facets.initHistoryState($this);
     // If facets are already defined in queryState.
@@ -266,7 +275,7 @@
     Drupal.ajax_facets.sendAjaxQuery({
       pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
       searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
-    });
+    }, $this);
   };
 
   /**
@@ -313,7 +322,7 @@
     Drupal.ajax_facets.sendAjaxQuery({
       pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
       searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
-    });
+    }, $this);
   };
 
   /**
@@ -359,7 +368,7 @@
     Drupal.ajax_facets.sendAjaxQuery({
       pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
       searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
-    });
+    }, $this);
     event.preventDefault();
   };
 
@@ -380,7 +389,7 @@
     Drupal.ajax_facets.sendAjaxQuery({
       pushStateNeeded: !Drupal.ajax_facets.ajax_facets_buttons,
       searchResultsNeeded: !Drupal.ajax_facets.ajax_facets_buttons
-    });
+    }, $this);
   };
 
   /**
@@ -400,7 +409,7 @@
   /**
    * Send ajax.
    */
-  Drupal.ajax_facets.sendAjaxQuery = function (options) {
+  Drupal.ajax_facets.sendAjaxQuery = function (options, $facet) {
     Drupal.ajax_facets.beforeAjax();
     var data = Drupal.ajax_facets.queryState;
     // Render the exposed filter data to send along with the ajax request
@@ -411,6 +420,9 @@
         data[value.name] = value.value;
       });
     });
+
+    // Set or reset current facet.
+    Drupal.ajax_facets.current_facet_name = $facet ? $facet.data('raw-facet-name') : undefined;
 
     // Notify Drupal do we need search results or not.
     data.searchResultsNeeded = options.searchResultsNeeded;
@@ -658,6 +670,26 @@
     };
   }
 
+  /* Show tooltip if facet results are not updated by ajax (in settings). */
+  Drupal.ajax_facets.showTooltip = function ($, response) {
+    // Reset the timeout handler to avoid troubles when user is clicking on items very fast.
+    window.clearTimeout(Drupal.ajax_facets.tooltipTimeout);
+
+    // If we have chosen facet.
+    if (Drupal.ajax_facets.current_facet_name) {
+      var pos = $('[data-raw-facet-name=' + Drupal.ajax_facets.current_facet_name + ']').offset(),
+        $tooltip = $('#ajax-facets-tooltip');
+      $tooltip.css('top', pos.top - 15);
+      $tooltip.css('left', pos.left - $tooltip.width() - 40);
+      $tooltip.show();
+      $tooltip.find('span').html(Drupal.t('Found:') + ' ' + response.total_results);
+
+      Drupal.ajax_facets.tooltipTimeout = setTimeout(function () {
+        $tooltip.hide(250);
+      }, 3000);
+    }
+  };
+
   if (Drupal.ajax) {
     // Command for process search results and facets by ajax.
     Drupal.ajax.prototype.commands.ajax_facets_update_content = function(ajax, response) {
@@ -689,6 +721,7 @@
       }
 
       /* Update results if we have they and ajax facets buttons are not enabled or force mode is enabled. */
+      var show_tip = false;
       var buttons_exist = Drupal.ajax_facets.ajax_facets_buttons,
         force_update_results = Drupal.ajax_facets.force_update_results;
       if (!buttons_exist || force_update_results) {
@@ -703,6 +736,9 @@
             $('#views-exposed-form-' + viewId.replace(/_/g, '-')).replaceWith(view.exposed_form);
           }
         });
+      }
+      else {
+        show_tip = true;
       }
 
       // As some blocks could be empty in results of filtering - hide them.
@@ -731,6 +767,10 @@
       Drupal.ajax_facets.afterContentUpdate(ajax, response);
 
       Drupal.attachBehaviors();
+      // Show the tooltip if need.
+      if (show_tip) {
+        Drupal.ajax_facets.showTooltip($, response.data);
+      }
     };
   }
 })(jQuery);
