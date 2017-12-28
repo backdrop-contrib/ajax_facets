@@ -341,7 +341,7 @@
       /* Handle value - deactivate. */
       if ($this.hasClass('facetapi-active')) {
         for (var index in Drupal.ajax_facets.queryState['f']) {
-          if (Drupal.ajax_facets.queryState['f'][index] != name_value) {
+          if (Drupal.ajax_facets.queryState['f'][index] !== name_value) {
             queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
           }
         }
@@ -351,7 +351,7 @@
       else if ($this.hasClass('facetapi-inactive')) {
         var addCurrentParam = true;
         for (var index in Drupal.ajax_facets.queryState['f']) {
-          if (Drupal.ajax_facets.queryState['f'][index] == name_value) {
+          if (Drupal.ajax_facets.queryState['f'][index] === name_value) {
             addCurrentParam = false;
           }
         }
@@ -610,17 +610,18 @@
       method = 'pushState';
     }
 
-    // If history.js available - use it.
-    if (Drupal.settings.facetapi.isHistoryJsExists) {
-      var $window = $(window);
+    // Try to use HTML5 history object.
+    if (history[method]) {
+      history[method](state, title, stateUrl);
+    }
+    else {
+      // If history.js available - use it.
+      if (Drupal.settings.facetapi.isHistoryJsExists) {
+        var $window = $(window);
 
-      $window.unbind('statechange', Drupal.ajax_facets.reactOnStateChange);
-      History[method](state, title, stateUrl);
-      $window.bind('statechange', Drupal.ajax_facets.reactOnStateChange);
-    } else {
-      // Fallback to HTML5 history object.
-      if (history[method]) {
-        history[method](state, title, stateUrl);
+        $window.unbind('statechange', Drupal.ajax_facets.reactOnStateChange);
+        History[method](state, title, stateUrl);
+        $window.bind('statechange', Drupal.ajax_facets.reactOnStateChange);
       }
     }
   };
@@ -632,16 +633,17 @@
     var state = null,
       facets = [];
 
-    // If history.js available - use it.
-    if (Drupal.settings.facetapi.isHistoryJsExists) {
-      if (state = History.getState()) {
-        facets = state.data.facets;
+    // Try to use HTML5 history object.
+    if (history.pushState) {
+      if (state = history.state) {
+        facets = state.facets;
       }
-    } else {
-      // Fallback to HTML5 history object.
-      if (history.pushState) {
-        if (state = history.state) {
-          facets = state.facets;
+    }
+    else {
+      // If history.js available - use it.
+      if (Drupal.settings.facetapi.isHistoryJsExists) {
+        if (state = History.getState()) {
+          facets = state.data.facets;
         }
       }
     }
@@ -660,14 +662,16 @@
   // If user opened new page and then clicked browser's back button then would not be fired "statechange" event.
   // So we need to bind on 'statechange' event and react only once.
   // All farther work does Drupal.ajax_facets.pushState() function.
-  // If history.js Adapter available - use it to bind "statechange" event.
-  if (History.Adapter && Drupal.ajax_facets.firstLoad) {
-    History.Adapter.bind(window, 'statechange', Drupal.ajax_facets.reactOnStateChange);
-  } else {
-    // Fallback to default HTML5 event.
+  // Try to use HTML5 history object.
+  if (history) {
     window.onpopstate = function () {
       Drupal.ajax_facets.reactOnStateChange();
     };
+  } else {
+    // If history.js Adapter available - use it to bind "statechange" event.
+    if (History.Adapter && Drupal.ajax_facets.firstLoad) {
+      History.Adapter.bind(window, 'statechange', Drupal.ajax_facets.reactOnStateChange);
+    }
   }
 
   /* Show tooltip if facet results are not updated by ajax (in settings). */
