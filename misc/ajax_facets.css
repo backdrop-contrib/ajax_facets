@@ -26,11 +26,12 @@
   top: 50%;
   left: 100%;
   margin-top: -8px;
-  width: 0; height: 0;
+  width: 0;
+  height: 0;
   border-left: 8px solid #FFFFFF;
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
-
+}
 
 a.reset-link {
   display: block;
