@@ -282,10 +282,10 @@
    * Callback for onClick event for widget checkboxes.
    */
   Drupal.ajax_facets.processCheckboxes = function (event) {
-    var $this = $(this);
-    var facetName = $this.data('facet-name');
-    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values like 4.0 to 4, avoid it.
-    var rawFacetName = $this.data('raw-facet-name');
+    var $this = $(this),
+      facetName = $this.data('facet-name'),
+      name_value = facetName + ':' + $this.attr('data-facet-value'),// $.data can round decimal values like 4.0 to 4, avoid it.
+      rawFacetName = $this.data('raw-facet-name');
     // Init history.
     Drupal.ajax_facets.initHistoryState($this);
     // If facets are already defined in queryState.
@@ -329,10 +329,10 @@
    * Callback for onClick event for widget links.
    */
   Drupal.ajax_facets.processLink = function (event) {
-    var $this = $(this);
-    var facetName = $this.data('facet-name');
-    var name_value = facetName + ':' + $this.attr('data-facet-value');// $.data can round decimal values like 4.0 to 4, avoid it.
-    var rawFacetName = $this.data('raw-facet-name');
+    var $this = $(this),
+      facetName = $this.data('facet-name'),
+      name_value = facetName + ':' + $this.attr('data-facet-value'),// $.data can round decimal values like 4.0 to 4, avoid it.
+      rawFacetName = $this.data('raw-facet-name');
     // Init history.
     Drupal.ajax_facets.initHistoryState($this);
     // If facets are already defined in queryState.
@@ -376,7 +376,8 @@
    * Callback for slide event for widget ranges.
    */
   Drupal.ajax_facets.processSlider = function($sliderWrapper, min, max) {
-    var facetName = $sliderWrapper.data('facet-name');
+    var $this = $(this),
+      facetName = $sliderWrapper.data('facet-name');
     // Init history.
     Drupal.ajax_facets.initHistoryState($sliderWrapper);
     // If facets are already defined in queryState.
