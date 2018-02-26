@@ -737,7 +737,7 @@
         // Update the exposed form separately if needed.
         $.each(response.data.views, function(key, view) {
           if (view.exposed_form) {
-            var viewId = view.views_name + '-' + view.views_display_id;
+            var viewId = view.view_name + '-' + view.view_display_id;
             $('#views-exposed-form-' + viewId.replace(/_/g, '-')).replaceWith(view.exposed_form);
           }
         });
