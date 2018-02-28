@@ -36,6 +36,12 @@ function ajax_facets_block_configure($delta = '') {
         '#default_value' => ajax_facets_block_link_text('submit'),
       ];
 
+      $form['ajax_facets_auto_update_facets'] = [
+        '#type' => 'checkbox',
+        '#title' => t('Auto-update available facets and counts after facet select'),
+        '#default_value' => variable_get('ajax_facets_auto_update_facets', 1),
+      ];
+
       break;
   }
 
@@ -50,6 +56,7 @@ function ajax_facets_block_save($delta = '', $edit = []) {
     case 'ajax_facets_block':
       variable_set('ajax_facets_reset_all_link_text', $edit['ajax_facets_reset_all_link_text']);
       variable_set('ajax_facets_submit_all_link_text', $edit['ajax_facets_submit_all_link_text']);
+      variable_set('ajax_facets_auto_update_facets', $edit['ajax_facets_auto_update_facets']);
       // Update the i18n string if need.
       if (function_exists('i18n_string_update')) {
         $name = [
@@ -124,7 +131,7 @@ function ajax_facets_block_view($delta = '') {
 }
 
 /**
- * Returns text for Ajax Facets reset link.
+ * Returns text for Ajax Facets submit & reset links.
  */
 function ajax_facets_block_link_text($type) {
   $text = '';

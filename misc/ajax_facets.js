@@ -52,6 +52,7 @@
           'views': new Array(),
           'f': settings.facetapi.defaultQuery ? settings.facetapi.defaultQuery : []
         };
+
         // We will send original search path to server to get back proper reset links.
         if (settings.facetapi.searchPath) {
           Drupal.ajax_facets.queryState['searchPath'] = settings.facetapi.searchPath;
@@ -434,6 +435,11 @@
 
     // Set or reset current facet.
     Drupal.ajax_facets.current_facet_name = $facet ? $facet.data('raw-facet-name') : undefined;
+
+    // Do not auto update facets and counts if auto update is turned off in block settings.
+    if (!Drupal.settings.ajax_facets.auto_update_facets && !options.searchResultsNeeded && !options.pushStateNeeded) {
+      return;
+    }
 
     // Notify Drupal do we need search results or not.
     data.searchResultsNeeded = options.searchResultsNeeded;
