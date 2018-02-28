@@ -294,9 +294,11 @@
       if ($this.is(':checked')) {
         var addCurrentParam = true;
         for (var index in Drupal.ajax_facets.queryState['f']) {
-          // If we already have this value in queryState.
-          if (Drupal.ajax_facets.queryState['f'][index] == name_value) {
-            addCurrentParam = false;
+          if (Drupal.ajax_facets.queryState['f'].hasOwnProperty(index)) {
+            // If we already have this value in queryState.
+            if (Drupal.ajax_facets.queryState['f'][index] == name_value) {
+              addCurrentParam = false;
+            }
           }
         }
         // Add new value if need.
@@ -311,8 +313,10 @@
       // If we unset filter, remove it from query.
       else {
         for (var index in Drupal.ajax_facets.queryState['f']) {
-          if (Drupal.ajax_facets.queryState['f'][index] != name_value) {
-            queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+          if (Drupal.ajax_facets.queryState['f'].hasOwnProperty(index)) {
+            if (Drupal.ajax_facets.queryState['f'][index] != name_value) {
+              queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+            }
           }
         }
         Drupal.ajax_facets.queryState['f'] = queryNew;
@@ -341,8 +345,10 @@
       /* Handle value - deactivate. */
       if ($this.hasClass('facetapi-active')) {
         for (var index in Drupal.ajax_facets.queryState['f']) {
-          if (Drupal.ajax_facets.queryState['f'][index] !== name_value) {
-            queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+          if (Drupal.ajax_facets.queryState['f'].hasOwnProperty(index)) {
+            if (Drupal.ajax_facets.queryState['f'][index] !== name_value) {
+              queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+            }
           }
         }
         Drupal.ajax_facets.queryState['f'] = queryNew;
@@ -351,8 +357,10 @@
       else if ($this.hasClass('facetapi-inactive')) {
         var addCurrentParam = true;
         for (var index in Drupal.ajax_facets.queryState['f']) {
-          if (Drupal.ajax_facets.queryState['f'][index] === name_value) {
-            addCurrentParam = false;
+          if (Drupal.ajax_facets.queryState['f'].hasOwnProperty(index)) {
+            if (Drupal.ajax_facets.queryState['f'][index] === name_value) {
+              addCurrentParam = false;
+            }
           }
         }
         if (addCurrentParam) {
@@ -400,8 +408,10 @@
     facetName = facetName + ':';
     var queryNew = [];
     for (var index in Drupal.ajax_facets.queryState['f']) {
-      if (Drupal.ajax_facets.queryState['f'][index].substring(0, facetName.length) != facetName) {
-        queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+      if (Drupal.ajax_facets.queryState['f'].hasOwnProperty(index)) {
+        if (Drupal.ajax_facets.queryState['f'][index].substring(0, facetName.length) != facetName) {
+          queryNew[queryNew.length] = Drupal.ajax_facets.queryState['f'][index];
+        }
       }
     }
     Drupal.ajax_facets.queryState['f'] = queryNew;
@@ -536,7 +546,7 @@
     var result = {};
 
     // If we have GET params.
-    if (window.location.href.indexOf('?') != -1) {
+    if (window.location.href.indexOf('?') !== -1) {
       var respectedParameters = window.location.href.split('?')[1].split('&');
 
       // Get all query parameters in array.
@@ -547,7 +557,7 @@
         pair[0] = pair[0].replace(/\[\d*\]/, '');
 
         // We interested only in additional parameters but not in facet parameters.
-        if (pair[0] != 'f') {
+        if (pair[0] !== 'f') {
           if (!result[pair[0]]) {
             result[pair[0]] = [];
             result[pair[0]].push(pair[1]);
@@ -749,16 +759,18 @@
       // As some blocks could be empty in results of filtering - hide them.
       if (response.data.hideBlocks) {
         for (var id in response.data.hideBlocks) {
-          // Search for drupal blocks (id="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
-          var $block = $('#' + response.data.hideBlocks[id]);
-          if ($block.size()) {
-            $block.hide();
-          }
-          // Search for panel panes (class="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
-          else {
-            var $pane = $('.' + response.data.hideBlocks[id]);
-            if ($pane.size()) {
-              $pane.hide();
+          if (response.data.hideBlocks.hasOwnProperty(id)) {
+            // Search for drupal blocks (id="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
+            var $block = $('#' + response.data.hideBlocks[id]);
+            if ($block.size()) {
+              $block.hide();
+            }
+            // Search for panel panes (class="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
+            else {
+              var $pane = $('.' + response.data.hideBlocks[id]);
+              if ($pane.size()) {
+                $pane.hide();
+              }
             }
           }
         }
