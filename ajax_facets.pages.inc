@@ -32,7 +32,7 @@ function ajax_facets_refresh_facets_content() {
     // Attempt to process all the received views.
     foreach ($received_views as $key => $received_view) {
       // Fix 'q' for paging.
-      $view_path = isset($received_view['view_path']) ? rawurldecode($received_view['view_path']) : NULL;
+      $view_path = isset($received_view['view_path'])?rawurldecode($received_view['view_path']) : NULL;
       if (!empty($received_view['view_path'])) {
         $_GET['q'] = $received_view['view_path'];
       }
@@ -50,9 +50,9 @@ function ajax_facets_refresh_facets_content() {
         unset($_GET['searchResultsNeeded']);
       }
       // Reuse dom id.
-      $view->dom_id = isset($received_view['view_dom_id']) ? preg_replace('/[^a-zA-Z0-9_-]+/', '-', $received_view['view_dom_id']) : NULL;
+      $view->dom_id = isset($received_view['view_dom_id'])?preg_replace('/[^a-zA-Z0-9_-]+/', '-', $received_view['view_dom_id']) : NULL;
 
-      $view_args = !empty($received_view['view_args']) ? explode('/', $received_view['view_args']) : [];
+      $view_args = !empty($received_view['view_args'])?explode('/', $received_view['view_args']) : [];
 
       // Prepare data to update certain view.
       $name = $received_view['view_name'];
@@ -69,7 +69,7 @@ function ajax_facets_refresh_facets_content() {
       }
       // Maybe display uses access settings for a default display.
       else if (!isset($view->display[$dis_id]->display_options['access'])
-        && !empty($view->display['default']->display_options['access'])) {
+         && !empty($view->display['default']->display_options['access'])) {
         // And that restriction is not "none".
         if ($view->display['default']->display_options['access']['type'] !== 'none') {
           $is_restricted = TRUE;
@@ -166,8 +166,8 @@ function ajax_facets_refresh_facets_content() {
  */
 function ajax_facets_send_commands($commands, $view = NULL) {
   // Allow other modules to add, change or delete commands.
-  drupal_alter('ajax_facets_data', $commands, $view);
-  drupal_add_http_header('Content-Type', 'application/json; charset=utf-8');
+  backdrop_alter('ajax_facets_data', $commands, $view);
+  backdrop_add_http_header('Content-Type', 'application/json; charset=utf-8');
   print ajax_render($commands);
-  drupal_exit();
+  backdrop_exit();
 }

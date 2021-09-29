@@ -4,7 +4,7 @@
  *  Ajax facets implementation.
  */
 
-require_once __DIR__ . '/includes/ajax_facets.block.inc';
+require_once . '/includes/ajax_facets.block.inc';
 
 /**
  * Implements hook_menu().
@@ -95,6 +95,17 @@ function ajax_facets_facetapi_empty_behaviors() {
 }
 
 /**
+ * Implements hook_config_info().
+ */
+function ajax_facets_config_info() {
+  $prefixes['ajax_facets.settings'] = array(
+    'label' => t('Ajax facet filters settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+/**
  * Add required JS and handle single inclusion.
  */
 function ajax_facets_add_ajax_js($facet) {
@@ -102,19 +113,19 @@ function ajax_facets_add_ajax_js($facet) {
   if (!$included) {
     $included = TRUE;
     $history_js_exists = FALSE;
-    $module_path = drupal_get_path('module', 'ajax_facets');
-    drupal_add_js($module_path . '/misc/ajax_facets.js');
-    drupal_add_js(
+    $module_path = backdrop_get_path('module', 'ajax_facets');
+    backdrop_add_js($module_path . '/misc/ajax_facets.js');
+    backdrop_add_js(
       [
-        'ajax_facets' => [
-          'auto_update_facets' => variable_get('ajax_facets_auto_update_facets', 1)
-        ]
+      'ajax_facets' => [
+        'auto_update_facets' => config_get('ajax_facets.settings', 'ajax_facets_auto_update_facets'),
       ],
+    ],
       [
-        'type' => 'setting'
-      ]
+      'type' => 'setting',
+    ]
     );
-    drupal_add_css($module_path . '/misc/ajax_facets.css');
+    backdrop_add_css($module_path . '/misc/ajax_facets.css');
     $search_path = $facet->getAdapter()->getSearchPath();
     $filter_key = $facet->getAdapter()->getUrlProcessor()->getFilterKey();
     // Note that we add in query only filter params and exclude pages and etc...
@@ -133,7 +144,7 @@ function ajax_facets_add_ajax_js($facet) {
             'view_name' => $views_parts[1],
             'view_display_id' => $views_parts[2],
             // Used to identify viewsDomId in settings.facetapi.
-            'facetapi_view_display_id' => $facetapi_parts[2]
+            'facetapi_view_display_id' => $facetapi_parts[2],
           ];
         }
       }
@@ -145,7 +156,7 @@ function ajax_facets_add_ajax_js($facet) {
 
       if ($history_js_path) {
         $history_js_exists = TRUE;
-        drupal_add_js($history_js_path . '/scripts/bundled/html4+html5/jquery.history.js', ['group' => JS_LIBRARY]);
+        backdrop_add_js($history_js_path . '/scripts/bundled/html4+html5/jquery.history.js', ['group' => JS_LIBRARY]);
       }
     }
 
@@ -159,13 +170,13 @@ function ajax_facets_add_ajax_js($facet) {
       'applyPath' => url($search_path, ['query' => $query]),
       'isHistoryJsExists' => $history_js_exists,
     ];
-    drupal_add_js($setting, 'setting');
-    drupal_add_library('system', 'drupal.ajax');
+    backdrop_add_js($setting, 'setting');
+    backdrop_add_library('system', 'backdrop.ajax');
   }
 }
 
 /**
- * Return Drupal formed url for reset current facet filter.
+ * Return Backdrop formed url for reset current facet filter.
  */
 function ajax_facets_facet_build_reset_path($facet, $adapter) {
   $params = $adapter->getUrlProcessor()->fetchParams();
@@ -197,7 +208,7 @@ function ajax_facets_facet_build_reset_path($facet, $adapter) {
 }
 
 /**
- * Implementation of hook_views_ajax_data_alter()
+ * Implements hook_views_ajax_data_alter().
  */
 function ajax_facets_views_ajax_data_alter(&$commands, $view) {
   // As long as we're on a search api index view
@@ -301,7 +312,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
         }
 
         // Skip currently checked facet - we will not refresh them.
-        $blocks['facet_blocks'][$builds[$group][$facet_name]['#attributes']['id']] = drupal_render($builds[$group][$facet_name]);
+        $blocks['facet_blocks'][$builds[$group][$facet_name]['#attributes']['id']] = backdrop_render($builds[$group][$facet_name]);
       }
       else {
         $facet_name = rawurlencode($facet_name);
@@ -319,7 +330,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
  */
 function ajax_facets_form_facetapi_facet_display_form_alter(&$form, $form_state) {
   // Add JS file for settings form of each facet.
-  drupal_add_js(drupal_get_path('module', 'ajax_facets') . '/misc/ajax_facets.admin.js');
+  backdrop_add_js(backdrop_get_path('module', 'ajax_facets') . '/misc/ajax_facets.admin.js');
 }
 
 /**
@@ -341,7 +352,7 @@ function ajax_facets_views_pre_render(&$view) {
   $setting['facetapi']['view_path'][$name_display] = $view->get_path();
   $setting['facetapi']['view_dom_id'][$name_display] = $view->dom_id;
 
-  drupal_add_js($setting, 'setting');
+  backdrop_add_js($setting, 'setting');
 }
 
 /**
@@ -373,7 +384,7 @@ function ajax_facets_facet_settings_form_submit($form, $form_state) {
           'ajax_facets',
           'facet_label',
           str_replace(':', '_', $form['#facetapi']['facet']['name']),
-          'label'
+          'label',
         ];
         i18n_string_update($name, $values['ajax_select_default_option_label']);
       }
@@ -385,7 +396,7 @@ function ajax_facets_facet_settings_form_submit($form, $form_state) {
           'ajax_facets',
           'reset_link_text',
           str_replace(':', '_', $form['#facetapi']['facet']['name']),
-          'value'
+          'value',
         ];
         i18n_string_update($reset_link_text, $values['reset_link_text']);
       }
@@ -402,7 +413,7 @@ function theme_ajax_facets_select($variables) {
   element_set_attributes($element, ['id', 'name', 'size']);
   _form_set_class($element, ['form-select']);
 
-  return '<select' . drupal_attributes($element['#attributes']) . '>' . ajax_facets_form_select_options($element) . '</select>';
+  return '<select' . backdrop_attributes($element['#attributes']) . '>' . ajax_facets_form_select_options($element) . '</select>';
 }
 
 /**
@@ -441,4 +452,18 @@ function ajax_facets_form_select_options($element, $choices = NULL) {
     }
   }
   return $options;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function ajax_facets_autoload_info() {
+  return array(
+    'FacetapiAjaxWidget' => 'plugins/facetapi/ajax_widget.inc',
+    'FacetapiAjaxWidgetCheckboxes' => 'plugins/facetapi/ajax_widget_checkboxes.inc',
+    'FacetapiAjaxWidgetLinks' => 'plugins/facetapi/ajax_widget_links.inc',
+    'FacetapiAjaxWidgetRanges' => 'plugins/facetapi/ajax_widget_ranges.inc',
+    'FacetapiAjaxWidgetSelect' => 'plugins/facetapi/ajax_widget_select.inc',
+    'FacetapiEmptyBehaviorAjaxFacets' => 'plugins/facetapi/empty_behavior_ajax_facets.inc',
+  );
 }

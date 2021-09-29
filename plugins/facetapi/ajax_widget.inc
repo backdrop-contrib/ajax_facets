@@ -59,9 +59,9 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
           than values of other facets will be changed.
           ',
           [
-            '@empty' => t('Empty facet behavior'),
-            '@d_text' => t('Display ajax_facets wrapper')
-          ]
+        '@empty' => t('Empty facet behavior'),
+        '@d_text' => t('Display ajax_facets wrapper'),
+      ]
         )
         . '<br />'
         . t('More info here !link', ['!link' => l('https://drupal.org/node/2081831', 'https://drupal.org/node/2081831')])
@@ -91,7 +91,7 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
 
       case 'facetapi_ajax_links':
       case 'facetapi_ajax_checkboxes':
-        return str_replace('_', '-', $this->id) . '-' . str_replace($to_replace, '-', $this->key . '-' . drupal_strtolower($value));
+        return str_replace('_', '-', $this->id) . '-' . str_replace($to_replace, '-', $this->key . '-' . backdrop_strtolower($value));
         break;
     }
   }
@@ -116,14 +116,14 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
       '#attributes' => $this->build['#attributes'],
     ];
 
-    // We cannot use drupal_html_id to save the same id for each facet.
+    // We cannot use backdrop_html_id to save the same id for each facet.
     $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
 
     $element = [
       '#markup' => '<div id="' . $wrapper_id . '">'
         . $this->getResetLink()
         . render($item_list)
-        . '</div>'
+        . '</div>',
     ];
 
     ajax_facets_add_ajax_js($this->facet);
@@ -140,11 +140,11 @@ class FacetapiAjaxWidget extends FacetapiWidgetCheckboxLinks {
       if (function_exists('i18n_string_translate')) {
         $text = i18n_string_translate(
           [
-            'ajax_facets',
-            'reset_link_text',
-            str_replace(':', '_', $this->key),
-            'value'
-          ],
+          'ajax_facets',
+          'reset_link_text',
+          str_replace(':', '_', $this->key),
+          'value',
+        ],
           $settings['reset_link_text']
         );
       }

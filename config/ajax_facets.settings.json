@@ -1,0 +1,6 @@
+{
+    "_config_name": "ajax_facets.settings",
+    "ajax_facets_auto_update_facets": "1",
+    "ajax_facets_reset_all_link_text": "dynamic value in file /ajax_facets/includes/ajax_facets.block.inc line 139",
+    "ajax_facets_submit_all_link_text": "dynamic value in file /ajax_facets/includes/ajax_facets.block.inc line 153"
+}

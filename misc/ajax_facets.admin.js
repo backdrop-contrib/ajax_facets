@@ -1,6 +1,6 @@
 (function ($) {
 
-Drupal.behaviors.ajax_facets_admin = {
+Backdrop.behaviors.ajax_facets_admin = {
   attach: function(context, settings) {
     // Ensures ALL "update results" checkboxes boxes are updated.
     // @see http://drupal.org/node/735528

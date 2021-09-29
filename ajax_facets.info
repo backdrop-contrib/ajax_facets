@@ -4,12 +4,7 @@ dependencies[] = facetapi (>=7.x-1.4)
 dependencies[] = search_api
 dependencies[] = views
 package = Search Toolkit
-core = 7.x
+backdrop = 1.x
+type = module
 php = 5.4
 
-files[] = plugins/facetapi/ajax_widget.inc
-files[] = plugins/facetapi/ajax_widget_checkboxes.inc
-files[] = plugins/facetapi/ajax_widget_select.inc
-files[] = plugins/facetapi/ajax_widget_links.inc
-files[] = plugins/facetapi/ajax_widget_ranges.inc
-files[] = plugins/facetapi/empty_behavior_ajax_facets.inc

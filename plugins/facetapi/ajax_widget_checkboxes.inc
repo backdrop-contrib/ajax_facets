@@ -37,7 +37,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
       '#type' => 'select',
       '#title' => t('Soft limit'),
       '#default_value' => $this->settings->settings['soft_limit'],
-      '#options' => [0 => t('No limit')] + drupal_map_assoc([50, 40, 30, 20, 15, 10, 5, 3]),
+      '#options' => [0 => t('No limit')] + backdrop_map_assoc([50, 40, 30, 20, 15, 10, 5, 3]),
       '#description' => t('Limits the number of displayed facets via JavaScript.'),
       '#states' => [
         'visible' => [
@@ -110,7 +110,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
       }
 
       // Show/hide counts according to the settings.
-      if(!empty($this->settings->settings['display_count'])) {
+      if (!empty($this->settings->settings['display_count'])) {
         $item['#markup'] .= ' ' . theme('facetapi_count', (['count' => $item['#count']]));
       }
 
@@ -121,7 +121,7 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         '#title' => $item['#markup'],
         '#attributes' => $attributes,
       ];
-      $row['data'] = drupal_render($checkbox);
+      $row['data'] = backdrop_render($checkbox);
       if ($items_count == 1) {
         $row['class'][] = 'single-leaf';
       }
@@ -130,7 +130,8 @@ class FacetapiAjaxWidgetCheckboxes extends FacetapiAjaxWidget {
         if (!empty($item['#active']) || !empty($this->settings->settings['show_expanded'])) {
           $row['class'][] = 'expanded';
           $row['children'] = $this->buildListItems($item['#item_children']);
-        } else {
+        }
+        else {
           $row['class'][] = 'collapsed';
         }
       }

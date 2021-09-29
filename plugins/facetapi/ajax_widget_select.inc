@@ -91,7 +91,7 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
 
       // Show/hide counts according to the settings.
       if (!empty($this->settings->settings['display_count'])) {
-        $items['values'][$item['#indexed_value']] .= ' ' . theme('facetapi_count',(['count' => $item['#count']]));
+        $items['values'][$item['#indexed_value']] .= ' ' . theme('facetapi_count', (['count' => $item['#count']]));
       }
 
       if (!empty($item['#item_children'])) {
@@ -149,14 +149,14 @@ class FacetapiAjaxWidgetSelect extends FacetapiAjaxWidget {
       $select['#value'] = $items['active_value'];
     }
 
-    // We cannot use drupal_html_id to save the same id for each facet.
+    // We cannot use backdrop_html_id to save the same id for each facet.
     $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
 
     $element = [
       '#markup' => '<div id="' . $wrapper_id . '">'
         . $this->getResetLink()
         . render($select)
-        . '</div>'
+        . '</div>',
     ];
 
     ajax_facets_add_ajax_js($this->facet);

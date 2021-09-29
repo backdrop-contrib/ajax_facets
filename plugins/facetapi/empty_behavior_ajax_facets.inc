@@ -38,16 +38,16 @@ class FacetapiEmptyBehaviorAjaxFacets extends FacetapiEmptyBehavior {
    */
   public function execute() {
     $class1 = str_replace('facetapi_', '', $this->settings['widget']);
-    $class1 = drupal_html_class("facet-wrapper-$class1");
+    $class1 = backdrop_html_class("facet-wrapper-$class1");
 
     // This class should match facet widget build "id" attribute.
     // Explode configName to searcher, realm name and facet name,
     // and create the class the same way as "id" for widget.
     // @see FacetapiWidget::init()
     $facet_widget_build = explode(':', $this->configName, 3);
-    // We shouldn't use drupal_html_id because id shouldn't be changed.
-    $id = drupal_html_class("facetapi-facet-$facet_widget_build[0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}-wrapper");
-    $class2 = drupal_html_class("facetapi-facet-$facet_widget_build[0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}");
+    // We shouldn't use backdrop_html_id because id shouldn't be changed.
+    $id = backdrop_html_class("facetapi-facet-$facet_widget_build [0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}-wrapper");
+    $class2 = backdrop_html_class("facetapi-facet-$facet_widget_build [0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}");
     $wrapper = '<div class="ajax-facets-empty-behavior ' . $class1 . ' ' . $class2 . '" id="' . $id . '"></div>';
     return ['#markup' => $wrapper];
   }

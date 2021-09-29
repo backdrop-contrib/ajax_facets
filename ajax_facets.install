@@ -39,3 +39,27 @@ function ajax_facets_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Migrate ajax_facets variables to config.
+ */
+function ajax_facets_update_1000() {
+  $config = config('ajax_facets.settings');
+  $config->set('ajax_facets_auto_update_facets', update_variable_get('ajax_facets_auto_update_facets', '1'));
+  $config->set('ajax_facets_reset_all_link_text', update_variable_get('ajax_facets_reset_all_link_text', 'dynamic value in file /ajax_facets/includes/ajax_facets.block.inc line 139'));
+  $config->set('ajax_facets_submit_all_link_text', update_variable_get('ajax_facets_submit_all_link_text', 'dynamic value in file /ajax_facets/includes/ajax_facets.block.inc line 153'));
+  $config->save();
+
+  update_variable_del('ajax_facets_auto_update_facets');
+  update_variable_del('ajax_facets_reset_all_link_text');
+  update_variable_del('ajax_facets_submit_all_link_text');
+}
+
+/**
+ * Implements hook_install().
+ */
+function ajax_facets_install() {
+  // Dynamically generated variable data was detected.
+  // /ajax_facets/includes/ajax_facets.block.inc line 139
+  // /ajax_facets/includes/ajax_facets.block.inc line 153
+}

@@ -39,7 +39,7 @@ function ajax_facets_block_configure($delta = '') {
       $form['ajax_facets_auto_update_facets'] = [
         '#type' => 'checkbox',
         '#title' => t('Auto-update available facets and counts after facet select'),
-        '#default_value' => variable_get('ajax_facets_auto_update_facets', 1),
+        '#default_value' => config_get('ajax_facets.settings', 'ajax_facets_auto_update_facets'),
       ];
 
       break;
@@ -54,9 +54,9 @@ function ajax_facets_block_configure($delta = '') {
 function ajax_facets_block_save($delta = '', $edit = []) {
   switch ($delta) {
     case 'ajax_facets_block':
-      variable_set('ajax_facets_reset_all_link_text', $edit['ajax_facets_reset_all_link_text']);
-      variable_set('ajax_facets_submit_all_link_text', $edit['ajax_facets_submit_all_link_text']);
-      variable_set('ajax_facets_auto_update_facets', $edit['ajax_facets_auto_update_facets']);
+      config_set('ajax_facets.settings', 'ajax_facets_reset_all_link_text', $edit['ajax_facets_reset_all_link_text']);
+      config_set('ajax_facets.settings', 'ajax_facets_submit_all_link_text', $edit['ajax_facets_submit_all_link_text']);
+      config_set('ajax_facets.settings', 'ajax_facets_auto_update_facets', $edit['ajax_facets_auto_update_facets']);
       // Update the i18n string if need.
       if (function_exists('i18n_string_update')) {
         $name = [
@@ -92,36 +92,36 @@ function ajax_facets_block_view($delta = '') {
         ajax_facets_block_link_text('reset'),
         current_path(),
         [
-          'attributes' => [
-            'class' => [
-              'ajax-facets-reset-all-link',
-            ],
+        'attributes' => [
+          'class' => [
+            'ajax-facets-reset-all-link',
           ],
-        ]
+        ],
+      ]
       );
 
       $submit_link = l(
         ajax_facets_block_link_text('submit'),
         current_path(),
         [
-          'attributes' => [
-            'class' => [
-              'ajax-facets-submit-all-link',
-            ],
+        'attributes' => [
+          'class' => [
+            'ajax-facets-submit-all-link',
           ],
-        ]
+        ],
+      ]
       );
 
       $block['content'] = [
         '#markup' => theme(
           'item_list',
           [
-            'items' => [
-              $reset_link,
-              $submit_link
-            ]
-          ]
-        )
+          'items' => [
+            $reset_link,
+            $submit_link,
+          ],
+        ]
+        ),
       ];
 
       break;
@@ -134,32 +134,33 @@ function ajax_facets_block_view($delta = '') {
  * Returns text for Ajax Facets submit & reset links.
  */
 function ajax_facets_block_link_text($type) {
+  $config = config('ajax_facets.settings');
   $text = '';
   if ($type == 'reset') {
-    $text = variable_get('ajax_facets_reset_all_link_text', t('Reset all facets'));
+    $text = $config->get('ajax_facets_reset_all_link_text');
     if (function_exists('i18n_string_translate')) {
       $text = i18n_string_translate(
         [
-          'ajax_facets',
-          'ajax_facets_block',
-          'facet_reset_all_link_text',
-          'text'
-        ],
+        'ajax_facets',
+        'ajax_facets_block',
+        'facet_reset_all_link_text',
+        'text',
+      ],
         $text
       );
     }
   }
   elseif ($type == 'submit') {
-    $text = variable_get('ajax_facets_submit_all_link_text', t('Submit all facets'));
+    $text = $config->get('ajax_facets_submit_all_link_text');
 
     if (function_exists('i18n_string_translate')) {
       $text = i18n_string_translate(
         [
-          'ajax_facets',
-          'ajax_facets_submit_block',
-          'facet_submit_all_link_text',
-          'text',
-        ],
+        'ajax_facets',
+        'ajax_facets_submit_block',
+        'facet_submit_all_link_text',
+        'text',
+      ],
         $text
       );
     }
@@ -191,7 +192,7 @@ function ajax_facets_preprocess_panels_pane(&$variables) {
       // Add BEM style class to facet block.
       // This class is using to show hidden facet block.
       $variables['classes_array'][] = 'block--ajax_facets';
-      // We set class but not ID, because drupal blocks have such ID by default,
+      // We set class but not ID, because backdrop blocks have such ID by default,
       // but panes can have other ID and it can be a cause of potential problems.
       $variables['classes_array'][] = strtolower("block-{$variables['pane']->subtype}");
     }

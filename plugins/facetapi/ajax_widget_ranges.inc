@@ -95,27 +95,27 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
       }
 
       // @todo move it into the other place?
-      drupal_add_library('system', 'ui.slider');
+      backdrop_add_library('system', 'ui.slider');
 
       $min_input = theme(
         'ajax_facets_ranges_input',
         [
-          'title' => t('From:'),
-          'attributes' => ['class' => 'ajax-facets-slider-amount-min'],
-          'value' => $slider_attrs['data-min-val'],
-        ]
+        'title' => t('From:'),
+        'attributes' => ['class' => 'ajax-facets-slider-amount-min'],
+        'value' => $slider_attrs['data-min-val'],
+      ]
       );
 
       $max_input = theme(
         'ajax_facets_ranges_input',
         [
-          'title' => t('To:'),
-          'attributes' => ['class' => 'ajax-facets-slider-amount-max'],
-          'value' => $slider_attrs['data-max-val'],
-        ]
+        'title' => t('To:'),
+        'attributes' => ['class' => 'ajax-facets-slider-amount-max'],
+        'value' => $slider_attrs['data-max-val'],
+      ]
       );
 
-      // We cannot use drupal_html_id to save the same id for each facet.
+      // We cannot use backdrop_html_id to save the same id for each facet.
       $wrapper_id = $this->build['#attributes']['id'] . '-wrapper';
 
       $element = [
@@ -124,9 +124,9 @@ class FacetapiAjaxWidgetRanges extends FacetapiAjaxWidget {
           . '<div class="ajax-facets-controls-wrapper">'
           . $min_input
           . $max_input
-          . '<div ' . drupal_attributes($slider_attrs) . '></div>'
+          . '<div ' . backdrop_attributes($slider_attrs) . '></div>'
           . '</div>'
-          . '</div>'
+          . '</div>',
       ];
 
       ajax_facets_add_ajax_js($this->facet);
