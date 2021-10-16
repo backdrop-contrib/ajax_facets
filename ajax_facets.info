@@ -1,10 +1,10 @@
+type = module
 name = Ajax facet filters
 description = Ajax facet filters.
-dependencies[] = facetapi (>=7.x-1.4)
-dependencies[] = search_api
-dependencies[] = views
 package = Search Toolkit
 backdrop = 1.x
-type = module
 php = 5.4
 
+dependencies[] = facetapi (>=1.x-1.0)
+dependencies[] = search_api
+dependencies[] = views

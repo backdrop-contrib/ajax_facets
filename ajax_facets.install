@@ -1,5 +1,5 @@
-<?php
 
+<?php
 /**
  * @file
  * ajax_facets.install file.
@@ -9,13 +9,13 @@
  * Implements hook_requirements().
  */
 function ajax_facets_requirements($phase) {
-  $requirements = [];
+  $requirements = array();
   $t = get_t();
 
   switch ($phase) {
     case 'runtime':
-      $description = $t('For now browser ajax history feature works only in HTML5 browsers. If you want to get this feature on HTML4 browsers you need to install libraries module and download history.js library.');
-      $value = $t('Libraries module not installed.');
+      $description = $t('For now, browser ajax history feature works only in HTML5 browsers. If you want to get this feature on HTML4 browsers you need to install libraries module and download history.js library.');
+      $value = $t('Browser ajax history feature works only in HTML5 browsers.');
 
       if (module_exists('libraries')) {
         if (!libraries_get_path('history.js')) {
@@ -28,12 +28,12 @@ function ajax_facets_requirements($phase) {
         }
       }
 
-      $requirements['ajax_facets_message'] = [
+      $requirements['ajax_facets_message'] = array(
         'title' => $t('Ajax Facets'),
         'description' => $description,
         'value' => $value,
         'severity' => REQUIREMENT_INFO,
-      ];
+      );
       break;
   }
 
@@ -53,13 +53,4 @@ function ajax_facets_update_1000() {
   update_variable_del('ajax_facets_auto_update_facets');
   update_variable_del('ajax_facets_reset_all_link_text');
   update_variable_del('ajax_facets_submit_all_link_text');
-}
-
-/**
- * Implements hook_install().
- */
-function ajax_facets_install() {
-  // Dynamically generated variable data was detected.
-  // /ajax_facets/includes/ajax_facets.block.inc line 139
-  // /ajax_facets/includes/ajax_facets.block.inc line 153
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * User page callbacks for the ajax_facets module.
@@ -21,13 +20,13 @@ function ajax_facets_refresh_facets_content() {
     $total_results = 0;
     $facet_query = !empty($_GET['f']) ? $_GET['f'] : '';
     $received_views = $_GET['views'];
-    $processed_views = [];
-    $views_settings = [
-      'views' => [
-        'ajax_path' => url('views/ajax', ['query' => ['f' => $facet_query]]),
-        'ajaxViews' => [],
-      ],
-    ];
+    $processed_views = array();
+    $views_settings = array(
+      'views' => array(
+        'ajax_path' => url('views/ajax', array('query' => array('f' => $facet_query))),
+        'ajaxViews' => array(),
+      ),
+    );
 
     // Attempt to process all the received views.
     foreach ($received_views as $key => $received_view) {
@@ -82,12 +81,12 @@ function ajax_facets_refresh_facets_content() {
       if ($is_restricted) {
         // Check that we have an access to this display.
         if ($view->access($dis_id)) {
-          $processed_views[$key] = [
+          $processed_views[$key] = array(
             'view_name' => $name,
             'view_display_id' => $dis_id,
             'view_dom_id' => $view->dom_id,
             'content' => $view->preview($dis_id, $view_args),
-          ];
+          );
           $access = TRUE;
         }
       }
@@ -96,22 +95,22 @@ function ajax_facets_refresh_facets_content() {
       // To do not let abuse this functionality.
       // We can process only that views which have access settings.
       if (!$access) {
-        $commands = [
+        $commands = array(
           ajax_command_alert(
             t('Search results cannot be filtered, please contact site administrator.')
           ),
-        ];
-        watchdog('access denied', 'Search results cannot be filtered for view - "%view_name", display - "%display_id"', [
+        );
+        watchdog('access denied', 'Search results cannot be filtered for view - "%view_name", display - "%display_id"', array(
           '%view_name' => $name,
           '%display_id' => $dis_id,
-        ], WATCHDOG_WARNING);
+        ), WATCHDOG_WARNING);
         ajax_facets_send_commands($commands);
       }
 
       // @see template_preprocess_views_view();
       // Update settings when view will be reloaded. Specifically $view->dom_id.
       if ($view->use_ajax) {
-        $views_settings['views']['ajaxViews']['views_dom_id:' . $view->dom_id] = [
+        $views_settings['views']['ajaxViews']['views_dom_id:' . $view->dom_id] = array(
           'view_name' => $view->name,
           'view_display_id' => $view->current_display,
           'view_args' => check_plain(implode('/', $view->args)),
@@ -122,7 +121,7 @@ function ajax_facets_refresh_facets_content() {
           // To fit multiple views on a page, the programmer may have
           // overridden the display's pager_element.
           'pager_element' => isset($view->query->pager) ? $view->query->pager->get_pager_id() : 0,
-        ];
+        );
       }
 
       // Render exposed form separately if needed.
@@ -140,22 +139,22 @@ function ajax_facets_refresh_facets_content() {
     $searcher = 'search_api@' . $_GET['index_id'];
     $blocks = ajax_facets_process_facet_blocks($searcher);
 
-    $result = [
+    $result = array(
       'resetUrls' => $blocks['reset_urls'],
       'newContent' => $blocks['facet_blocks'],
       'hideBlocks' => $blocks['hide_blocks'],
       'activeItems' => $blocks['active_items'],
       'views' => $processed_views,
       'facets' => $facet_query,
-      'settings' => !empty($views_settings['views']['ajaxViews']) ? $views_settings : [],
+      'settings' => !empty($views_settings['views']['ajaxViews']) ? $views_settings : array(),
       'total_results' => $total_results,
-    ];
+    );
 
-    $commands = [];
-    $commands[] = [
+    $commands = array();
+    $commands[] = array(
       'command' => 'ajax_facets_update_content',
       'data' => $result,
-    ];
+    );
 
     ajax_facets_send_commands($commands, $view);
   }

@@ -163,7 +163,7 @@ function ajax_facets_add_ajax_js($facet) {
       'index_id' => $facet['map options']['index id'],
       'views' => $processable_views,
       'facet_field' => $facet['map options']['field']['key'],
-      'applyPath' => url($search_path, array('query' => $query),
+      'applyPath' => url($search_path, array('query' => $query)),
       'isHistoryJsExists' => $history_js_exists,
     );
     backdrop_add_js($setting, 'setting');
@@ -192,7 +192,7 @@ function ajax_facets_facet_build_reset_path($facet, $adapter) {
       $url_params = array('query' => array($filter_key => $clean_params));
     }
 
-    $unset_keys = array('searchPath', 'q', 'page', $filter_key];
+    $unset_keys = array('searchPath', 'q', 'page', $filter_key);
     // Remove default params from redirect.
     foreach ($params as $key => $value) {
       if (!in_array($key, $unset_keys)) {
@@ -274,7 +274,7 @@ function ajax_facets_process_facet_blocks($searcher, $realm_name = 'block') {
     'hide_blocks' => array(),
     'reset_urls' => array(),
     'active_items' => array(),
-  ];
+  );
 
   $group = $searcher . ':' . $realm_name;
   $realm = facetapi_realm_load($realm_name);
