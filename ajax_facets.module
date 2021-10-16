@@ -231,9 +231,7 @@ function ajax_facets_views_ajax_data_alter(&$commands, $view) {
     if ($facet_query) {
       $settings = array(
         'views' => array(
-          'ajax_path' => url('views/ajax',
-            array('query' => array('f' => $facet_query)),
-          ),
+          'ajax_path' => url('views/ajax', array('query' => array('f' => $facet_query))),
         ),
       );
       // We need to put this at the head of the commands so that it runs before
