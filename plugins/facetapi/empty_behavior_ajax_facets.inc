@@ -46,8 +46,8 @@ class FacetapiEmptyBehaviorAjaxFacets extends FacetapiEmptyBehavior {
     // @see FacetapiWidget::init()
     $facet_widget_build = explode(':', $this->configName, 3);
     // We shouldn't use backdrop_html_id because id shouldn't be changed.
-    $id = backdrop_html_class("facetapi-facet-$facet_widget_build [0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}-wrapper");
-    $class2 = backdrop_html_class("facetapi-facet-$facet_widget_build [0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}");
+    $id = backdrop_html_class("facetapi-facet-$facet_widget_build[0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}-wrapper");
+    $class2 = backdrop_html_class("facetapi-facet-$facet_widget_build[0]-{$facet_widget_build[1]}-{$facet_widget_build[2]}");
     $wrapper = '<div class="ajax-facets-empty-behavior ' . $class1 . ' ' . $class2 . '" id="' . $id . '"></div>';
     return ['#markup' => $wrapper];
   }
