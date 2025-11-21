@@ -731,11 +731,11 @@
       if (response.data.newContent) {
         for (var id in response.data.newContent) {
           var $blockToReplace = $('#' + id + '-wrapper');
-          if ($blockToReplace.size()) {
+          if ($blockToReplace.length) {
             $blockToReplace.replaceWith(response.data.newContent[id]);
           }
           var $block = $('#' + id + '-wrapper').parents('div.block--ajax_facets:not(:visible)');
-          if ($block.size()) {
+          if ($block.length) {
             $block.show();
           }
         }
@@ -768,13 +768,13 @@
           if (response.data.hideBlocks.hasOwnProperty(id)) {
             // Search for backdrop blocks (id="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
             var $block = $('#' + response.data.hideBlocks[id]);
-            if ($block.size()) {
+            if ($block.length) {
               $block.hide();
             }
             // Search for panel panes (class="block-facetapi-xcogxrrjodjldoogufmypf7sc4rpofuk").
             else {
               var $pane = $('.' + response.data.hideBlocks[id]);
-              if ($pane.size()) {
+              if ($pane.length) {
                 $pane.hide();
               }
             }
