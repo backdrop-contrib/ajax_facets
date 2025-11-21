@@ -46,8 +46,8 @@ function ajax_facets_requirements($phase) {
 function ajax_facets_update_1000() {
   $config = config('ajax_facets.settings');
   $config->set('ajax_facets_auto_update_facets', update_variable_get('ajax_facets_auto_update_facets', '1'));
-  $config->set('ajax_facets_reset_all_link_text', update_variable_get('ajax_facets_reset_all_link_text', 'dynamic value in file /ajax_facets/includes/ajax_facets.block.inc line 139'));
-  $config->set('ajax_facets_submit_all_link_text', update_variable_get('ajax_facets_submit_all_link_text', 'dynamic value in file /ajax_facets/includes/ajax_facets.block.inc line 153'));
+  $config->set('ajax_facets_reset_all_link_text', update_variable_get('ajax_facets_reset_all_link_text', 'Reset all facets'));
+  $config->set('ajax_facets_submit_all_link_text', update_variable_get('ajax_facets_submit_all_link_text', 'Submit all facets'));
   $config->save();
 
   update_variable_del('ajax_facets_auto_update_facets');
